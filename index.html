@@ -185,21 +185,45 @@
         }
 
         .spell-header {
-            display: grid; grid-template-columns: 1fr 3fr; gap: 10px;
+            display: grid; grid-template-columns: 1.5fr 3.5fr; gap: 15px;
             border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px;
         }
 
-        .spell-slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; font-size: 0.8rem; }
+        /* Spell Stats 2x2 Grid */
+        .spell-stats-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+        .spell-stat-item {
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .spell-slots-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px 5px; 
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
         
         .diamond-check {
             appearance: none; width: 12px; height: 12px; border: 1px solid black; transform: rotate(45deg);
-            margin: 2px; cursor: pointer; display: inline-block; vertical-align: middle;
+            margin: 2px 3px; cursor: pointer; display: inline-block; vertical-align: middle;
         }
         .diamond-check:checked { background: black; }
 
         /* Bio Column */
         .bio-col { display: flex; flex-direction: column; gap: 15px; height: 100%; }
-        .coins { display: flex; gap: 5px; justify-content: space-around; border: 2px solid var(--border-color); padding: 5px; border-radius: 10px;}
+        
+        .coins-container {
+            border: 2px solid var(--border-color); padding: 5px; border-radius: 10px;
+            display: flex; flex-direction: column;
+        }
+        .coins { display: flex; gap: 5px; justify-content: space-around; }
         .coin-slot input { width: 40px; text-align: center; }
 
         @media screen and (max-width: 768px) {
@@ -412,23 +436,37 @@
         <div class="spell-grid-layout">
             <div>
                 <div class="spell-header">
-                    <div>
-                        <div class="ability-box" style="margin-bottom: 5px;"><span class="label-sm">Spell Ability</span><input type="text" id="spell-ability"></div>
-                        <div class="ability-box" style="margin-bottom: 5px;"><span class="label-sm">Save DC</span><input type="text" id="spell-save-dc"></div>
-                        <div class="ability-box"><span class="label-sm">Atk Bonus</span><input type="text" id="spell-atk"></div>
+                    <div class="panel">
+                        <span class="box-title" style="margin-bottom: 10px; display:block;">Spellcasting</span>
+                        <div class="spell-stats-box">
+                            <div class="spell-stat-item">
+                                <span class="label-sm">Ability</span>
+                                <input type="text" id="spell-ability" style="text-align:center;">
+                            </div>
+                            <div class="spell-stat-item">
+                                <span class="label-sm">Modifier</span>
+                                <input type="text" id="spell-mod" style="text-align:center;">
+                            </div>
+                            <div class="spell-stat-item">
+                                <span class="label-sm">Save DC</span>
+                                <input type="text" id="spell-save-dc" style="text-align:center;">
+                            </div>
+                            <div class="spell-stat-item">
+                                <span class="label-sm">Atk Bonus</span>
+                                <input type="text" id="spell-atk" style="text-align:center;">
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="panel">
                         <span class="box-title">Spell Slots</span>
                         <div class="spell-slots-grid">
                             <script>
+                                const slotCounts = [0, 4, 3, 3, 3, 3, 2, 2, 1, 1];
                                 for(let i=1; i<=9; i++) {
                                     document.write(`<div>${i}${i===1?'st':i===2?'nd':i===3?'rd':'th'} `);
-                                    // 4 slots for low levels, tapering off for high levels visually
-                                    let count = (i==1)?4:(i<4)?3:(i<6)?2:(i<8)?1:1;
-                                    for(let j=0; j<4; j++) {
-                                        // Print 4 checkboxes but hide visual clutter for high levels if desired, 
-                                        // or just leave 4 generic slots for all levels. keeping it simple:
+                                    let count = slotCounts[i];
+                                    for(let j=0; j<count; j++) {
                                         document.write(`<input type="checkbox" class="diamond-check" id="slot-${i}-${j}">`);
                                     }
                                     document.write(`</div>`);
@@ -473,12 +511,15 @@
                     <textarea id="equipment" style="height: 100%; border:none;"></textarea>
                 </div>
                 
-                <div class="coins">
-                    <div class="coin-slot"><span class="label-sm">CP</span><input type="number" id="cp"></div>
-                    <div class="coin-slot"><span class="label-sm">SP</span><input type="number" id="sp"></div>
-                    <div class="coin-slot"><span class="label-sm">EP</span><input type="number" id="ep"></div>
-                    <div class="coin-slot"><span class="label-sm">GP</span><input type="number" id="gp"></div>
-                    <div class="coin-slot"><span class="label-sm">PP</span><input type="number" id="pp"></div>
+                <div class="coins-container">
+                    <span class="box-title">COINS</span>
+                    <div class="coins">
+                        <div class="coin-slot"><span class="label-sm">CP</span><input type="number" id="cp"></div>
+                        <div class="coin-slot"><span class="label-sm">SP</span><input type="number" id="sp"></div>
+                        <div class="coin-slot"><span class="label-sm">EP</span><input type="number" id="ep"></div>
+                        <div class="coin-slot"><span class="label-sm">GP</span><input type="number" id="gp"></div>
+                        <div class="coin-slot"><span class="label-sm">PP</span><input type="number" id="pp"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -486,18 +527,15 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Populate Rows
             for(let i=0; i<5; i++) addWeaponRow();
             for(let i=0; i<15; i++) addSpellRow();
             
-            // Listeners
             const allInputs = document.querySelectorAll('input, textarea');
             allInputs.forEach(input => {
                 input.addEventListener('input', debounce(autoSave, 1000));
                 input.addEventListener('change', autoSave);
             });
 
-            // Load Data
             loadData();
             updateVersionDropdown();
             
@@ -506,7 +544,6 @@
             }
         });
 
-        // --- UI Helpers ---
         function addWeaponRow() {
             const tbody = document.getElementById('weapons-body');
             const tr = document.createElement('tr');
@@ -530,7 +567,6 @@
             tr.querySelectorAll('input').forEach(i => i.addEventListener('input', debounce(autoSave, 1000)));
         }
 
-        // --- Data Handling ---
         function collectData() {
             const data = {};
             document.querySelectorAll('input[id], textarea[id]').forEach(el => {
@@ -549,7 +585,6 @@
                 data['spells'].push([i[0].value, i[1].value, i[2].checked, i[3].checked, i[4].checked]);
             });
             
-            // Grab dynamically generated slots
             data['spellSlots'] = {};
             document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => {
                 data['spellSlots'][cb.id] = cb.checked;
@@ -561,7 +596,7 @@
         function populateData(data) {
             if(!data) return;
             for (const [key, value] of Object.entries(data)) {
-                if(key === 'spellSlots') continue; // Handle separately
+                if(key === 'spellSlots') continue;
                 const el = document.getElementById(key);
                 if (el) {
                     if(el.type === 'checkbox') el.checked = value;
@@ -584,7 +619,6 @@
             }
         }
 
-        // --- Storage ---
         function autoSave() {
             localStorage.setItem('dnd_current_sheet', JSON.stringify(collectData()));
             document.getElementById('status').innerText = 'Saved ' + new Date().toLocaleTimeString();
