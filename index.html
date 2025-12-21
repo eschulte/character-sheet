@@ -50,21 +50,27 @@
             border: 1px solid #777;
         }
 
-        /* --- Single Continuous Sheet --- */
+        /* --- Print Styles --- */
+        @media print {
+            #app-controls { display: none !important; }
+            body { background: white; padding: 0; display: block; }
+            .sheet-container { width: 100%; max-width: 100%; box-shadow: none; padding: 0; margin: 0; }
+            textarea { border: 1px solid #ccc; }
+        }
+
+        /* --- Sheet Layout --- */
         .sheet-container {
             background-color: var(--bg-color);
             width: 100%;
-            max-width: 900px;
-            /* No fixed height, grows with content */
+            max-width: 950px;
             padding: 40px;
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
-            gap: 30px; /* Space between the "old page 1" and "old page 2" content */
-            margin-top: 40px; /* Offset for fixed header */
+            gap: 20px;
+            margin-top: 40px;
         }
 
-        /* Input Styling */
         input[type="text"], input[type="number"], textarea {
             background: transparent;
             border: none;
@@ -78,7 +84,7 @@
         textarea { resize: vertical; border: 1px solid var(--faint-line); padding: 5px; }
         .label-sm { font-size: 0.7rem; text-transform: uppercase; color: #666; font-family: sans-serif; display: block; margin-top: 2px;}
 
-        /* --- Header Section --- */
+        /* --- Header --- */
         .main-header {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -86,21 +92,16 @@
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 20px;
         }
-        .header-section { display: flex; flex-direction: column; }
-        
-        /* --- Main Grid Layout --- */
+        .header-section { display: flex; flex-direction: column; justify-content: flex-end; }
+
+        /* --- Main Grid --- */
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 2.5fr; 
+            grid-template-columns: 1fr 2.6fr; 
             gap: 25px;
         }
 
-        /* Stats Column */
-        .stats-col {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        .stats-col { display: flex; flex-direction: column; gap: 15px; }
 
         .ability-box {
             border: 2px solid var(--border-color);
@@ -113,7 +114,6 @@
         .ability-score { font-size: 1.5rem; font-weight: bold; width: 50px; margin: 0 auto; display: block; text-align: center; border: 1px solid #ccc; border-radius: 5px; }
         .ability-mod { font-size: 2rem; font-weight: bold; border: none; text-align: center;}
         
-        /* Skills Area */
         .skills-list {
             font-size: 0.85rem;
             text-align: left;
@@ -122,107 +122,91 @@
         }
         
         .skill-row { 
-            display: flex; 
-            align-items: center; 
-            gap: 5px; 
-            margin-bottom: 5px; 
-            border-bottom: 1px solid #eee;
+            display: flex; align-items: center; gap: 5px; margin-bottom: 5px; border-bottom: 1px solid #eee;
         }
         
         .prof-bubble { 
-            width: 12px; height: 12px; 
-            border: 1px solid black; border-radius: 50%; 
+            width: 12px; height: 12px; border: 1px solid black; border-radius: 50%; 
             appearance: none; cursor: pointer; flex-shrink: 0;
         }
         .prof-bubble:checked { background: black; }
         
         .save-val-input {
-            width: 25px !important;
-            text-align: center;
-            font-size: 0.8rem;
-            margin-right: 5px;
-            border-bottom: 1px solid #999 !important;
+            width: 25px !important; text-align: center; font-size: 0.8rem; margin-right: 5px; border-bottom: 1px solid #999 !important;
         }
 
-        /* Combat Header */
-        .combat-header {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
+        /* Combat Area */
+        .combat-row-1 {
+            display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;
         }
+        .combat-row-2 {
+            display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 20px;
+        }
+
         .shield-box {
             border: 2px double var(--border-color);
-            padding: 10px;
-            text-align: center;
+            padding: 5px; text-align: center;
             border-radius: 5px 5px 50% 50%;
+            display: flex; flex-direction: column; justify-content: center;
         }
-        .box-title { font-family: sans-serif; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .rect-box {
+            border: 2px double var(--border-color);
+            padding: 5px; border-radius: 5px;
+            display: flex; flex-direction: column;
+        }
 
-        /* Tables & Lists */
-        .weapons-table, .spells-list-table {
-            width: 100%; border-collapse: collapse; margin-bottom: 10px;
-        }
+        .box-title { font-family: sans-serif; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 5px;}
+
+        /* Death Saves */
+        .death-save-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; }
+        .ds-bubbles { display: flex; gap: 5px; }
+
+        /* Tables */
+        .weapons-table, .spells-list-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
         .weapons-table th, .spells-list-table th { text-align: left; border-bottom: 2px solid var(--border-color); font-size: 0.8rem; }
         .weapons-table td, .spells-list-table td { border-bottom: 1px solid var(--faint-line); padding: 5px 0; }
 
-        /* Expanded Boxes */
-        .feature-box {
-            border: 2px solid var(--border-color);
-            border-radius: 5px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Bottom Grid (Traits/Feats) */
+        /* Bottom Sections */
         .bottom-sections {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;
         }
-        .tall-box { height: 250px; } /* Increased height */
+        .tall-box { height: 200px; display: flex; flex-direction: column;}
+        .panel { border: 2px solid var(--border-color); border-radius: 5px; padding: 10px; }
 
-        /* Second Half (Spells/Bio) */
+        /* Proficiencies Box */
+        .prof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem; margin-bottom: 10px; }
+        .prof-check-row { display: flex; gap: 10px; align-items: center; }
+
+        /* Spell Page */
         .spell-grid-layout {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-            border-top: 3px double var(--border-color); /* Visual separator */
-            padding-top: 20px;
+            display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-top: 20px;
+            border-top: 3px double var(--border-color); padding-top: 20px;
         }
 
         .spell-header {
-            display: grid;
-            grid-template-columns: 1fr 3fr;
-            gap: 10px;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            display: grid; grid-template-columns: 1fr 3fr; gap: 10px;
+            border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px;
         }
 
+        .spell-slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; font-size: 0.8rem; }
+        
         .diamond-check {
-            appearance: none; width: 12px; height: 12px;
-            border: 1px solid black; transform: rotate(45deg);
-            margin: 5px; cursor: pointer; display: inline-block;
+            appearance: none; width: 12px; height: 12px; border: 1px solid black; transform: rotate(45deg);
+            margin: 2px; cursor: pointer; display: inline-block; vertical-align: middle;
         }
         .diamond-check:checked { background: black; }
 
-        .bio-col { display: flex; flex-direction: column; gap: 20px; height: 100%; }
-        
-        .panel { border: 2px solid var(--border-color); border-radius: 5px; padding: 10px; display: flex; flex-direction: column; }
-
-        /* Coins */
+        /* Bio Column */
+        .bio-col { display: flex; flex-direction: column; gap: 15px; height: 100%; }
         .coins { display: flex; gap: 5px; justify-content: space-around; border: 2px solid var(--border-color); padding: 5px; border-radius: 10px;}
-        .coin-slot { text-align: center; }
         .coin-slot input { width: 40px; text-align: center; }
 
         @media screen and (max-width: 768px) {
-            .main-grid, .spell-grid-layout, .main-header, .combat-header, .spell-header, .bottom-sections { display: flex; flex-direction: column; }
+            .main-grid, .spell-grid-layout, .main-header, .combat-row-1, .combat-row-2, .spell-header, .bottom-sections, .prof-grid { display: flex; flex-direction: column; }
             #app-controls { position: relative; }
             body { padding: 0; }
+            .sheet-container { margin-top: 0; padding: 10px; }
         }
     </style>
 </head>
@@ -235,6 +219,7 @@
             <option value="">Load Version...</option>
         </select>
         <button onclick="resetSheet()" style="background: #800;">Reset</button>
+        <button onclick="window.print()" style="background: #005f80;">Print</button>
         <span id="status" style="font-size: 0.8rem; color: #aaa; margin-left: auto;">Auto-saving...</span>
     </div>
 
@@ -244,6 +229,8 @@
             <div class="header-section">
                 <input type="text" id="charName" placeholder="Character Name" style="font-size: 1.5rem; font-weight: bold;">
                 <span class="label-sm">Character Name</span>
+                <input type="text" id="species" placeholder="Species" style="margin-top: 5px;">
+                <span class="label-sm">Species</span>
             </div>
             <div class="header-section">
                 <input type="text" id="class">
@@ -268,7 +255,7 @@
         <div class="main-grid">
             <div class="stats-col">
                 <div class="ability-box">
-                    <span class="box-title">Proficiency Bonus</span>
+                    <span class="box-title">Prof. Bonus</span>
                     <input type="text" id="prof-bonus" style="font-size: 1.5rem; text-align: center; border:none;">
                 </div>
 
@@ -276,7 +263,7 @@
                     const abilityData = {
                         "Strength": ["Athletics"],
                         "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"],
-                        "Constitution": [], // Usually just save
+                        "Constitution": [], 
                         "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"],
                         "Wisdom": ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"],
                         "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"]
@@ -284,7 +271,6 @@
 
                     for (const [stat, skills] of Object.entries(abilityData)) {
                         const lowStat = stat.toLowerCase();
-                        
                         let skillsHtml = '';
                         skills.forEach(skill => {
                             const skillId = skill.replace(/\s+/g, '-').toLowerCase();
@@ -295,7 +281,6 @@
                                 <span>${skill}</span>
                             </div>`;
                         });
-
                         document.write(`
                         <div class="ability-box">
                             <span class="box-title">${stat}</span>
@@ -305,7 +290,6 @@
                                 <input type="number" id="${lowStat}-score" class="ability-score" placeholder="10">
                                 <span class="label-sm">Score</span>
                             </div>
-                            
                             <div class="skills-list">
                                 <div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;">
                                     <input type="number" class="save-val-input" id="save-val-${lowStat}" placeholder="0">
@@ -321,7 +305,7 @@
             </div>
 
             <div class="main-col">
-                <div class="combat-header">
+                <div class="combat-row-1">
                     <div class="shield-box">
                         <span class="box-title">Initiative</span>
                         <input type="text" id="initiative" style="text-align: center; font-size: 1.5rem;">
@@ -330,11 +314,48 @@
                         <span class="box-title">Speed</span>
                         <input type="text" id="speed" style="text-align: center; font-size: 1.5rem;">
                     </div>
-                    <div class="shield-box" style="grid-column: span 2; border-radius: 5px;">
+                    <div class="shield-box">
+                        <span class="box-title">Size</span>
+                        <input type="text" id="size" style="text-align: center; font-size: 1.5rem;">
+                    </div>
+                    <div class="shield-box">
+                        <span class="box-title">Passive Perc.</span>
+                        <input type="text" id="pass-perc" style="text-align: center; font-size: 1.5rem;">
+                    </div>
+                </div>
+
+                <div class="combat-row-2">
+                    <div class="rect-box">
                         <span class="box-title">Hit Points</span>
-                        <div style="display: flex; gap: 5px;">
-                            <div style="flex:1"><input type="text" id="hp-curr" placeholder="Current"></div>
-                            <div style="flex:1"><input type="text" id="hp-max" placeholder="Max"></div>
+                        <div style="display: flex; gap: 10px; height: 100%;">
+                            <div style="flex:1; text-align: center;">
+                                <input type="number" id="hp-max" placeholder="Max" style="text-align:center;">
+                                <span class="label-sm">Max</span>
+                            </div>
+                            <div style="flex:1; text-align: center;">
+                                <input type="number" id="hp-curr" placeholder="Current" style="text-align:center; font-size: 1.2rem; font-weight: bold;">
+                                <span class="label-sm">Current</span>
+                            </div>
+                            <div style="flex:1; text-align: center;">
+                                <input type="number" id="hp-temp" placeholder="Temp" style="text-align:center;">
+                                <span class="label-sm">Temp</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rect-box">
+                        <span class="box-title">Death Saves</span>
+                        <div class="death-save-row">
+                            <span>Successes</span>
+                            <div class="ds-bubbles">
+                                <input type="checkbox" class="prof-bubble" id="ds-s-1"><input type="checkbox" class="prof-bubble" id="ds-s-2"><input type="checkbox" class="prof-bubble" id="ds-s-3">
+                            </div>
+                        </div>
+                        <div class="death-save-row">
+                            <span>Failures</span>
+                            <div class="ds-bubbles">
+                                <input type="checkbox" class="prof-bubble" id="ds-f-1"><input type="checkbox" class="prof-bubble" id="ds-f-2"><input type="checkbox" class="prof-bubble" id="ds-f-3">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -342,22 +363,14 @@
                 <div class="panel">
                     <span class="box-title">Weapons & Damage Cantrips</span>
                     <table class="weapons-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Atk Bonus / DC</th>
-                                <th>Damage & Type</th>
-                                <th>Notes</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Name</th><th>Atk/DC</th><th>Damage</th><th>Notes</th></tr></thead>
                         <tbody id="weapons-body"></tbody>
                     </table>
                     <button onclick="addWeaponRow()" style="width: 100%;">+</button>
                 </div>
 
                 <br>
-
-                <div class="feature-box" style="height: 300px;">
+                <div class="panel" style="min-height: 200px;">
                     <span class="box-title">Class Features</span>
                     <textarea id="class-features" style="height: 100%; border:none;"></textarea>
                 </div>
@@ -372,6 +385,27 @@
                         <textarea id="feats" style="height: 100%; border:none;"></textarea>
                     </div>
                 </div>
+                
+                <div class="panel" style="margin-top: 10px;">
+                    <span class="box-title">Proficiencies & Training</span>
+                    <div style="margin-bottom: 5px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+                        <span class="label-sm" style="display:inline; margin-right: 10px;">Armor:</span>
+                        <label><input type="checkbox" id="prof-armor-light"> Light</label> &nbsp;
+                        <label><input type="checkbox" id="prof-armor-medium"> Medium</label> &nbsp;
+                        <label><input type="checkbox" id="prof-armor-heavy"> Heavy</label> &nbsp; | &nbsp;
+                        <label><input type="checkbox" id="prof-shields"> Shields</label>
+                    </div>
+                    <div class="prof-grid">
+                        <div>
+                            <span class="label-sm">Weapons</span>
+                            <textarea id="prof-weapons-text" style="height: 60px;"></textarea>
+                        </div>
+                        <div>
+                            <span class="label-sm">Tools</span>
+                            <textarea id="prof-tools-text" style="height: 60px;"></textarea>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -379,28 +413,27 @@
             <div>
                 <div class="spell-header">
                     <div>
-                        <div class="ability-box" style="margin-bottom: 5px;">
-                            <span class="label-sm">Spell Ability</span>
-                            <input type="text" id="spell-ability">
-                        </div>
-                        <div class="ability-box" style="margin-bottom: 5px;">
-                            <span class="label-sm">Save DC</span>
-                            <input type="text" id="spell-save-dc">
-                        </div>
-                        <div class="ability-box">
-                            <span class="label-sm">Atk Bonus</span>
-                            <input type="text" id="spell-atk">
-                        </div>
+                        <div class="ability-box" style="margin-bottom: 5px;"><span class="label-sm">Spell Ability</span><input type="text" id="spell-ability"></div>
+                        <div class="ability-box" style="margin-bottom: 5px;"><span class="label-sm">Save DC</span><input type="text" id="spell-save-dc"></div>
+                        <div class="ability-box"><span class="label-sm">Atk Bonus</span><input type="text" id="spell-atk"></div>
                     </div>
                     
                     <div class="panel">
                         <span class="box-title">Spell Slots</span>
-                        <div class="spell-slots-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.8rem;">
-                            <div>1st <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></div>
-                            <div>2nd <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></div>
-                            <div>3rd <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></div>
-                            <div>4th <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></div>
-                            <div>5th <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></div>
+                        <div class="spell-slots-grid">
+                            <script>
+                                for(let i=1; i<=9; i++) {
+                                    document.write(`<div>${i}${i===1?'st':i===2?'nd':i===3?'rd':'th'} `);
+                                    // 4 slots for low levels, tapering off for high levels visually
+                                    let count = (i==1)?4:(i<4)?3:(i<6)?2:(i<8)?1:1;
+                                    for(let j=0; j<4; j++) {
+                                        // Print 4 checkboxes but hide visual clutter for high levels if desired, 
+                                        // or just leave 4 generic slots for all levels. keeping it simple:
+                                        document.write(`<input type="checkbox" class="diamond-check" id="slot-${i}-${j}">`);
+                                    }
+                                    document.write(`</div>`);
+                                }
+                            </script>
                         </div>
                     </div>
                 </div>
@@ -408,13 +441,7 @@
                 <div class="panel">
                     <span class="box-title">Cantrips & Prepared Spells</span>
                     <table class="spells-list-table">
-                        <thead>
-                            <tr>
-                                <th width="30">Lvl</th>
-                                <th>Name</th>
-                                <th width="50">C/R/M</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th width="30">Lvl</th><th>Name</th><th width="80" style="text-align: center;">C / R / M</th></tr></thead>
                         <tbody id="spells-body"></tbody>
                     </table>
                     <button onclick="addSpellRow()" style="width: 100%;">+</button>
@@ -424,17 +451,26 @@
             <div class="bio-col">
                 <div class="panel">
                     <span class="box-title">Appearance</span>
-                    <textarea id="appearance" style="height: 100px; border:none;"></textarea>
+                    <textarea id="appearance" style="height: 80px; border:none;"></textarea>
                 </div>
                 
-                <div class="panel" style="flex-grow: 1; min-height: 300px;">
+                <div class="panel" style="height: 250px; display: flex; flex-direction: column;">
                     <span class="box-title">Backstory & Personality</span>
-                    <textarea id="backstory" style="height: 100%; border:none;"></textarea>
+                    <textarea id="backstory" style="flex-grow: 1; border:none;"></textarea>
+                    <div style="margin-top: 5px; border-top: 1px solid #ccc; padding-top: 5px;">
+                        <span class="label-sm" style="display:inline;">Alignment:</span>
+                        <input type="text" id="alignment" style="width: 70%; display:inline-block;">
+                    </div>
                 </div>
 
                 <div class="panel">
+                    <span class="box-title">Languages</span>
+                    <textarea id="languages" style="height: 50px; border:none;"></textarea>
+                </div>
+
+                <div class="panel" style="flex-grow: 1; min-height: 300px;">
                     <span class="box-title">Equipment</span>
-                    <textarea id="equipment" style="height: 150px; border:none;"></textarea>
+                    <textarea id="equipment" style="height: 100%; border:none;"></textarea>
                 </div>
                 
                 <div class="coins">
@@ -446,7 +482,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -466,7 +501,6 @@
             loadData();
             updateVersionDropdown();
             
-            // SW Registration
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail', err));
             }
@@ -484,8 +518,14 @@
         function addSpellRow() {
             const tbody = document.getElementById('spells-body');
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td><input type="text" style="width:25px;"></td><td><input type="text"></td>
-                <td><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></td>`;
+            tr.innerHTML = `
+                <td><input type="text" style="width:25px; text-align:center;"></td>
+                <td><input type="text"></td>
+                <td style="white-space: nowrap; text-align: center;">
+                    <input type="checkbox" class="diamond-check" title="Concentration">
+                    <input type="checkbox" class="diamond-check" title="Ritual">
+                    <input type="checkbox" class="diamond-check" title="Material">
+                </td>`;
             tbody.appendChild(tr);
             tr.querySelectorAll('input').forEach(i => i.addEventListener('input', debounce(autoSave, 1000)));
         }
@@ -509,8 +549,11 @@
                 data['spells'].push([i[0].value, i[1].value, i[2].checked, i[3].checked, i[4].checked]);
             });
             
-            data['spellSlots'] = [];
-            document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => data['spellSlots'].push(cb.checked));
+            // Grab dynamically generated slots
+            data['spellSlots'] = {};
+            document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => {
+                data['spellSlots'][cb.id] = cb.checked;
+            });
             
             return data;
         }
@@ -518,6 +561,7 @@
         function populateData(data) {
             if(!data) return;
             for (const [key, value] of Object.entries(data)) {
+                if(key === 'spellSlots') continue; // Handle separately
                 const el = document.getElementById(key);
                 if (el) {
                     if(el.type === 'checkbox') el.checked = value;
@@ -533,8 +577,10 @@
                 data.spells.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r[0]; inputs[1].value=r[1]; inputs[2].checked=r[2]; inputs[3].checked=r[3]; inputs[4].checked=r[4]; }});
             }
             if(data.spellSlots) {
-                const slots = document.querySelectorAll('.spell-slots-grid input[type="checkbox"]');
-                data.spellSlots.forEach((v, i) => { if(slots[i]) slots[i].checked = v; });
+                for (const [slotId, checked] of Object.entries(data.spellSlots)) {
+                    const el = document.getElementById(slotId);
+                    if(el) el.checked = checked;
+                }
             }
         }
 
