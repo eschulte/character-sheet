@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5e Character Sheet PWA</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#fdf6e3">
+    <style>
+        :root {
+            --bg-color: #fdf6e3; /* Parchment look */
+            --text-color: #2b2b2b;
+            --border-color: #5c4b3f;
+            --accent-color: #8b0000;
+            --faint-line: #dcd6c7;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background-color: #222;
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        /* --- UI Controls (Version Control) --- */
+        #app-controls {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #333;
+            color: white;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+            font-family: sans-serif;
+            align-items: center;
+        }
+        
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+            background: #555;
+            color: white;
+            border: 1px solid #777;
+        }
+
+        /* --- Sheet Layout --- */
+        .sheet-page {
+            background-color: var(--bg-color);
+            width: 100%;
+            max-width: 900px;
+            min-height: 1100px;
+            padding: 40px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 20px;
+            position: relative;
+        }
+
+        /* Generic Input Styling to look like paper */
+        input[type="text"], input[type="number"], textarea {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            width: 100%;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+        
+        textarea { resize: vertical; border: 1px solid var(--faint-line); }
+
+        .label-sm { font-size: 0.7rem; text-transform: uppercase; color: #666; font-family: sans-serif; display: block; margin-top: 2px;}
+
+        /* --- Headers --- */
+        .main-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        .header-section { display: flex; flex-direction: column; }
+        
+        /* --- Page 1 Layout --- */
+        .p1-grid {
+            display: grid;
+            grid-template-columns: 1fr 2.5fr; /* Stats column vs Main column */
+            gap: 25px;
+        }
+
+        /* Stats Column */
+        .stats-col {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .ability-box {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 5px;
+            text-align: center;
+            position: relative;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .ability-score { font-size: 1.5rem; font-weight: bold; width: 50px; margin: 0 auto; display: block; text-align: center; border: 1px solid #ccc; border-radius: 5px; }
+        .ability-mod { font-size: 2rem; font-weight: bold; border: none; text-align: center;}
+        
+        .skills-list {
+            font-size: 0.85rem;
+            text-align: left;
+            margin-top: 10px;
+        }
+        
+        .skill-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+        .prof-bubble { width: 10px; height: 10px; border: 1px solid black; border-radius: 50%; appearance: none; cursor: pointer; }
+        .prof-bubble:checked { background: black; }
+
+        /* Main Content Column */
+        .combat-header {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .shield-box {
+            border: 2px double var(--border-color);
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px 5px 50% 50%;
+        }
+
+        .box-title { font-family: sans-serif; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        .weapons-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .weapons-table th { text-align: left; border-bottom: 2px solid var(--border-color); font-size: 0.8rem; }
+        .weapons-table td { border-bottom: 1px solid var(--faint-line); padding: 5px 0; }
+
+        .feature-box {
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            height: 300px;
+            padding: 10px;
+            position: relative;
+        }
+        .feature-box textarea { height: 90%; border: none; }
+
+        .bottom-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .panel { border: 2px solid var(--border-color); border-radius: 5px; padding: 10px; min-height: 150px; }
+
+        /* --- Page 2 Layout --- */
+        .p2-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 20px;
+        }
+
+        .spell-header {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .spell-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            font-size: 0.8rem;
+        }
+        
+        /* Diamond Checkboxes for spell slots */
+        .diamond-check {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border: 1px solid black;
+            transform: rotate(45deg);
+            margin: 5px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .diamond-check:checked { background: black; }
+
+        .spells-list-table { width: 100%; border-collapse: collapse; }
+        .spells-list-table th { font-size: 0.7rem; text-align: left; border-bottom: 1px solid black; }
+        .spells-list-table td { border-bottom: 1px solid #ddd; padding: 4px; }
+
+        .bio-section { display: flex; flex-direction: column; gap: 20px; }
+        .coins { display: flex; gap: 5px; justify-content: space-around; border: 2px solid var(--border-color); padding: 5px; border-radius: 10px;}
+        .coin-slot { text-align: center; }
+        .coin-slot input { width: 40px; text-align: center; }
+
+        @media screen and (max-width: 768px) {
+            .sheet-page { padding: 10px; height: auto; display: flex; flex-direction: column;}
+            .main-header, .p1-grid, .p2-grid, .combat-header, .spell-header { display: flex; flex-direction: column; }
+            .bottom-sections { grid-template-columns: 1fr; }
+            #app-controls { position: relative; }
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-controls">
+        <span><b>D&D 5e Sheet App</b></span>
+        <button onclick="saveVersion()">Save Snapshot</button>
+        <select id="versionSelect" onchange="loadSelectedVersion()">
+            <option value="">Load Version...</option>
+        </select>
+        <button onclick="resetSheet()" style="background: #800;">Reset</button>
+        <span id="status" style="font-size: 0.8rem; color: #aaa; margin-left: auto;">Auto-saving...</span>
+    </div>
+
+    <div class="sheet-page">
+        <div class="main-header">
+            <div class="header-section">
+                <input type="text" id="charName" placeholder="Character Name" style="font-size: 1.5rem; font-weight: bold;">
+                <span class="label-sm">Character Name</span>
+            </div>
+            <div class="header-section">
+                <input type="text" id="class">
+                <span class="label-sm">Class</span>
+                <input type="text" id="subclass">
+                <span class="label-sm">Subclass</span>
+            </div>
+            <div class="header-section">
+                <input type="text" id="level">
+                <span class="label-sm">Level</span>
+                <input type="text" id="xp">
+                <span class="label-sm">XP</span>
+            </div>
+            <div class="header-section">
+                <div class="shield-box">
+                    <span class="box-title">Armor Class</span>
+                    <input type="number" id="ac" style="font-size: 1.5rem; text-align: center; border: none;">
+                </div>
+            </div>
+        </div>
+
+        <div class="p1-grid">
+            <div class="stats-col">
+                <script>
+                    const stats = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+                    stats.forEach(stat => {
+                        document.write(`
+                        <div class="ability-box">
+                            <span class="box-title">${stat}</span>
+                            <input type="number" id="${stat.toLowerCase()}-mod" class="ability-mod" placeholder="+0">
+                            <span class="label-sm">Modifier</span>
+                            <input type="number" id="${stat.toLowerCase()}-score" class="ability-score" placeholder="10">
+                            <span class="label-sm">Score</span>
+                            <div class="skills-list">
+                                <div class="skill-row">
+                                    <input type="checkbox" class="prof-bubble" id="save-${stat}"> <span class="label-sm">Save</span>
+                                </div>
+                                <div class="skill-row"><input type="checkbox" class="prof-bubble" id="skill-${stat}-1"> <input type="text" placeholder="Skill Name" style="font-size: 0.8rem;"></div>
+                                <div class="skill-row"><input type="checkbox" class="prof-bubble" id="skill-${stat}-2"> <input type="text" placeholder="Skill Name" style="font-size: 0.8rem;"></div>
+                            </div>
+                        </div>
+                        `);
+                    });
+                </script>
+                
+                <div class="ability-box">
+                    <span class="box-title">Proficiency Bonus</span>
+                    <input type="text" id="prof-bonus" style="font-size: 1.5rem; text-align: center; border:none;">
+                </div>
+            </div>
+
+            <div class="main-col">
+                <div class="combat-header">
+                    <div class="shield-box">
+                        <span class="box-title">Initiative</span>
+                        <input type="text" id="initiative" style="text-align: center; font-size: 1.5rem;">
+                    </div>
+                    <div class="shield-box">
+                        <span class="box-title">Speed</span>
+                        <input type="text" id="speed" style="text-align: center; font-size: 1.5rem;">
+                    </div>
+                    <div class="shield-box" style="grid-column: span 2; border-radius: 5px;">
+                        <span class="box-title">Hit Points</span>
+                        <div style="display: flex; gap: 5px;">
+                            <div style="flex:1"><input type="text" id="hp-curr" placeholder="Current"></div>
+                            <div style="flex:1"><input type="text" id="hp-max" placeholder="Max"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <span class="box-title">Weapons & Damage Cantrips</span>
+                    <table class="weapons-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Atk Bonus / DC</th>
+                                <th>Damage & Type</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="weapons-body">
+                            </tbody>
+                    </table>
+                    <button onclick="addWeaponRow()" style="width: 100%;">+</button>
+                </div>
+
+                <br>
+
+                <div class="feature-box">
+                    <span class="box-title">Class Features</span>
+                    <textarea id="class-features"></textarea>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="panel">
+                        <span class="box-title">Species Traits</span>
+                        <textarea id="species-traits"></textarea>
+                    </div>
+                    <div class="panel">
+                        <span class="box-title">Feats</span>
+                        <textarea id="feats"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sheet-page">
+        <div class="spell-header">
+            <div>
+                <div class="ability-box" style="margin-bottom: 5px;">
+                    <span class="label-sm">Spellcasting Ability</span>
+                    <input type="text" id="spell-ability">
+                </div>
+                <div class="ability-box" style="margin-bottom: 5px;">
+                    <span class="label-sm">Spell Save DC</span>
+                    <input type="text" id="spell-save-dc">
+                </div>
+                <div class="ability-box">
+                    <span class="label-sm">Attack Bonus</span>
+                    <input type="text" id="spell-atk">
+                </div>
+            </div>
+            
+            <div class="panel">
+                <span class="box-title">Spell Slots</span>
+                <div class="spell-slots-grid">
+                    <div>
+                        Lvl 1: <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check">
+                    </div>
+                    <div>
+                        Lvl 2: <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check">
+                    </div>
+                    <div>
+                        Lvl 3: <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check">
+                    </div>
+                    <div>
+                        Lvl 4: <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check">
+                    </div>
+                    </div>
+            </div>
+        </div>
+
+        <div class="p2-grid">
+            <div class="panel">
+                <span class="box-title">Cantrips & Prepared Spells</span>
+                <table class="spells-list-table">
+                    <thead>
+                        <tr>
+                            <th width="30">Lvl</th>
+                            <th>Name</th>
+                            <th width="50">C/R/M</th>
+                        </tr>
+                    </thead>
+                    <tbody id="spells-body">
+                        </tbody>
+                </table>
+                <button onclick="addSpellRow()" style="width: 100%;">+</button>
+            </div>
+
+            <div class="bio-section">
+                <div class="panel">
+                    <span class="box-title">Appearance</span>
+                    <textarea id="appearance" style="height: 100px;"></textarea>
+                </div>
+                <div class="panel">
+                    <span class="box-title">Backstory & Personality</span>
+                    <textarea id="backstory" style="height: 200px;"></textarea>
+                </div>
+                <div class="panel">
+                    <span class="box-title">Equipment</span>
+                    <textarea id="equipment" style="height: 150px;"></textarea>
+                </div>
+                
+                <div class="coins">
+                    <div class="coin-slot"><span class="label-sm">CP</span><input type="number" id="cp"></div>
+                    <div class="coin-slot"><span class="label-sm">SP</span><input type="number" id="sp"></div>
+                    <div class="coin-slot"><span class="label-sm">EP</span><input type="number" id="ep"></div>
+                    <div class="coin-slot"><span class="label-sm">GP</span><input type="number" id="gp"></div>
+                    <div class="coin-slot"><span class="label-sm">PP</span><input type="number" id="pp"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Populate Rows
+            for(let i=0; i<5; i++) addWeaponRow();
+            for(let i=0; i<15; i++) addSpellRow();
+            
+            // Register auto-save on inputs
+            const allInputs = document.querySelectorAll('input, textarea');
+            allInputs.forEach(input => {
+                input.addEventListener('input', debounce(autoSave, 1000));
+                input.addEventListener('change', autoSave);
+            });
+
+            // Load last state
+            loadData();
+            updateVersionDropdown();
+            
+            // PWA SW Register
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js');
+            }
+        });
+
+        // --- Layout Helpers ---
+        function addWeaponRow() {
+            const tbody = document.getElementById('weapons-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+            `;
+            tbody.appendChild(tr);
+            // Re-bind listeners for new elements
+            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', debounce(autoSave, 1000)));
+        }
+
+        function addSpellRow() {
+            const tbody = document.getElementById('spells-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" style="width: 25px;"></td>
+                <td><input type="text"></td>
+                <td>
+                    <input type="checkbox" class="diamond-check" title="Concentration">
+                    <input type="checkbox" class="diamond-check" title="Ritual">
+                    <input type="checkbox" class="diamond-check" title="Material">
+                </td>
+            `;
+            tbody.appendChild(tr);
+            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', debounce(autoSave, 1000)));
+        }
+
+        // --- Data Logic ---
+        function collectData() {
+            const data = {};
+            // Collect all inputs with IDs
+            document.querySelectorAll('input[id], textarea[id]').forEach(el => {
+                if(el.type === 'checkbox') data[el.id] = el.checked;
+                else data[el.id] = el.value;
+            });
+
+            // Collect Tables (complex data without IDs)
+            data['weapons'] = [];
+            document.querySelectorAll('#weapons-body tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                data['weapons'].push([inputs[0].value, inputs[1].value, inputs[2].value, inputs[3].value]);
+            });
+
+            data['spells'] = [];
+            document.querySelectorAll('#spells-body tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                data['spells'].push([
+                    inputs[0].value, // lvl
+                    inputs[1].value, // name
+                    inputs[2].checked, // C
+                    inputs[3].checked, // R
+                    inputs[4].checked  // M
+                ]);
+            });
+
+            // Collect spell slots (checkboxes without IDs)
+            data['spellSlots'] = [];
+            document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => {
+                data['spellSlots'].push(cb.checked);
+            });
+
+            return data;
+        }
+
+        function populateData(data) {
+            if(!data) return;
+
+            // ID Inputs
+            for (const [key, value] of Object.entries(data)) {
+                const el = document.getElementById(key);
+                if (el) {
+                    if(el.type === 'checkbox') el.checked = value;
+                    else el.value = value;
+                }
+            }
+
+            // Tables
+            if(data.weapons) {
+                const rows = document.querySelectorAll('#weapons-body tr');
+                data.weapons.forEach((rowData, i) => {
+                    if(rows[i]) {
+                        const inputs = rows[i].querySelectorAll('input');
+                        inputs[0].value = rowData[0];
+                        inputs[1].value = rowData[1];
+                        inputs[2].value = rowData[2];
+                        inputs[3].value = rowData[3];
+                    }
+                });
+            }
+
+            if(data.spells) {
+                const rows = document.querySelectorAll('#spells-body tr');
+                data.spells.forEach((rowData, i) => {
+                    if(rows[i]) {
+                        const inputs = rows[i].querySelectorAll('input');
+                        inputs[0].value = rowData[0];
+                        inputs[1].value = rowData[1];
+                        inputs[2].checked = rowData[2];
+                        inputs[3].checked = rowData[3];
+                        inputs[4].checked = rowData[4];
+                    }
+                });
+            }
+
+            if(data.spellSlots) {
+                const slots = document.querySelectorAll('.spell-slots-grid input[type="checkbox"]');
+                data.spellSlots.forEach((val, i) => {
+                    if(slots[i]) slots[i].checked = val;
+                });
+            }
+        }
+
+        // --- Storage & Versioning ---
+        function autoSave() {
+            const data = collectData();
+            localStorage.setItem('dnd_current_sheet', JSON.stringify(data));
+            document.getElementById('status').innerText = 'Saved ' + new Date().toLocaleTimeString();
+        }
+
+        function saveVersion() {
+            const name = prompt("Name this version (e.g., 'Level 3 Start'):");
+            if(!name) return;
+
+            const current = collectData();
+            const versionObj = {
+                name: name,
+                timestamp: new Date().toISOString(),
+                data: current
+            };
+
+            let versions = JSON.parse(localStorage.getItem('dnd_versions') || "[]");
+            versions.push(versionObj);
+            localStorage.setItem('dnd_versions', JSON.stringify(versions));
+            updateVersionDropdown();
+            alert("Version saved!");
+        }
+
+        function loadData() {
+            const stored = localStorage.getItem('dnd_current_sheet');
+            if(stored) populateData(JSON.parse(stored));
+        }
+
+        function updateVersionDropdown() {
+            const select = document.getElementById('versionSelect');
+            select.innerHTML = '<option value="">Load Version...</option>';
+            const versions = JSON.parse(localStorage.getItem('dnd_versions') || "[]");
+            
+            versions.forEach((v, index) => {
+                const opt = document.createElement('option');
+                opt.value = index;
+                opt.text = `${v.name} (${new Date(v.timestamp).toLocaleDateString()})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function loadSelectedVersion() {
+            const idx = document.getElementById('versionSelect').value;
+            if(idx === "") return;
+
+            if(confirm("This will overwrite current unsaved changes. Proceed?")) {
+                const versions = JSON.parse(localStorage.getItem('dnd_versions') || "[]");
+                populateData(versions[idx].data);
+                autoSave(); // Set this as current
+            }
+        }
+
+        function resetSheet() {
+            if(confirm("Clear all fields?")) {
+                document.querySelectorAll('input').forEach(i => {
+                    if(i.type==='checkbox') i.checked=false;
+                    else i.value = "";
+                });
+                document.querySelectorAll('textarea').forEach(t => t.value = "");
+                autoSave();
+            }
+        }
+
+        // Utility: Debounce to prevent lag
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+    </script>
+</body>
+</html>

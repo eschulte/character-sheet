@@ -1,0 +1,20 @@
+{
+  "name": "D&D 5e Character Sheet",
+  "short_name": "D&D Sheet",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fdf6e3",
+  "theme_color": "#333333",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192.png?text=D%26D",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512.png?text=D%26D",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
