@@ -83,6 +83,32 @@
             font-size: 1rem;
             color: var(--text-color);
         }
+
+        /* Remove Spinners by Default */
+        /* 1. Hide arrows for all browsers by default */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield; /* Firefox */
+            appearance: textfield;
+        }
+
+        /* 2. Show arrows ONLY when hovering over the specific input */
+        /* The @media (hover: hover) ensures this doesn't trigger on touch devices */
+        @media (hover: hover) {
+            input[type="number"]:hover::-webkit-outer-spin-button,
+            input[type="number"]:hover::-webkit-inner-spin-button {
+                -webkit-appearance: auto;
+            }
+
+            input[type="number"]:hover {
+                -moz-appearance: number-input; /* Firefox */
+            }
+        }
         
         textarea { resize: vertical; border: 1px solid var(--faint-line); padding: 5px; }
         .label-sm { font-size: 0.7rem; text-transform: uppercase; color: #666; font-family: sans-serif; display: block; margin-top: 2px;}
