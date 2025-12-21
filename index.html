@@ -44,7 +44,7 @@
             font-family: sans-serif;
             align-items: center;
         }
-        
+
         button {
             padding: 5px 10px;
             cursor: pointer;
@@ -109,7 +109,7 @@
                 -moz-appearance: number-input; /* Firefox */
             }
         }
-        
+
         textarea { resize: vertical; border: 1px solid var(--faint-line); padding: 5px; }
         .label-sm { font-size: 0.7rem; text-transform: uppercase; color: #666; font-family: sans-serif; display: block; margin-top: 2px;}
 
@@ -126,7 +126,7 @@
         /* --- Main Grid --- */
         .main-grid {
             display: grid;
-            grid-template-columns: 1fr 2.6fr; 
+            grid-template-columns: 1fr 2.6fr;
             gap: 25px;
         }
 
@@ -142,24 +142,24 @@
 
         .ability-score { font-size: 1.5rem; font-weight: bold; width: 50px; margin: 0 auto; display: block; text-align: center; border: 1px solid #ccc; border-radius: 5px; }
         .ability-mod { font-size: 2rem; font-weight: bold; border: none; text-align: center;}
-        
+
         .skills-list {
             font-size: 0.85rem;
             text-align: left;
             margin-top: 15px;
             padding-left: 5px;
         }
-        
-        .skill-row { 
+
+        .skill-row {
             display: flex; align-items: center; gap: 5px; margin-bottom: 5px; border-bottom: 1px solid #eee;
         }
-        
-        .prof-bubble { 
-            width: 12px; height: 12px; border: 1px solid black; border-radius: 50%; 
+
+        .prof-bubble {
+            width: 12px; height: 12px; border: 1px solid black; border-radius: 50%;
             appearance: none; cursor: pointer; flex-shrink: 0;
         }
         .prof-bubble:checked { background: black; }
-        
+
         .save-val-input {
             width: 25px !important; text-align: center; font-size: 0.8rem; margin-right: 5px; border-bottom: 1px solid #999 !important;
         }
@@ -178,7 +178,7 @@
             border-radius: 5px 5px 50% 50%;
             display: flex; flex-direction: column; justify-content: center;
         }
-        
+
         .rect-box {
             border: 2px double var(--border-color);
             padding: 5px; border-radius: 5px;
@@ -231,14 +231,14 @@
             text-align: center;
         }
 
-        .spell-slots-grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 10px 5px; 
+        .spell-slots-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px 5px;
             font-size: 0.8rem;
             white-space: nowrap;
         }
-        
+
         .diamond-check {
             appearance: none; width: 12px; height: 12px; border: 1px solid black; transform: rotate(45deg);
             margin: 2px 3px; cursor: pointer; display: inline-block; vertical-align: middle;
@@ -247,7 +247,7 @@
 
         /* Bio Column */
         .bio-col { display: flex; flex-direction: column; gap: 15px; height: 100%; }
-        
+
         .coins-container {
             border: 2px solid var(--border-color); padding: 5px; border-radius: 10px;
             display: flex; flex-direction: column;
@@ -257,23 +257,23 @@
 
         /* --- MOBILE UPDATES --- */
         @media screen and (max-width: 768px) {
-            body { 
+            body {
                 display: block; /* Removes flex centering which caused the side gaps */
-                padding: 0; 
+                padding: 0;
             }
-            #app-controls { 
+            #app-controls {
                 position: absolute; /* Ensures it stays at the top of the document */
             }
-            .sheet-container { 
-                margin-top: 0; 
-                padding: 10px; 
+            .sheet-container {
+                margin-top: 0;
+                padding: 10px;
                 padding-top: 80px; /* Provides space for the wrapped absolute top bar */
                 border-radius: 0;
                 box-shadow: none;
             }
-            .main-grid, .spell-grid-layout, .main-header, .combat-row-1, .combat-row-2, .spell-header, .bottom-sections, .prof-grid { 
-                display: flex; 
-                flex-direction: column; 
+            .main-grid, .spell-grid-layout, .main-header, .combat-row-1, .combat-row-2, .spell-header, .bottom-sections, .prof-grid {
+                display: flex;
+                flex-direction: column;
             }
             #status {
                 margin-left: 0; /* Align status better on mobile */
@@ -296,7 +296,7 @@
     </div>
 
     <div class="sheet-container">
-        
+
         <div class="main-header">
             <div class="header-section">
                 <input type="text" id="charName" placeholder="Character Name" style="font-size: 1.5rem; font-weight: bold;">
@@ -335,7 +335,7 @@
                     const abilityData = {
                         "Strength": ["Athletics"],
                         "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"],
-                        "Constitution": [], 
+                        "Constitution": [],
                         "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"],
                         "Wisdom": ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"],
                         "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"]
@@ -349,7 +349,7 @@
                             skillsHtml += `
                             <div class="skill-row">
                                 <input type="number" class="save-val-input" id="val-${lowStat}-${skillId}" placeholder="0">
-                                <input type="checkbox" class="prof-bubble" id="prof-${lowStat}-${skillId}"> 
+                                <input type="checkbox" class="prof-bubble" id="prof-${lowStat}-${skillId}">
                                 <span>${skill}</span>
                             </div>`;
                         });
@@ -365,7 +365,7 @@
                             <div class="skills-list">
                                 <div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;">
                                     <input type="number" class="save-val-input" id="save-val-${lowStat}" placeholder="0">
-                                    <input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}"> 
+                                    <input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}">
                                     <span>Saving Throw</span>
                                 </div>
                                 ${skillsHtml}
@@ -457,7 +457,7 @@
                         <textarea id="feats" style="height: 100%; border:none;"></textarea>
                     </div>
                 </div>
-                
+
                 <div class="panel" style="margin-top: 10px;">
                     <span class="box-title">Proficiencies & Training</span>
                     <div style="margin-bottom: 5px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
@@ -505,7 +505,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="panel">
                         <span class="box-title">Spell Slots</span>
                         <div class="spell-slots-grid">
@@ -539,7 +539,7 @@
                     <span class="box-title">Appearance</span>
                     <textarea id="appearance" style="height: 80px; border:none;"></textarea>
                 </div>
-                
+
                 <div class="panel" style="height: 250px; display: flex; flex-direction: column;">
                     <span class="box-title">Backstory & Personality</span>
                     <textarea id="backstory" style="flex-grow: 1; border:none;"></textarea>
@@ -558,7 +558,7 @@
                     <span class="box-title">Equipment</span>
                     <textarea id="equipment" style="height: 100%; border:none;"></textarea>
                 </div>
-                
+
                 <div class="coins-container">
                     <span class="box-title">COINS</span>
                     <div class="coins">
@@ -577,7 +577,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             for(let i=0; i<5; i++) addWeaponRow();
             for(let i=0; i<15; i++) addSpellRow();
-            
+
             const allInputs = document.querySelectorAll('input, textarea');
             allInputs.forEach(input => {
                 input.addEventListener('input', debounce(autoSave, 1000));
@@ -586,10 +586,23 @@
 
             loadData();
             updateVersionDropdown();
-            
+
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail', err));
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const titleInputs = ['charName', 'class'];
+            titleInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', updatePageTitle);
+                }
+            });
+
+            // Call it once on load in case data is restored from localStorage
+            setTimeout(updatePageTitle, 100);
         });
 
         function addWeaponRow() {
@@ -632,12 +645,12 @@
                 const i = tr.querySelectorAll('input');
                 data['spells'].push([i[0].value, i[1].value, i[2].checked, i[3].checked, i[4].checked]);
             });
-            
+
             data['spellSlots'] = {};
             document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => {
                 data['spellSlots'][cb.id] = cb.checked;
             });
-            
+
             return data;
         }
 
@@ -718,6 +731,19 @@
         function debounce(func, wait) {
             let timeout;
             return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); };
+        }
+
+        function updatePageTitle() {
+            const name = document.getElementById('charName').value.trim();
+            const charClass = document.getElementById('class').value.trim();
+
+            if (name && charClass) {
+                document.title = `${name} (${charClass}) - 5e Sheet`;
+            } else if (name) {
+                document.title = `${name} - 5e Sheet`;
+            } else {
+                document.title = "5e Character Sheet PWA";
+            }
         }
     </script>
 </body>
