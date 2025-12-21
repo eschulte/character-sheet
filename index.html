@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="D&D 5e Character Sheet intended to be easy to use to create characters and look up stats and take notes during play.">
-    <title>5e Character Sheet PWA</title>
+    <title>5e Character Sheet</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#fdf6e3">
     <style>
@@ -285,7 +285,7 @@
 <body>
 
     <div id="app-controls">
-        <span><b>D&D 5e PWA</b></span>
+        <span><b>D&D 5e</b></span>
         <button onclick="saveVersion()">Save Snapshot</button>
         <select id="versionSelect" onchange="loadSelectedVersion()">
             <option value="">Load Version...</option>
@@ -742,7 +742,7 @@
             } else if (name) {
                 document.title = `${name} - 5e Sheet`;
             } else {
-                document.title = "5e Character Sheet PWA";
+                document.title = "5e Character Sheet";
             }
         }
     </script>
