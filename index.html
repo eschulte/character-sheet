@@ -292,7 +292,7 @@
         </select>
         <button onclick="resetSheet()" style="background: #800;">Reset</button>
         <button onclick="window.print()" style="background: #005f80;">Print</button>
-        <span id="status" style="font-size: 0.8rem; color: #aaa; margin-left: auto;">Auto-saving...</span>
+        <!-- <span id="status" style="font-size: 0.8rem; color: #aaa; margin-left: auto;">Auto-saving...</span> -->
     </div>
 
     <div class="sheet-container">
@@ -357,10 +357,10 @@
                         <div class="ability-box">
                             <span class="box-title">${stat}</span>
                             <div style="position: relative;">
-                                <input type="number" id="${lowStat}-mod" class="ability-mod" placeholder="+0">
-                                <span class="label-sm">Modifier</span>
                                 <input type="number" id="${lowStat}-score" class="ability-score" placeholder="10">
                                 <span class="label-sm">Score</span>
+                                <input type="number" id="${lowStat}-mod" class="ability-mod" placeholder="+0">
+                                <span class="label-sm">Modifier</span>
                             </div>
                             <div class="skills-list">
                                 <div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;">
