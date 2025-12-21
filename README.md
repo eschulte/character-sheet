@@ -1,1 +1,13 @@
-Prompt: Here are two pictures which provide a wire frame for a web site I would like to build in HTML, CSS, and Javascript which will also be usable as a progressive web app (PWA) and will make use of localStorage to hold information put into the form with version control features so previous versions are saved, timestamped, optionally named, and can be returned to.  When building the app from these pictures copy the layout and style as much as possible.  Keep the text from the pictures, you can ignore the little numbers in circles as those are not needed in the app.
+Simple D&D 5e Character Sheet
+
+- Offline storage and functionality
+- Snapshots to easily view and recover old versions
+- Mobile friendly
+- Simple and easy to use
+
+Todo:
+- Sharing links
+- Update the title to match the name, species, and class
+- Hide the up/down arrows when not hovering for better look
+- Tool tips on hover
+- Suggested smart completion for spell names
