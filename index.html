@@ -292,6 +292,7 @@
         </select>
         <button onclick="resetSheet()" style="background: #800;">Reset</button>
         <button onclick="window.print()" style="background: #005f80;">Print</button>
+        <button onclick="shareSheet()" style="background: #28a745;">Share</button>
         <!-- <span id="status" style="font-size: 0.8rem; color: #aaa; margin-left: auto;">Auto-saving...</span> -->
     </div>
 
@@ -584,6 +585,7 @@
                 input.addEventListener('change', autoSave);
             });
 
+            loadFromUrl();
             loadData();
             updateVersionDropdown();
 
@@ -745,6 +747,48 @@
                 document.title = "5e Character Sheet";
             }
         }
+
+        // 1. Generate the URL and copy it to the clipboard
+        async function shareSheet() {
+            const data = collectData();
+            const jsonString = JSON.stringify(data);
+            // Encode to Base64 to keep the URL relatively clean
+            const encodedData = btoa(unescape(encodeURIComponent(jsonString)));
+
+            const shareUrl = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
+
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                alert("Sharable link copied to clipboard!");
+            } catch (err) {
+                console.error("Failed to copy:", err);
+                alert("Could not copy link automatically. URL: " + shareUrl);
+            }
+        }
+
+        // 2. Check for data in the URL on page load
+        function loadFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const encodedData = urlParams.get('data');
+
+            if (encodedData) {
+                try {
+                    const jsonString = decodeURIComponent(escape(atob(encodedData)));
+                    const data = JSON.parse(jsonString);
+
+                    if (confirm("A character was shared with you! Do you want to load it? (This will overwrite your current current view)")) {
+                        populateData(data);
+                        autoSave();
+                        updatePageTitle();
+                        // Clean the URL so the data doesn't reload on every refresh
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
+                } catch (e) {
+                    console.error("Error decoding shared data:", e);
+                }
+            }
+        }
+
     </script>
 </body>
 </html>
