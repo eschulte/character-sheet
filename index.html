@@ -8,10 +8,9 @@
     <meta name="theme-color" content="#fdf6e3">
     <style>
         :root {
-            --bg-color: #fdf6e3; /* Parchment look */
+            --bg-color: #fdf6e3;
             --text-color: #2b2b2b;
             --border-color: #5c4b3f;
-            --accent-color: #8b0000;
             --faint-line: #dcd6c7;
         }
 
@@ -25,11 +24,9 @@
             color: var(--text-color);
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
         }
 
-        /* --- UI Controls (Version Control) --- */
+        /* --- UI Controls --- */
         #app-controls {
             position: fixed;
             top: 0;
@@ -53,21 +50,21 @@
             border: 1px solid #777;
         }
 
-        /* --- Sheet Layout --- */
-        .sheet-page {
+        /* --- Single Continuous Sheet --- */
+        .sheet-container {
             background-color: var(--bg-color);
             width: 100%;
             max-width: 900px;
-            min-height: 1100px;
+            /* No fixed height, grows with content */
             padding: 40px;
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            display: grid;
-            grid-template-rows: auto 1fr;
-            gap: 20px;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 30px; /* Space between the "old page 1" and "old page 2" content */
+            margin-top: 40px; /* Offset for fixed header */
         }
 
-        /* Generic Input Styling to look like paper */
+        /* Input Styling */
         input[type="text"], input[type="number"], textarea {
             background: transparent;
             border: none;
@@ -78,11 +75,10 @@
             color: var(--text-color);
         }
         
-        textarea { resize: vertical; border: 1px solid var(--faint-line); }
-
+        textarea { resize: vertical; border: 1px solid var(--faint-line); padding: 5px; }
         .label-sm { font-size: 0.7rem; text-transform: uppercase; color: #666; font-family: sans-serif; display: block; margin-top: 2px;}
 
-        /* --- Headers --- */
+        /* --- Header Section --- */
         .main-header {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -90,13 +86,12 @@
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 20px;
         }
-
         .header-section { display: flex; flex-direction: column; }
         
-        /* --- Page 1 Layout --- */
-        .p1-grid {
+        /* --- Main Grid Layout --- */
+        .main-grid {
             display: grid;
-            grid-template-columns: 1fr 2.5fr; /* Stats column vs Main column */
+            grid-template-columns: 1fr 2.5fr; 
             gap: 25px;
         }
 
@@ -110,73 +105,93 @@
         .ability-box {
             border: 2px solid var(--border-color);
             border-radius: 10px;
-            padding: 5px;
+            padding: 10px 5px;
             text-align: center;
-            position: relative;
             background: rgba(255,255,255,0.3);
         }
 
         .ability-score { font-size: 1.5rem; font-weight: bold; width: 50px; margin: 0 auto; display: block; text-align: center; border: 1px solid #ccc; border-radius: 5px; }
         .ability-mod { font-size: 2rem; font-weight: bold; border: none; text-align: center;}
         
+        /* Skills Area */
         .skills-list {
             font-size: 0.85rem;
             text-align: left;
-            margin-top: 10px;
+            margin-top: 15px;
+            padding-left: 5px;
         }
         
-        .skill-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
-        .prof-bubble { width: 10px; height: 10px; border: 1px solid black; border-radius: 50%; appearance: none; cursor: pointer; }
+        .skill-row { 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            margin-bottom: 5px; 
+            border-bottom: 1px solid #eee;
+        }
+        
+        .prof-bubble { 
+            width: 12px; height: 12px; 
+            border: 1px solid black; border-radius: 50%; 
+            appearance: none; cursor: pointer; flex-shrink: 0;
+        }
         .prof-bubble:checked { background: black; }
+        
+        .save-val-input {
+            width: 25px !important;
+            text-align: center;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            border-bottom: 1px solid #999 !important;
+        }
 
-        /* Main Content Column */
+        /* Combat Header */
         .combat-header {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             margin-bottom: 20px;
         }
-
         .shield-box {
             border: 2px double var(--border-color);
             padding: 10px;
             text-align: center;
             border-radius: 5px 5px 50% 50%;
         }
-
         .box-title { font-family: sans-serif; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        .weapons-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+        /* Tables & Lists */
+        .weapons-table, .spells-list-table {
+            width: 100%; border-collapse: collapse; margin-bottom: 10px;
         }
-        .weapons-table th { text-align: left; border-bottom: 2px solid var(--border-color); font-size: 0.8rem; }
-        .weapons-table td { border-bottom: 1px solid var(--faint-line); padding: 5px 0; }
+        .weapons-table th, .spells-list-table th { text-align: left; border-bottom: 2px solid var(--border-color); font-size: 0.8rem; }
+        .weapons-table td, .spells-list-table td { border-bottom: 1px solid var(--faint-line); padding: 5px 0; }
 
+        /* Expanded Boxes */
         .feature-box {
             border: 2px solid var(--border-color);
             border-radius: 5px;
-            height: 300px;
             padding: 10px;
-            position: relative;
+            display: flex;
+            flex-direction: column;
         }
-        .feature-box textarea { height: 90%; border: none; }
 
+        /* Bottom Grid (Traits/Feats) */
         .bottom-sections {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-top: 20px;
         }
-        
-        .panel { border: 2px solid var(--border-color); border-radius: 5px; padding: 10px; min-height: 150px; }
+        .tall-box { height: 250px; } /* Increased height */
 
-        /* --- Page 2 Layout --- */
-        .p2-grid {
+        /* Second Half (Spells/Bio) */
+        .spell-grid-layout {
             display: grid;
             grid-template-columns: 1.5fr 1fr;
             gap: 20px;
+            margin-top: 20px;
+            border-top: 3px double var(--border-color); /* Visual separator */
+            padding-top: 20px;
         }
 
         .spell-header {
@@ -188,39 +203,24 @@
             margin-bottom: 20px;
         }
 
-        .spell-slots-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            font-size: 0.8rem;
-        }
-        
-        /* Diamond Checkboxes for spell slots */
         .diamond-check {
-            appearance: none;
-            width: 12px;
-            height: 12px;
-            border: 1px solid black;
-            transform: rotate(45deg);
-            margin: 5px;
-            cursor: pointer;
-            display: inline-block;
+            appearance: none; width: 12px; height: 12px;
+            border: 1px solid black; transform: rotate(45deg);
+            margin: 5px; cursor: pointer; display: inline-block;
         }
         .diamond-check:checked { background: black; }
 
-        .spells-list-table { width: 100%; border-collapse: collapse; }
-        .spells-list-table th { font-size: 0.7rem; text-align: left; border-bottom: 1px solid black; }
-        .spells-list-table td { border-bottom: 1px solid #ddd; padding: 4px; }
+        .bio-col { display: flex; flex-direction: column; gap: 20px; height: 100%; }
+        
+        .panel { border: 2px solid var(--border-color); border-radius: 5px; padding: 10px; display: flex; flex-direction: column; }
 
-        .bio-section { display: flex; flex-direction: column; gap: 20px; }
+        /* Coins */
         .coins { display: flex; gap: 5px; justify-content: space-around; border: 2px solid var(--border-color); padding: 5px; border-radius: 10px;}
         .coin-slot { text-align: center; }
         .coin-slot input { width: 40px; text-align: center; }
 
         @media screen and (max-width: 768px) {
-            .sheet-page { padding: 10px; height: auto; display: flex; flex-direction: column;}
-            .main-header, .p1-grid, .p2-grid, .combat-header, .spell-header { display: flex; flex-direction: column; }
-            .bottom-sections { grid-template-columns: 1fr; }
+            .main-grid, .spell-grid-layout, .main-header, .combat-header, .spell-header, .bottom-sections { display: flex; flex-direction: column; }
             #app-controls { position: relative; }
             body { padding: 0; }
         }
@@ -229,7 +229,7 @@
 <body>
 
     <div id="app-controls">
-        <span><b>D&D 5e Sheet App</b></span>
+        <span><b>D&D 5e PWA</b></span>
         <button onclick="saveVersion()">Save Snapshot</button>
         <select id="versionSelect" onchange="loadSelectedVersion()">
             <option value="">Load Version...</option>
@@ -238,7 +238,8 @@
         <span id="status" style="font-size: 0.8rem; color: #aaa; margin-left: auto;">Auto-saving...</span>
     </div>
 
-    <div class="sheet-page">
+    <div class="sheet-container">
+        
         <div class="main-header">
             <div class="header-section">
                 <input type="text" id="charName" placeholder="Character Name" style="font-size: 1.5rem; font-weight: bold;">
@@ -264,34 +265,59 @@
             </div>
         </div>
 
-        <div class="p1-grid">
+        <div class="main-grid">
             <div class="stats-col">
-                <script>
-                    const stats = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
-                    stats.forEach(stat => {
-                        document.write(`
-                        <div class="ability-box">
-                            <span class="box-title">${stat}</span>
-                            <input type="number" id="${stat.toLowerCase()}-mod" class="ability-mod" placeholder="+0">
-                            <span class="label-sm">Modifier</span>
-                            <input type="number" id="${stat.toLowerCase()}-score" class="ability-score" placeholder="10">
-                            <span class="label-sm">Score</span>
-                            <div class="skills-list">
-                                <div class="skill-row">
-                                    <input type="checkbox" class="prof-bubble" id="save-${stat}"> <span class="label-sm">Save</span>
-                                </div>
-                                <div class="skill-row"><input type="checkbox" class="prof-bubble" id="skill-${stat}-1"> <input type="text" placeholder="Skill Name" style="font-size: 0.8rem;"></div>
-                                <div class="skill-row"><input type="checkbox" class="prof-bubble" id="skill-${stat}-2"> <input type="text" placeholder="Skill Name" style="font-size: 0.8rem;"></div>
-                            </div>
-                        </div>
-                        `);
-                    });
-                </script>
-                
                 <div class="ability-box">
                     <span class="box-title">Proficiency Bonus</span>
                     <input type="text" id="prof-bonus" style="font-size: 1.5rem; text-align: center; border:none;">
                 </div>
+
+                <script>
+                    const abilityData = {
+                        "Strength": ["Athletics"],
+                        "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"],
+                        "Constitution": [], // Usually just save
+                        "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"],
+                        "Wisdom": ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"],
+                        "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"]
+                    };
+
+                    for (const [stat, skills] of Object.entries(abilityData)) {
+                        const lowStat = stat.toLowerCase();
+                        
+                        let skillsHtml = '';
+                        skills.forEach(skill => {
+                            const skillId = skill.replace(/\s+/g, '-').toLowerCase();
+                            skillsHtml += `
+                            <div class="skill-row">
+                                <input type="number" class="save-val-input" id="val-${lowStat}-${skillId}" placeholder="0">
+                                <input type="checkbox" class="prof-bubble" id="prof-${lowStat}-${skillId}"> 
+                                <span>${skill}</span>
+                            </div>`;
+                        });
+
+                        document.write(`
+                        <div class="ability-box">
+                            <span class="box-title">${stat}</span>
+                            <div style="position: relative;">
+                                <input type="number" id="${lowStat}-mod" class="ability-mod" placeholder="+0">
+                                <span class="label-sm">Modifier</span>
+                                <input type="number" id="${lowStat}-score" class="ability-score" placeholder="10">
+                                <span class="label-sm">Score</span>
+                            </div>
+                            
+                            <div class="skills-list">
+                                <div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;">
+                                    <input type="number" class="save-val-input" id="save-val-${lowStat}" placeholder="0">
+                                    <input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}"> 
+                                    <span>Saving Throw</span>
+                                </div>
+                                ${skillsHtml}
+                            </div>
+                        </div>
+                        `);
+                    }
+                </script>
             </div>
 
             <div class="main-col">
@@ -324,98 +350,91 @@
                                 <th>Notes</th>
                             </tr>
                         </thead>
-                        <tbody id="weapons-body">
-                            </tbody>
+                        <tbody id="weapons-body"></tbody>
                     </table>
                     <button onclick="addWeaponRow()" style="width: 100%;">+</button>
                 </div>
 
                 <br>
 
-                <div class="feature-box">
+                <div class="feature-box" style="height: 300px;">
                     <span class="box-title">Class Features</span>
-                    <textarea id="class-features"></textarea>
+                    <textarea id="class-features" style="height: 100%; border:none;"></textarea>
                 </div>
 
                 <div class="bottom-sections">
-                    <div class="panel">
+                    <div class="panel tall-box">
                         <span class="box-title">Species Traits</span>
-                        <textarea id="species-traits"></textarea>
+                        <textarea id="species-traits" style="height: 100%; border:none;"></textarea>
                     </div>
-                    <div class="panel">
+                    <div class="panel tall-box">
                         <span class="box-title">Feats</span>
-                        <textarea id="feats"></textarea>
+                        <textarea id="feats" style="height: 100%; border:none;"></textarea>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="sheet-page">
-        <div class="spell-header">
+        <div class="spell-grid-layout">
             <div>
-                <div class="ability-box" style="margin-bottom: 5px;">
-                    <span class="label-sm">Spellcasting Ability</span>
-                    <input type="text" id="spell-ability">
+                <div class="spell-header">
+                    <div>
+                        <div class="ability-box" style="margin-bottom: 5px;">
+                            <span class="label-sm">Spell Ability</span>
+                            <input type="text" id="spell-ability">
+                        </div>
+                        <div class="ability-box" style="margin-bottom: 5px;">
+                            <span class="label-sm">Save DC</span>
+                            <input type="text" id="spell-save-dc">
+                        </div>
+                        <div class="ability-box">
+                            <span class="label-sm">Atk Bonus</span>
+                            <input type="text" id="spell-atk">
+                        </div>
+                    </div>
+                    
+                    <div class="panel">
+                        <span class="box-title">Spell Slots</span>
+                        <div class="spell-slots-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.8rem;">
+                            <div>1st <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></div>
+                            <div>2nd <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></div>
+                            <div>3rd <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></div>
+                            <div>4th <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></div>
+                            <div>5th <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="ability-box" style="margin-bottom: 5px;">
-                    <span class="label-sm">Spell Save DC</span>
-                    <input type="text" id="spell-save-dc">
-                </div>
-                <div class="ability-box">
-                    <span class="label-sm">Attack Bonus</span>
-                    <input type="text" id="spell-atk">
-                </div>
-            </div>
-            
-            <div class="panel">
-                <span class="box-title">Spell Slots</span>
-                <div class="spell-slots-grid">
-                    <div>
-                        Lvl 1: <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check">
-                    </div>
-                    <div>
-                        Lvl 2: <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check">
-                    </div>
-                    <div>
-                        Lvl 3: <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check">
-                    </div>
-                    <div>
-                        Lvl 4: <input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check">
-                    </div>
-                    </div>
-            </div>
-        </div>
 
-        <div class="p2-grid">
-            <div class="panel">
-                <span class="box-title">Cantrips & Prepared Spells</span>
-                <table class="spells-list-table">
-                    <thead>
-                        <tr>
-                            <th width="30">Lvl</th>
-                            <th>Name</th>
-                            <th width="50">C/R/M</th>
-                        </tr>
-                    </thead>
-                    <tbody id="spells-body">
-                        </tbody>
-                </table>
-                <button onclick="addSpellRow()" style="width: 100%;">+</button>
+                <div class="panel">
+                    <span class="box-title">Cantrips & Prepared Spells</span>
+                    <table class="spells-list-table">
+                        <thead>
+                            <tr>
+                                <th width="30">Lvl</th>
+                                <th>Name</th>
+                                <th width="50">C/R/M</th>
+                            </tr>
+                        </thead>
+                        <tbody id="spells-body"></tbody>
+                    </table>
+                    <button onclick="addSpellRow()" style="width: 100%;">+</button>
+                </div>
             </div>
 
-            <div class="bio-section">
+            <div class="bio-col">
                 <div class="panel">
                     <span class="box-title">Appearance</span>
-                    <textarea id="appearance" style="height: 100px;"></textarea>
+                    <textarea id="appearance" style="height: 100px; border:none;"></textarea>
                 </div>
-                <div class="panel">
+                
+                <div class="panel" style="flex-grow: 1; min-height: 300px;">
                     <span class="box-title">Backstory & Personality</span>
-                    <textarea id="backstory" style="height: 200px;"></textarea>
+                    <textarea id="backstory" style="height: 100%; border:none;"></textarea>
                 </div>
+
                 <div class="panel">
                     <span class="box-title">Equipment</span>
-                    <textarea id="equipment" style="height: 150px;"></textarea>
+                    <textarea id="equipment" style="height: 150px; border:none;"></textarea>
                 </div>
                 
                 <div class="coins">
@@ -427,104 +446,77 @@
                 </div>
             </div>
         </div>
+
     </div>
 
     <script>
-        // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             // Populate Rows
             for(let i=0; i<5; i++) addWeaponRow();
             for(let i=0; i<15; i++) addSpellRow();
             
-            // Register auto-save on inputs
+            // Listeners
             const allInputs = document.querySelectorAll('input, textarea');
             allInputs.forEach(input => {
                 input.addEventListener('input', debounce(autoSave, 1000));
                 input.addEventListener('change', autoSave);
             });
 
-            // Load last state
+            // Load Data
             loadData();
             updateVersionDropdown();
             
-            // PWA SW Register
+            // SW Registration
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js');
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail', err));
             }
         });
 
-        // --- Layout Helpers ---
+        // --- UI Helpers ---
         function addWeaponRow() {
             const tbody = document.getElementById('weapons-body');
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><input type="text"></td>
-                <td><input type="text"></td>
-                <td><input type="text"></td>
-                <td><input type="text"></td>
-            `;
+            tr.innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>`;
             tbody.appendChild(tr);
-            // Re-bind listeners for new elements
             tr.querySelectorAll('input').forEach(i => i.addEventListener('input', debounce(autoSave, 1000)));
         }
 
         function addSpellRow() {
             const tbody = document.getElementById('spells-body');
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><input type="text" style="width: 25px;"></td>
-                <td><input type="text"></td>
-                <td>
-                    <input type="checkbox" class="diamond-check" title="Concentration">
-                    <input type="checkbox" class="diamond-check" title="Ritual">
-                    <input type="checkbox" class="diamond-check" title="Material">
-                </td>
-            `;
+            tr.innerHTML = `<td><input type="text" style="width:25px;"></td><td><input type="text"></td>
+                <td><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></td>`;
             tbody.appendChild(tr);
             tr.querySelectorAll('input').forEach(i => i.addEventListener('input', debounce(autoSave, 1000)));
         }
 
-        // --- Data Logic ---
+        // --- Data Handling ---
         function collectData() {
             const data = {};
-            // Collect all inputs with IDs
             document.querySelectorAll('input[id], textarea[id]').forEach(el => {
-                if(el.type === 'checkbox') data[el.id] = el.checked;
-                else data[el.id] = el.value;
+                data[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
             });
 
-            // Collect Tables (complex data without IDs)
             data['weapons'] = [];
             document.querySelectorAll('#weapons-body tr').forEach(tr => {
-                const inputs = tr.querySelectorAll('input');
-                data['weapons'].push([inputs[0].value, inputs[1].value, inputs[2].value, inputs[3].value]);
+                const i = tr.querySelectorAll('input');
+                data['weapons'].push([i[0].value, i[1].value, i[2].value, i[3].value]);
             });
 
             data['spells'] = [];
             document.querySelectorAll('#spells-body tr').forEach(tr => {
-                const inputs = tr.querySelectorAll('input');
-                data['spells'].push([
-                    inputs[0].value, // lvl
-                    inputs[1].value, // name
-                    inputs[2].checked, // C
-                    inputs[3].checked, // R
-                    inputs[4].checked  // M
-                ]);
+                const i = tr.querySelectorAll('input');
+                data['spells'].push([i[0].value, i[1].value, i[2].checked, i[3].checked, i[4].checked]);
             });
-
-            // Collect spell slots (checkboxes without IDs)
+            
             data['spellSlots'] = [];
-            document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => {
-                data['spellSlots'].push(cb.checked);
-            });
-
+            document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => data['spellSlots'].push(cb.checked));
+            
             return data;
         }
 
         function populateData(data) {
             if(!data) return;
-
-            // ID Inputs
             for (const [key, value] of Object.entries(data)) {
                 const el = document.getElementById(key);
                 if (el) {
@@ -532,66 +524,33 @@
                     else el.value = value;
                 }
             }
-
-            // Tables
             if(data.weapons) {
                 const rows = document.querySelectorAll('#weapons-body tr');
-                data.weapons.forEach((rowData, i) => {
-                    if(rows[i]) {
-                        const inputs = rows[i].querySelectorAll('input');
-                        inputs[0].value = rowData[0];
-                        inputs[1].value = rowData[1];
-                        inputs[2].value = rowData[2];
-                        inputs[3].value = rowData[3];
-                    }
-                });
+                data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r[0]; inputs[1].value=r[1]; inputs[2].value=r[2]; inputs[3].value=r[3]; }});
             }
-
             if(data.spells) {
                 const rows = document.querySelectorAll('#spells-body tr');
-                data.spells.forEach((rowData, i) => {
-                    if(rows[i]) {
-                        const inputs = rows[i].querySelectorAll('input');
-                        inputs[0].value = rowData[0];
-                        inputs[1].value = rowData[1];
-                        inputs[2].checked = rowData[2];
-                        inputs[3].checked = rowData[3];
-                        inputs[4].checked = rowData[4];
-                    }
-                });
+                data.spells.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r[0]; inputs[1].value=r[1]; inputs[2].checked=r[2]; inputs[3].checked=r[3]; inputs[4].checked=r[4]; }});
             }
-
             if(data.spellSlots) {
                 const slots = document.querySelectorAll('.spell-slots-grid input[type="checkbox"]');
-                data.spellSlots.forEach((val, i) => {
-                    if(slots[i]) slots[i].checked = val;
-                });
+                data.spellSlots.forEach((v, i) => { if(slots[i]) slots[i].checked = v; });
             }
         }
 
-        // --- Storage & Versioning ---
+        // --- Storage ---
         function autoSave() {
-            const data = collectData();
-            localStorage.setItem('dnd_current_sheet', JSON.stringify(data));
+            localStorage.setItem('dnd_current_sheet', JSON.stringify(collectData()));
             document.getElementById('status').innerText = 'Saved ' + new Date().toLocaleTimeString();
         }
 
         function saveVersion() {
-            const name = prompt("Name this version (e.g., 'Level 3 Start'):");
+            const name = prompt("Version Name:");
             if(!name) return;
-
-            const current = collectData();
-            const versionObj = {
-                name: name,
-                timestamp: new Date().toISOString(),
-                data: current
-            };
-
             let versions = JSON.parse(localStorage.getItem('dnd_versions') || "[]");
-            versions.push(versionObj);
+            versions.push({ name: name, timestamp: new Date().toISOString(), data: collectData() });
             localStorage.setItem('dnd_versions', JSON.stringify(versions));
             updateVersionDropdown();
-            alert("Version saved!");
         }
 
         function loadData() {
@@ -603,10 +562,9 @@
             const select = document.getElementById('versionSelect');
             select.innerHTML = '<option value="">Load Version...</option>';
             const versions = JSON.parse(localStorage.getItem('dnd_versions') || "[]");
-            
-            versions.forEach((v, index) => {
+            versions.forEach((v, idx) => {
                 const opt = document.createElement('option');
-                opt.value = index;
+                opt.value = idx;
                 opt.text = `${v.name} (${new Date(v.timestamp).toLocaleDateString()})`;
                 select.appendChild(opt);
             });
@@ -615,33 +573,23 @@
         function loadSelectedVersion() {
             const idx = document.getElementById('versionSelect').value;
             if(idx === "") return;
-
-            if(confirm("This will overwrite current unsaved changes. Proceed?")) {
-                const versions = JSON.parse(localStorage.getItem('dnd_versions') || "[]");
-                populateData(versions[idx].data);
-                autoSave(); // Set this as current
-            }
-        }
-
-        function resetSheet() {
-            if(confirm("Clear all fields?")) {
-                document.querySelectorAll('input').forEach(i => {
-                    if(i.type==='checkbox') i.checked=false;
-                    else i.value = "";
-                });
-                document.querySelectorAll('textarea').forEach(t => t.value = "");
+            if(confirm("Overwrite current data?")) {
+                populateData(JSON.parse(localStorage.getItem('dnd_versions'))[idx].data);
                 autoSave();
             }
         }
 
-        // Utility: Debounce to prevent lag
+        function resetSheet() {
+            if(confirm("Clear all?")) {
+                document.querySelectorAll('input').forEach(i => { if(i.type==='checkbox')i.checked=false; else i.value=""; });
+                document.querySelectorAll('textarea').forEach(t=>t.value="");
+                autoSave();
+            }
+        }
+
         function debounce(func, wait) {
             let timeout;
-            return function(...args) {
-                const context = this;
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(context, args), wait);
-            };
+            return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); };
         }
     </script>
 </body>
