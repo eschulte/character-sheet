@@ -242,6 +242,7 @@
         import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+        // --- CONFIGURATION ---
         const firebaseConfig = {
           apiKey: "AIzaSyAMfAkyUevv3BDKSO3yBjRra3jZ_uV5OlA",
           authDomain: "dnd-character-sheet-5e.firebaseapp.com",
@@ -257,23 +258,22 @@
         const provider = new GoogleAuthProvider();
 
         let currentUser = null;
-        let currentCharacterId = "default_char"; 
+        let currentCharacterId = localStorage.getItem('dnd_char_id') || generateUUID();
+        let isCloudOwner = true; // Defaults to true until we load a shared sheet
+
+        // Store ID immediately if it was new
+        localStorage.setItem('dnd_char_id', currentCharacterId);
 
         // --- AUTH EXPORTS ---
         window.login = async () => {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                if(error.code === 'auth/unauthorized-domain') {
-                    alert("Error: Unauthorized Domain. Please add 'localhost' or your current domain to Firebase Console > Authentication > Settings.");
-                } else {
-                    console.error("Login failed", error);
-                    alert("Login failed: " + error.message);
-                }
-            }
+            try { await signInWithPopup(auth, provider); } 
+            catch (error) { alert("Login failed: " + error.message); }
         };
 
-        window.logout = () => signOut(auth);
+        window.logout = () => {
+            signOut(auth);
+            window.location.reload(); // Refresh to clear user state
+        };
 
         onAuthStateChanged(auth, (user) => {
             const authBtn = document.getElementById('auth-btn');
@@ -282,51 +282,120 @@
                 currentUser = user;
                 authBtn.innerText = `Logout (${user.displayName.split(' ')[0]})`;
                 authBtn.onclick = window.logout;
-                statusEl.innerText = "Logged In - Syncing...";
-                loadFromCloud();
+                
+                // If we are viewing our own sheet, try to sync
+                if (isCloudOwner) {
+                    statusEl.innerText = "Online - Syncing...";
+                    saveToCloud(); // Push any local offline changes to cloud
+                }
             } else {
                 currentUser = null;
                 authBtn.innerText = "Login with Google";
                 authBtn.onclick = window.login;
-                statusEl.innerText = "Offline Mode (Local Storage Only)";
+                statusEl.innerText = "Offline Mode (Local Storage)";
             }
         });
 
-        // --- CLOUD SYNC ---
+        // --- CLOUD SYNC LOGIC ---
+        
+        // 1. Save to Cloud (Only if we are the owner)
         async function saveToCloud() {
-            if (!currentUser) return;
+            if (!currentUser || !isCloudOwner) return;
+
             const data = collectData();
+            const statusEl = document.getElementById('status');
+
             try {
-                await setDoc(doc(db, "users", currentUser.uid, "characters", currentCharacterId), {
+                // We use a root collection 'characters' for easier shared access
+                await setDoc(doc(db, "characters", currentCharacterId), {
                     lastUpdated: new Date().toISOString(),
                     sheetData: data,
+                    ownerId: currentUser.uid, // Important for Security Rules
                     ownerEmail: currentUser.email,
-                    visibility: "private"
+                    characterName: data.charName || "Unnamed"
                 }, { merge: true });
-                document.getElementById('status').innerText = 'Cloud Synced ' + new Date().toLocaleTimeString();
+
+                statusEl.innerText = 'Cloud Synced ' + new Date().toLocaleTimeString();
+                statusEl.style.color = '#28a745'; // Green
             } catch (e) {
                 console.error("Cloud save error:", e);
-                document.getElementById('status').innerText = 'Sync Error (See Console)';
+                statusEl.innerText = 'Sync Failed (Offline?)';
+                statusEl.style.color = '#dc3545'; // Red
             }
         }
 
-        async function loadFromCloud() {
-            if (!currentUser) return;
+        // 2. Load Shared Character (Read-Only Mode)
+        async function loadSharedCharacter(sharedId) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerText = "Loading Shared Sheet...";
+            
             try {
-                const docRef = doc(db, "users", currentUser.uid, "characters", currentCharacterId);
+                const docRef = doc(db, "characters", sharedId);
                 const docSnap = await getDoc(docRef);
+
                 if (docSnap.exists()) {
-                    populateData(docSnap.data().sheetData);
+                    const data = docSnap.data();
+                    
+                    // Check ownership
+                    if (currentUser && data.ownerId === currentUser.uid) {
+                        isCloudOwner = true;
+                        statusEl.innerText = "Loaded Your Cloud Sheet";
+                    } else {
+                        isCloudOwner = false;
+                        statusEl.innerText = "Viewing Shared Sheet (Read Only)";
+                        // Visual indicator that this is read-only
+                        document.getElementById('app-controls').style.borderBottom = "3px solid orange";
+                        alert("You are viewing a shared character. Changes will NOT save to the cloud unless you copy it.");
+                    }
+
+                    populateData(data.sheetData);
+                    // Update current ID to match the shared one so we don't overwrite our local "default" immediately
+                    currentCharacterId = sharedId; 
                     updatePageTitle();
                 } else {
-                    console.log("No cloud data found, using local.");
+                    alert("Character not found or deleted.");
                 }
             } catch (e) {
                 console.error("Load error:", e);
+                alert("Could not load character. Check your internet connection.");
             }
         }
 
-        // --- UTILITY EXPORTS (Attached to Window for HTML access) ---
+        // --- EVENT LISTENERS ---
+        
+        // Sync when internet comes back
+        window.addEventListener('online', () => {
+            document.getElementById('status').innerText = "Back Online!";
+            saveToCloud();
+        });
+
+        window.addEventListener('offline', () => {
+             document.getElementById('status').innerText = "You are Offline";
+        });
+
+        // --- UTILITY EXPORTS ---
+        window.shareSheet = async function() {
+            // New Sharing Logic: Share the ID, not the data
+            if (!currentUser) {
+                alert("You must be logged in to generate a cloud link.");
+                return;
+            }
+            // Ensure latest data is in cloud before sharing
+            await saveToCloud();
+            
+            const shareUrl = `${window.location.origin}${window.location.pathname}?charId=${currentCharacterId}`;
+
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                alert("Cloud Link copied! \nAnyone with this link can view (but not edit) this character.");
+            } catch (err) {
+                prompt("Copy this link:", shareUrl);
+            }
+        }
+
+        // ... [KEEP YOUR EXISTING window.addWeaponRow, window.addSpellRow, etc. HERE] ...
+        // (Paste the existing helper functions from the previous version: addWeaponRow, addSpellRow, saveVersion, loadSelectedVersion, resetSheet)
+
         window.addWeaponRow = function() {
             const tbody = document.getElementById('weapons-body');
             const tr = document.createElement('tr');
@@ -375,27 +444,31 @@
                 handleAutoSave();
             }
         }
-
-        window.shareSheet = async function() {
-             const data = collectData();
-            const jsonString = JSON.stringify(data);
-            const encodedData = btoa(unescape(encodeURIComponent(jsonString)));
-            const shareUrl = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
-
-            try {
-                await navigator.clipboard.writeText(shareUrl);
-                alert("Sharable link copied to clipboard!");
-            } catch (err) {
-                prompt("Copy this link:", shareUrl);
-            }
-        }
-
+        
         // --- INTERNAL HELPERS ---
         function handleAutoSave() {
+            // 1. Always save to LocalStorage (Offline support)
             localStorage.setItem('dnd_current_sheet', JSON.stringify(collectData()));
-            document.getElementById('status').innerText = 'Local Saved ' + new Date().toLocaleTimeString();
+            
+            const statusEl = document.getElementById('status');
+            // Only update text if we aren't currently running a cloud sync to avoid flickering
+            if(!statusEl.innerText.includes('Sync')) {
+                statusEl.innerText = 'Local Saved ' + new Date().toLocaleTimeString();
+            }
+
+            // 2. Try to Sync to Cloud (if owner and online)
             saveToCloud();
         }
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        
+        // ... [KEEP YOUR EXISTING collectData, populateData, updateVersionDropdown, debounce, updatePageTitle HERE] ...
+        // (Paste these exactly as they were in the previous working version)
 
         function collectData() {
             const data = {};
@@ -430,18 +503,14 @@
                 }
             }
             if(data.weapons) {
-                // Clear existing first
                 document.getElementById('weapons-body').innerHTML = '';
                 for(let i=0; i<Math.max(5, data.weapons.length); i++) window.addWeaponRow();
-                
                 const rows = document.querySelectorAll('#weapons-body tr');
                 data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r[0]; inputs[1].value=r[1]; inputs[2].value=r[2]; inputs[3].value=r[3]; }});
             }
             if(data.spells) {
-                // Clear existing
                 document.getElementById('spells-body').innerHTML = '';
                 for(let i=0; i<Math.max(15, data.spells.length); i++) window.addSpellRow();
-
                 const rows = document.querySelectorAll('#spells-body tr');
                 data.spells.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r[0]; inputs[1].value=r[1]; inputs[2].checked=r[2]; inputs[3].checked=r[3]; inputs[4].checked=r[4]; }});
             }
@@ -477,25 +546,9 @@
             else if (name) document.title = `${name} - 5e`;
         }
 
-        function loadFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const encodedData = urlParams.get('data');
-            if (encodedData) {
-                try {
-                    const jsonString = decodeURIComponent(escape(atob(encodedData)));
-                    const data = JSON.parse(jsonString);
-                    if (confirm("Load shared character?")) {
-                        populateData(data);
-                        handleAutoSave();
-                        window.history.replaceState({}, document.title, window.location.pathname);
-                    }
-                } catch (e) { console.error("URL Load Error", e); }
-            }
-        }
-
-        // --- GENERATE HTML CONTENT (Moved from document.write) ---
+        // --- CONTENT GENERATION ---
         function generateStaticContent() {
-            // 1. Ability Scores
+             // 1. Ability Scores
             const abilityData = {
                 "Strength": ["Athletics"], "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"], "Constitution": [],
                 "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"],
@@ -545,35 +598,42 @@
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            generateStaticContent(); // Replaces document.write
+            generateStaticContent();
             
             for(let i=0; i<5; i++) window.addWeaponRow();
             for(let i=0; i<15; i++) window.addSpellRow();
 
-            // Delay listener attachment slightly to ensure dynamic rows exist
+            // Load logic: Check URL for ID first, otherwise load local
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedId = urlParams.get('charId');
+
+            if (sharedId) {
+                // If ID is in URL, fetch from cloud
+                loadSharedCharacter(sharedId);
+            } else {
+                // Otherwise load local storage
+                const stored = localStorage.getItem('dnd_current_sheet');
+                if(stored) populateData(JSON.parse(stored));
+                updatePageTitle();
+            }
+
             setTimeout(() => {
                 const allInputs = document.querySelectorAll('input, textarea');
                 allInputs.forEach(input => {
                     input.addEventListener('input', debounce(handleAutoSave, 1000));
                     input.addEventListener('change', handleAutoSave);
                 });
-                // Title updates
                 ['charName', 'class'].forEach(id => {
                     document.getElementById(id)?.addEventListener('input', updatePageTitle);
                 });
             }, 100);
 
-            // Load Data
-            loadFromUrl();
-            const stored = localStorage.getItem('dnd_current_sheet');
-            if(stored) populateData(JSON.parse(stored));
             updateVersionDropdown();
-            updatePageTitle();
 
             if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
                 navigator.serviceWorker.register('sw.js').catch(err => console.log('SW fail', err));
             }
         });
     </script>
-</body>
+  </body>
 </html>
