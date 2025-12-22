@@ -10,6 +10,7 @@ https://eschulte.github.io/character-sheet
 - Sharing links
 - Update the title to match the name, species, and class
 - Hide the up/down arrows when not hovering for better look
+- Automate modifier calculation
 
 Bugs:
 - Currently firebase is throwing errors like:
@@ -21,7 +22,6 @@ Features:
 - Switch to a tabbed interface on mobile with tabs like "Combat," "Skills," "Spells," "Bio"
 - Touch friendly interface on mobile with "+" and "-" buttons to avoid raising the keyboard as much
 - Make some section collapsible on mobile to save space
-- Automate modified calculation
 - Automate Skill/Save calculation
 - Add short/long rest buttons for automatic reset
 - Add lookup from https://open5e.com for completion of spells, equipment, and anything else

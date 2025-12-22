@@ -67,7 +67,7 @@
         @media screen and (max-width: 768px) {
             body { display: block; padding: 0; }
             #app-controls { position: absolute; }
-            .sheet-container { margin-top: 0; padding: 10px; padding-top: 80px; border-radius: 0; box-shadow: none; }
+            .sheet-container { margin-top: 0; padding: 10px; padding-top: 110px; border-radius: 0; box-shadow: none; }
             .main-grid, .spell-grid-layout, .main-header, .combat-row-1, .combat-row-2, .spell-header, .bottom-sections, .prof-grid { display: flex; flex-direction: column; }
             #status { margin-left: 0; width: 100%; }
         }
@@ -449,6 +449,49 @@
         }
         
         // --- INTERNAL HELPERS ---
+        function updateModifiers() {
+            const stats = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+            const profBonus = parseInt(document.getElementById('prof-bonus').value) || 0;
+
+            stats.forEach(stat => {
+                const scoreEl = document.getElementById(`${stat}-score`);
+                const modEl = document.getElementById(`${stat}-mod`);
+
+                if (scoreEl && modEl) {
+                   const score = parseInt(scoreEl.value);
+                   if (isNaN(score)) {
+                       modEl.value = ""; 
+                   } else {
+                       const mod = Math.floor((score - 10) / 2);
+                       modEl.value = (mod >= 0 ? "+" : "") + mod;
+
+                       // Update Saving Throw
+                       const saveProf = document.getElementById(`save-prof-${stat}`).checked;
+                       const saveVal = document.getElementById(`save-val-${stat}`);
+                       const totalSave = mod + (saveProf ? profBonus : 0);
+                       saveVal.value = (totalSave >= 0 ? "+" : "") + totalSave;
+
+                       // Update Associated Skills
+                       const skillInputs = document.querySelectorAll(`[id^="val-${stat}-"]`);
+                       skillInputs.forEach(skillInput => {
+                           const skillId = skillInput.id.replace('val-', 'prof-');
+                           const isProficient = document.getElementById(skillId).checked;
+                           const totalSkill = mod + (isProficient ? profBonus : 0);
+                           skillInput.value = (totalSkill >= 0 ? "+" : "") + totalSkill;
+                       });
+                    }
+            }
+
+            });
+
+            // Update Passive Perception
+            const percVal = parseInt(document.getElementById('val-wisdom-perception').value) || 0;
+            const passPercEl = document.getElementById('pass-perc');
+            if (passPercEl) {
+                passPercEl.value = 10 + percVal;
+            }
+        }
+
         function handleAutoSave() {
             // 1. Always save to LocalStorage (Offline support)
             localStorage.setItem('dnd_current_sheet', JSON.stringify(collectData()));
@@ -481,12 +524,12 @@
             data['weapons'] = [];
             document.querySelectorAll('#weapons-body tr').forEach(tr => {
                 const i = tr.querySelectorAll('input');
-                data['weapons'].push([i[0].value, i[1].value, i[2].value, i[3].value]);
+                data['weapons'].push({name: i[0].value, atk: i[1].value, dmg: i[2].value, notes: i[3].value});
             });
             data['spells'] = [];
             document.querySelectorAll('#spells-body tr').forEach(tr => {
                 const i = tr.querySelectorAll('input');
-                data['spells'].push([i[0].value, i[1].value, i[2].checked, i[3].checked, i[4].checked]);
+                data['spells'].push({lvl: i[0].value, name: i[1].value, conc: i[2].checked, rit: i[3].checked, mat: i[4].checked});
             });
             data['spellSlots'] = {};
             document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => {
@@ -509,13 +552,13 @@
                 document.getElementById('weapons-body').innerHTML = '';
                 for(let i=0; i<Math.max(5, data.weapons.length); i++) window.addWeaponRow();
                 const rows = document.querySelectorAll('#weapons-body tr');
-                data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r[0]; inputs[1].value=r[1]; inputs[2].value=r[2]; inputs[3].value=r[3]; }});
+                data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.name; inputs[1].value=r.atk; inputs[2].value=r.dmg; inputs[3].value=r.notes; }});
             }
             if(data.spells) {
                 document.getElementById('spells-body').innerHTML = '';
                 for(let i=0; i<Math.max(15, data.spells.length); i++) window.addSpellRow();
                 const rows = document.querySelectorAll('#spells-body tr');
-                data.spells.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r[0]; inputs[1].value=r[1]; inputs[2].checked=r[2]; inputs[3].checked=r[3]; inputs[4].checked=r[4]; }});
+                data.spells.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.lvl; inputs[1].value=r.name; inputs[2].checked=r.conc; inputs[3].checked=r.rit; inputs[4].checked=r.mat; }});
             }
             if(data.spellSlots) {
                 for (const [slotId, checked] of Object.entries(data.spellSlots)) {
@@ -573,11 +616,11 @@
                         <span class="box-title">${stat}</span>
                         <div style="position: relative;">
                             <input type="number" id="${lowStat}-score" class="ability-score" placeholder="10"><span class="label-sm">Score</span>
-                            <input type="number" id="${lowStat}-mod" class="ability-mod" placeholder="+0"><span class="label-sm">Modifier</span>
+                            <input type="text" id="${lowStat}-mod" class="ability-mod" placeholder="+0"><span class="label-sm">Modifier</span>
                         </div>
                         <div class="skills-list">
                             <div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;">
-                                <input type="number" class="save-val-input" id="save-val-${lowStat}" placeholder="0"><input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}"><span>Saving Throw</span>
+                                <input type="text" class="save-val-input" id="save-val-${lowStat}" placeholder="0"><input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}"><span>Saving Throw</span>
                             </div>${skillsHtml}
                         </div>
                     </div>`;
@@ -624,6 +667,15 @@
                 const allInputs = document.querySelectorAll('input, textarea');
                 allInputs.forEach(input => {
                     input.addEventListener('input', debounce(handleAutoSave, 1000));
+
+                    // Trigger math on Score, Prof Bonus, or Checkbox clicks
+                    if (input.id.endsWith('-score') || input.id === 'prof-bonus') {
+                        input.addEventListener('input', updateModifiers);
+                    }
+                    if (input.type === 'checkbox' && (input.id.includes('prof-') || input.id.includes('save-prof-'))) {
+                        input.onchange = updateModifiers;
+                    }
+
                     input.addEventListener('change', handleAutoSave);
                 });
                 ['charName', 'class'].forEach(id => {
