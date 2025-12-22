@@ -7,13 +7,30 @@ https://eschulte.github.io/character-sheet
 - Snapshots to easily view and recover old versions
 - Mobile friendly
 - Simple and easy to use
-
-Todo:
 - Sharing links
 - Update the title to match the name, species, and class
 - Hide the up/down arrows when not hovering for better look
+
+Bugs:
+- Currently firebase is throwing errors like:
+  FirebaseError: [code=invalid-argument]: Function setDoc() called with invalid data. Nested arrays are not supported (found in document characters/6ca20fbb-9adb-4a34-970b-76332e16c255)
+
+Features:
+- Conflict Detection with modification on multiple devices add a "last updated" field to check on update
+- Use the status element to indicate if the current changes have sync'd to firebase
+- Switch to a tabbed interface on mobile with tabs like "Combat," "Skills," "Spells," "Bio"
+- Touch friendly interface on mobile with "+" and "-" buttons to avoid raising the keyboard as much
+- Make some section collapsible on mobile to save space
+- Automate modified calculation
+- Automate Skill/Save calculation
+- Add short/long rest buttons for automatic reset
+- Add lookup from https://open5e.com for completion of spells, equipment, and anything else
+- Add a "New Version available - Click to Update" button in the status element when applicable
+- Update the status element to indicate when offline
 - Tool tips on hover
 - Suggested smart completion for spell names
+
+
 
 ```js
 // Your web app's Firebase configuration
