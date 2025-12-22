@@ -34,6 +34,7 @@ Features:
 
 ```js
 // Your web app's Firebase configuration
+// https://console.firebase.google.com/project/dnd-character-sheet-5e/
 const firebaseConfig = {
   apiKey: "AIzaSyAMfAkyUevv3BDKSO3yBjRra3jZ_uV5OlA",
   authDomain: "dnd-character-sheet-5e.firebaseapp.com",

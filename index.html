@@ -159,9 +159,9 @@
                 </div>
 
                 <br>
-                <div class="panel" style="min-height: 200px;">
+                <div class="panel">
                     <span class="box-title">Class Features</span>
-                    <textarea id="class-features" style="height: 100%; border:none;"></textarea>
+                    <textarea id="class-features" style="height: 200px; border:none;"></textarea>
                 </div>
 
                 <div class="bottom-sections">
@@ -179,8 +179,8 @@
                         <label><input type="checkbox" id="prof-shields"> Shields</label>
                     </div>
                     <div class="prof-grid">
-                        <div><span class="label-sm">Weapons</span><textarea id="prof-weapons-text" style="height: 60px;"></textarea></div>
-                        <div><span class="label-sm">Tools</span><textarea id="prof-tools-text" style="height: 60px;"></textarea></div>
+                        <div><span class="label-sm">Weapons</span><textarea id="prof-weapons-text" style="height: 240px;"></textarea></div>
+                        <div><span class="label-sm">Tools</span><textarea id="prof-tools-text" style="height: 240px;"></textarea></div>
                     </div>
                 </div>
             </div>
@@ -192,7 +192,18 @@
                     <div class="panel">
                         <span class="box-title" style="margin-bottom: 10px; display:block;">Spellcasting</span>
                         <div class="spell-stats-box">
-                            <div class="spell-stat-item"><span class="label-sm">Ability</span><input type="text" id="spell-ability" style="text-align:center;"></div>
+                            <div class="spell-stat-item">
+                                <span class="label-sm">Ability</span>
+                                <select id="spell-ability" style="width: 100%; background: transparent; border: none; border-bottom: 1px solid var(--border-color); text-align: center; font-family: inherit;">
+                                    <option value="">None</option>
+                                    <option value="strength">Str</option>
+                                    <option value="dexterity">Dex</option>
+                                    <option value="constitution">Con</option>
+                                    <option value="intelligence">Int</option>
+                                    <option value="wisdom">Wis</option>
+                                    <option value="charisma">Cha</option>
+                                </select>
+                            </div>
                             <div class="spell-stat-item"><span class="label-sm">Modifier</span><input type="text" id="spell-mod" style="text-align:center;"></div>
                             <div class="spell-stat-item"><span class="label-sm">Save DC</span><input type="text" id="spell-save-dc" style="text-align:center;"></div>
                             <div class="spell-stat-item"><span class="label-sm">Atk Bonus</span><input type="text" id="spell-atk" style="text-align:center;"></div>
@@ -480,9 +491,22 @@
                            skillInput.value = (totalSkill >= 0 ? "+" : "") + totalSkill;
                        });
                     }
-            }
-
+                }
             });
+
+            // Update Spellcasting Stats
+            const selectedStat = document.getElementById('spell-ability').value;
+            if (selectedStat) {
+                const scoreEl = document.getElementById(`${selectedStat}-score`);
+                const mod = Math.floor((parseInt(scoreEl.value || 10) - 10) / 2);
+                document.getElementById('spell-mod').value = (mod >= 0 ? "+" : "") + mod;
+                document.getElementById('spell-save-dc').value = 8 + profBonus + mod;
+                document.getElementById('spell-atk').value = (profBonus + mod >= 0 ? "+" : "") + (profBonus + mod);
+            } else {
+                document.getElementById('spell-mod').value = "";
+                document.getElementById('spell-save-dc').value = "";
+                document.getElementById('spell-atk').value = "";
+            }
 
             // Update Passive Perception
             const percVal = parseInt(document.getElementById('val-wisdom-perception').value) || 0;
@@ -664,13 +688,16 @@
             }
 
             setTimeout(() => {
-                const allInputs = document.querySelectorAll('input, textarea');
+                const allInputs = document.querySelectorAll('input, textarea, select');
                 allInputs.forEach(input => {
                     input.addEventListener('input', debounce(handleAutoSave, 1000));
 
                     // Trigger math on Score, Prof Bonus, or Checkbox clicks
                     if (input.id.endsWith('-score') || input.id === 'prof-bonus') {
                         input.addEventListener('input', updateModifiers);
+                    }
+                    if (input.id === 'spell-ability') {
+                        input.addEventListener('change', updateModifiers);
                     }
                     if (input.type === 'checkbox' && (input.id.includes('prof-') || input.id.includes('save-prof-'))) {
                         input.onchange = updateModifiers;
