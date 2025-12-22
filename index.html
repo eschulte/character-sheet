@@ -25,7 +25,7 @@
         @media (hover: hover) { input[type="number"]:hover::-webkit-outer-spin-button, input[type="number"]:hover::-webkit-inner-spin-button { -webkit-appearance: auto; } input[type="number"]:hover { -moz-appearance: number-input; } }
         textarea { resize: vertical; border: 1px solid var(--faint-line); padding: 5px; }
         .label-sm { font-size: 0.7rem; text-transform: uppercase; color: #666; font-family: sans-serif; display: block; margin-top: 2px;}
-        .main-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; }
+        .main-header { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr; gap: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; }
         .header-section { display: flex; flex-direction: column; justify-content: flex-end; }
         .main-grid { display: grid; grid-template-columns: 1fr 2.6fr; gap: 25px; }
         .stats-col { display: flex; flex-direction: column; gap: 15px; }
@@ -44,6 +44,8 @@
         .box-title { font-family: sans-serif; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 5px;}
         .death-save-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; }
         .ds-bubbles { display: flex; gap: 5px; }
+        .physical-traits-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 5px; }
+        .trait-item { text-align: center; }
         .weapons-table, .spells-list-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
         .weapons-table th, .spells-list-table th { text-align: left; border-bottom: 2px solid var(--border-color); font-size: 0.8rem; }
         .weapons-table td, .spells-list-table td { border-bottom: 1px solid var(--faint-line); padding: 5px 0; }
@@ -93,8 +95,16 @@
             <div class="header-section">
                 <input type="text" id="charName" placeholder="Character Name" style="font-size: 1.5rem; font-weight: bold;">
                 <span class="label-sm">Character Name</span>
-                <input type="text" id="species" placeholder="Species" style="margin-top: 5px;">
-                <span class="label-sm">Species</span>
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <div style="flex: 1;">
+                        <input type="text" id="species" placeholder="Species">
+                        <span class="label-sm">Species</span>
+                    </div>
+                    <div style="flex: 1;">
+                        <input type="text" id="background" placeholder="Background">
+                        <span class="label-sm">Background</span>
+                    </div>
+                </div>
             </div>
             <div class="header-section">
                 <input type="text" id="class">
@@ -149,6 +159,20 @@
                     </div>
                 </div>
 
+                <div class="panel" style="margin-bottom: 15px;">
+                    <span class="box-title">Physical Characteristics</span>
+                    <div class="physical-traits-grid">
+                        <div class="trait-item"><input type="text" id="age" placeholder="25"><span class="label-sm">Age</span></div>
+                        <div class="trait-item"><input type="text" id="height" placeholder="5'10"><span class="label-sm">Height</span></div>
+                        <div class="trait-item"><input type="text" id="weight" placeholder="160 lbs"><span class="label-sm">Weight</span></div>
+                    </div>
+                    <div class="physical-traits-grid">
+                        <div class="trait-item"><input type="text" id="eyes" placeholder="Blue"><span class="label-sm">Eyes</span></div>
+                        <div class="trait-item"><input type="text" id="skin" placeholder="Fair"><span class="label-sm">Skin</span></div>
+                        <div class="trait-item"><input type="text" id="hair" placeholder="Brown"><span class="label-sm">Hair</span></div>
+                    </div>
+                </div>
+
                 <div class="panel">
                     <span class="box-title">Weapons & Damage Cantrips</span>
                     <table class="weapons-table">
@@ -156,17 +180,6 @@
                         <tbody id="weapons-body"></tbody>
                     </table>
                     <button onclick="addWeaponRow()" style="width: 100%;">+</button>
-                </div>
-
-                <br>
-                <div class="panel">
-                    <span class="box-title">Class Features</span>
-                    <textarea id="class-features" style="height: 200px; border:none;"></textarea>
-                </div>
-
-                <div class="bottom-sections">
-                    <div class="panel tall-box"><span class="box-title">Species Traits</span><textarea id="species-traits" style="height: 100%; border:none;"></textarea></div>
-                    <div class="panel tall-box"><span class="box-title">Feats</span><textarea id="feats" style="height: 100%; border:none;"></textarea></div>
                 </div>
 
                 <div class="panel" style="margin-top: 10px;">
@@ -183,6 +196,17 @@
                         <div><span class="label-sm">Tools</span><textarea id="prof-tools-text" style="height: 240px;"></textarea></div>
                     </div>
                 </div>
+
+                <div class="panel" style="margin-top: 10px;">
+                    <span class="box-title">Class Features</span>
+                    <textarea id="class-features" style="height: 200px; border:none;"></textarea>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="panel tall-box"><span class="box-title">Species Traits</span><textarea id="species-traits" style="height: 100%; border:none;"></textarea></div>
+                    <div class="panel tall-box"><span class="box-title">Feats</span><textarea id="feats" style="height: 100%; border:none;"></textarea></div>
+                </div>
+
             </div>
         </div>
 
