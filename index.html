@@ -325,6 +325,11 @@
                 currentUser = user;
                 authBtn.innerText = `Logout (${user.displayName.split(' ')[0]})`;
                 authBtn.onclick = window.logout;
+
+                const data = collectData();
+                if (data.ownerId === currentUser.uid) {
+                    isCloudOwner = true;
+                }
                 
                 // If we are viewing our own sheet, try to sync
                 if (isCloudOwner) {
