@@ -65,6 +65,14 @@
         .coins { display: flex; gap: 5px; justify-content: space-around; }
         .coin-slot input { width: 40px; text-align: center; }
 
+        @media screen and (max-width: 768px) {
+            body { display: block; padding: 0; }
+            #app-controls { position: absolute; }
+            .sheet-container { margin-top: 0; padding: 10px; padding-top: 110px; border-radius: 0; box-shadow: none; }
+            .main-grid, .spell-grid-layout, .main-header, .combat-row-1, .combat-row-2, .spell-header, .bottom-sections, .prof-grid { display: flex; flex-direction: column; }
+            #status { margin-left: 0; width: 100%; }
+        }
+
         /* TOOLTIP CSS */
         #ai-tooltip {
             position: fixed; background: rgba(20, 20, 20, 0.95); color: #dcd6c7; padding: 10px 15px; border-radius: 4px;
