@@ -137,10 +137,10 @@
 
             <div class="main-col">
                 <div class="combat-row-1">
-                    <div class="shield-box"><span class="box-title">Initiative</span><input type="text" id="initiative" style="text-align: center; font-size: 1.5rem;"></div>
-                    <div class="shield-box"><span class="box-title">Speed</span><input type="text" id="speed" style="text-align: center; font-size: 1.5rem;"></div>
-                    <div class="shield-box"><span class="box-title">Size</span><input type="text" id="size" style="text-align: center; font-size: 1.5rem;"></div>
-                    <div class="shield-box"><span class="box-title">Passive Perc.</span><input type="text" id="pass-perc" style="text-align: center; font-size: 1.5rem;"></div>
+                    <div class="shield-box"><span class="box-title">Initiative</span><input type="text" id="initiative" placeholder="d20 + dex mod" style="text-align: center; font-size: 1rem;"></div>
+                    <div class="shield-box"><span class="box-title">Speed</span><input type="text" id="speed" style="text-align: center; font-size: 1rem;"></div>
+                    <div class="shield-box"><span class="box-title">Size</span><input type="text" id="size" style="text-align: center; font-size: 1rem;"></div>
+                    <div class="shield-box"><span class="box-title">Passive Perc.</span><input type="text" id="pass-perc" style="text-align: center; font-size: 1rem;"></div>
                 </div>
 
                 <div class="combat-row-2">
@@ -199,7 +199,12 @@
 
                 <div class="panel" style="margin-top: 10px;">
                     <span class="box-title">Class Features</span>
-                    <textarea id="class-features" style="height: 200px; border:none;"></textarea>
+                    <textarea id="class-features" style="height: 120px; border:none;"></textarea>
+                </div>
+
+                <div class="panel" style="margin-top: 10px;">
+                    <span class="box-title">Background Features</span>
+                    <textarea id="background-features" style="height: 100px; border:none;"></textarea>
                 </div>
 
                 <div class="bottom-sections">
@@ -250,7 +255,7 @@
             </div>
 
             <div class="bio-col">
-                <div class="panel"><span class="box-title">Appearance</span><textarea id="appearance" style="height: 80px; border:none;"></textarea></div>
+                <div class="panel"><span class="box-title">Appearance</span><textarea id="appearance" style="height: 120px; border:none;"></textarea></div>
                 <div class="panel" style="height: 250px; display: flex; flex-direction: column;">
                     <span class="box-title">Backstory & Personality</span>
                     <textarea id="backstory" style="flex-grow: 1; border:none;"></textarea>
@@ -566,7 +571,7 @@
 
         function collectData() {
             const data = {};
-            document.querySelectorAll('input[id], textarea[id]').forEach(el => {
+            document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => {
                 data[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
             });
             data['weapons'] = [];
@@ -593,6 +598,7 @@
                 const el = document.getElementById(key);
                 if (el) {
                     if(el.type === 'checkbox') el.checked = value;
+                    else if(el.tagName === 'SELECT') el.value = value;
                     else el.value = value;
                 }
             }
