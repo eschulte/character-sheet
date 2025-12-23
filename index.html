@@ -247,7 +247,7 @@
                 <div class="panel">
                     <span class="box-title">Cantrips & Prepared Spells</span>
                     <table class="spells-list-table">
-                        <thead><tr><th width="30">Lvl</th><th>Name</th><th width="80" style="text-align: center;">C / R / M</th></tr></thead>
+                        <thead><tr><th width="30">Lvl</th><th>Name</th><th width="120" style="text-align: center;"><span title="Verbal, Somatic, Concentration, Ritual, Required Material">V / S / C / R / M</span></th></tr></thead>
                         <tbody id="spells-body"></tbody>
                     </table>
                     <button onclick="addSpellRow()" style="width: 100%;">+</button>
@@ -454,6 +454,8 @@
                 <td><input type="text" style="width:25px; text-align:center;"></td>
                 <td><input type="text"></td>
                 <td style="white-space: nowrap; text-align: center;">
+                    <input type="checkbox" class="diamond-check" title="Verbal">
+                    <input type="checkbox" class="diamond-check" title="Somatic">
                     <input type="checkbox" class="diamond-check" title="Concentration">
                     <input type="checkbox" class="diamond-check" title="Ritual">
                     <input type="checkbox" class="diamond-check" title="Material">
