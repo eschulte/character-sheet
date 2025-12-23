@@ -72,8 +72,9 @@
             pointer-events: none; opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.5); line-height: 1.4;
         }
         #ai-tooltip strong { color: #ff5555; display: block; margin-bottom: 4px; text-transform: uppercase; font-size: 0.75rem; border-bottom: 1px solid #444; padding-bottom: 2px; }
-        [data-tip] { cursor: help; border-bottom: 1px dotted #888; }
-        [data-tip]:hover, [data-tip]:focus { color: #800; border-bottom: 1px solid #800; outline: none; }
+        body.tips-enabled [data-tip] { cursor: help; border-bottom: 1px dotted #888; }
+        body.tips-enabled [data-tip]:hover, body.tips-enabled [data-tip]:focus { color: #800; border-bottom: 1px solid #800; outline: none; }
+        [data-tip] { outline: none; } /* Prevent default focus outlines if tips are off */
     </style>
 </head>
 <body>
@@ -83,6 +84,7 @@
     <div id="app-controls">
         <span><b>D&D 5e</b></span>
         <button id="auth-btn">Login with Google</button>
+        <button id="toggle-tips" onclick="toggleTips()" style="background: #222;">Tips: OFF</button>
         <button onclick="saveVersion(true)">Save Snapshot</button>
         <select id="versionSelect" onchange="loadSelectedVersion()">
             <option value="">Load Version...</option>
@@ -164,7 +166,7 @@
                 </div>
 
                 <div class="panel" style="margin-bottom: 15px;">
-                    <span class="box-title" data-tip="Physical" tabindex="0">Physical Characteristics</span>
+                    <span class="box-title" tabindex="0">Physical Characteristics</span>
                     <div class="physical-traits-grid">
                         <div class="trait-item"><input type="text" id="age" placeholder="25"><span class="label-sm">Age</span></div>
                         <div class="trait-item"><input type="text" id="height" placeholder="5'10"><span class="label-sm">Height</span></div>
@@ -302,6 +304,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         // --- DUNGEON AI DICTIONARY ---
+        let tipsEnabled = false;
         let AI_COMMENTS = {}; // Initialize as empty
 
         const firebaseConfig = {
@@ -323,6 +326,7 @@
         let isCloudOwner = true;
         let isLoading = false;
         let lastAutoSaveTime = 0;
+        let hasUnsavedChanges = false;
 
         localStorage.setItem('dnd_char_id', currentCharacterId);
 
@@ -349,7 +353,6 @@
             }
         });
 
-        // --- DYNAMIC CONTENT GENERATION (Restored to fix Traits & Tooltips) ---
         function generateStaticContent() {
             // Ability Scores with Tooltips
             const abilityData = {
@@ -399,7 +402,15 @@
             }
         }
 
-        // --- TOOLTIPS (Restored) ---
+        // --- TOOLTIPS ---
+         window.toggleTips = () => {
+             tipsEnabled = !tipsEnabled;
+             const btn = document.getElementById('toggle-tips');
+             document.body.classList.toggle('tips-enabled', tipsEnabled);
+             btn.innerText = `Tips: ${tipsEnabled ? 'ON' : 'OFF'}`;
+             btn.style.background = tipsEnabled ? '#4a5568' : '#222';
+         };
+
         async function setupTooltips() {
             try {
                 const response = await fetch('./ai_comments.json');
@@ -414,6 +425,7 @@
             let currentTarget = null;
 
             function showTip(e, text, title) {
+                if (!tipsEnabled || !text || text.length === 0) return;
                 const quote = text[Math.floor(Math.random() * text.length)];
                 tooltipEl.innerHTML = `<strong>${title}</strong>${quote}`;
                 tooltipEl.style.opacity = '1';
@@ -436,11 +448,21 @@
                 currentTarget = null;
             }
 
+            // Helper to find matches in dictionary (case-insensitive)
+            function getMatch(str) {
+                const search = str.trim().toLowerCase();
+                const key = Object.keys(AI_COMMENTS).find(k => k.toLowerCase() === search);
+                return key ? { title: key, text: AI_COMMENTS[key] } : null;
+            }
+
             document.body.addEventListener('mouseover', (e) => {
                 const target = e.target.closest('[data-tip]');
-                if (target && AI_COMMENTS[target.dataset.tip]) {
-                    currentTarget = target;
-                    showTip(e, AI_COMMENTS[target.dataset.tip], target.dataset.tip);
+                if (target) {
+                    const match = getMatch(target.dataset.tip);
+                    if (match) {
+                        currentTarget = target;
+                        showTip(e, match.text, match.title);
+                    }
                 }
             });
 
@@ -459,16 +481,18 @@
         }
 
         // --- CLOUD SYNC & RACE CONDITION FIXES ---
+        let initialLoadNoAsk = true;
         function setupRealtimeListener() {
             if (!currentUser) return;
             onSnapshot(doc(db, "characters", currentCharacterId), (docSnap) => {
                 if (docSnap.exists()) {
                     const cloudData = docSnap.data();
-                    if (!isLoading) {
+                    if (!isLoading && !hasUnsavedChanges) {
                         const localTime = parseInt(localStorage.getItem('dnd_last_edit_ts') || '0');
                         const cloudTime = new Date(cloudData.lastUpdated || 0).getTime();
                         if (cloudTime > localTime + 2000) { 
-                            if(confirm("Newer version found on server. Load it?")) {
+                            if(initialLoadNoAsk || confirm("Newer version found on server. Load it?")) {
+                                initialLoadNoAsk = false;
                                 isLoading = true;
                                 populateData(cloudData.sheetData);
                                 isLoading = false;
@@ -506,6 +530,7 @@
                 }, { merge: true });
                 
                 lastAutoSaveTime = now;
+                hasUnsavedChanges = false;
                 localStorage.setItem('dnd_last_edit_ts', now);
                 statusEl.innerText = 'Saved ' + new Date().toLocaleTimeString();
                 statusEl.style.color = '#28a745';
@@ -654,6 +679,7 @@
             if (e.target.id.endsWith('-score') || e.target.id === 'prof-bonus' || e.target.type === 'checkbox' || e.target.id === 'spell-ability') {
                 updateModifiers();
             }
+            hasUnsavedChanges = true;
             debounce(() => saveToCloud(false), 2000)();
         }
 

@@ -319,7 +319,8 @@
     "Quantified regret delivered.",
     "Transfer of force begins at the ground up."
 ],
-"Proficiencies_List": [
+"Proficiencies": [
+    "Things you’re officially allowed to be good at.",
     "Tasks you\u2019re licensed to attempt.",
     "Everything else is freestyle."
 ],
@@ -327,7 +328,7 @@
     "Your class-issued advantages.",
     "Use them or be judged silently."
 ],
-"Background Features": [
+"Background": [
     "Proof you existed before the violence.",
     "Old habits show in how you stand."
 ],
@@ -376,8 +377,13 @@
     "Interrupted magic."
 ],
 "Appearance": [
-    "Your visual branding.",
-    "Footwear noted. Style logged."
+    "This is what enemies see right before deciding how seriously to take you.",
+    "Your visual presentation: armor, scars, posture, and unresolved trauma.",
+    "Appearance affects first impressions, targeting priority, and NPC assumptions.",
+    "This is not cosmetic. This is narrative telegraphing.",
+    "Describe what stands out immediately, not your tragic backstory.",
+    "Blood, dirt, and wear accumulate faster than you think.",
+    "The dungeon notices silhouettes, motion, and menace.",
 ],
 "Backstory": [
     "Narrative justification for your issues.",
