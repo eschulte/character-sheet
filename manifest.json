@@ -7,12 +7,7 @@
   "theme_color": "#333333",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192.png?text=D%26D",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://via.placeholder.com/512.png?text=D%26D",
+      "src": "https://eschulte.github.io/icon-512.png?text=D%26D",
       "sizes": "512x512",
       "type": "image/png"
     }
