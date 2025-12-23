@@ -11,7 +11,6 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#fdf6e3">
     <style>
-        /* [KEEPING YOUR EXISTING CSS UNCHANGED] */
         :root { --bg-color: #fdf6e3; --text-color: #2b2b2b; --border-color: #5c4b3f; --faint-line: #dcd6c7; }
         * { box-sizing: border-box; }
         body { font-family: 'Georgia', 'Times New Roman', serif; background-color: #222; margin: 0; padding: 20px; color: var(--text-color); display: flex; justify-content: center; }
@@ -65,32 +64,12 @@
         .coins-container { border: 2px solid var(--border-color); padding: 5px; border-radius: 10px; display: flex; flex-direction: column; }
         .coins { display: flex; gap: 5px; justify-content: space-around; }
         .coin-slot input { width: 40px; text-align: center; }
-        
-        @media screen and (max-width: 768px) {
-            body { display: block; padding: 0; }
-            #app-controls { position: absolute; }
-            .sheet-container { margin-top: 0; padding: 10px; padding-top: 110px; border-radius: 0; box-shadow: none; }
-            .main-grid, .spell-grid-layout, .main-header, .combat-row-1, .combat-row-2, .spell-header, .bottom-sections, .prof-grid { display: flex; flex-direction: column; }
-            #status { margin-left: 0; width: 100%; }
-        }
 
-        /* [NEW MINIMAL TOOLTIP CSS] */
+        /* TOOLTIP CSS */
         #ai-tooltip {
-            position: fixed;
-            background: rgba(20, 20, 20, 0.95);
-            color: #dcd6c7;
-            padding: 10px 15px;
-            border-radius: 4px;
-            border: 1px solid #800;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            max-width: 250px;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            line-height: 1.4;
+            position: fixed; background: rgba(20, 20, 20, 0.95); color: #dcd6c7; padding: 10px 15px; border-radius: 4px;
+            border: 1px solid #800; font-family: 'Courier New', monospace; font-size: 0.85rem; max-width: 250px; z-index: 9999;
+            pointer-events: none; opacity: 0; transition: opacity 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.5); line-height: 1.4;
         }
         #ai-tooltip strong { color: #ff5555; display: block; margin-bottom: 4px; text-transform: uppercase; font-size: 0.75rem; border-bottom: 1px solid #444; padding-bottom: 2px; }
         [data-tip] { cursor: help; border-bottom: 1px dotted #888; }
@@ -104,13 +83,14 @@
     <div id="app-controls">
         <span><b>D&D 5e</b></span>
         <button id="auth-btn">Login with Google</button>
-        <button onclick="saveVersion()">Save Snapshot</button>
+        <button onclick="saveVersion(true)">Save Snapshot</button>
         <select id="versionSelect" onchange="loadSelectedVersion()">
             <option value="">Load Version...</option>
         </select>
         <button onclick="resetSheet()" style="background: #800;">Reset</button>
         <button onclick="window.print()" style="background: #005f80;">Print</button>
         <button onclick="shareSheet()" style="background: #28a745;">Share URL</button>
+        <button onclick="manualSave()" style="background: #444;">Manual Save</button>
         <span id="status" style="font-size: 0.8rem; color: #aaa; margin-left: auto;">Offline Mode</span>
     </div>
 
@@ -322,461 +302,8 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         // --- DUNGEON AI DICTIONARY ---
-        const AI_COMMENTS = {
-          "Character Name": [
-          "Your chosen identifier. The label that will appear on kill feeds, tombstones, and post-mortem loot audits.",
-          "Pick something heroic, ominous, or ironic. The dungeon prefers irony.",
-          "The name they'll put on your tombstone. Try to make it spell-check friendly.",
-          "Choose wisely. You're going to hear me scream this name while you die.",
-          "Your identifier. NEW ACHIEVEMENT: Named yourself something stupid!",
-          "Does it strike fear? No? Well, maybe it strikes mild confusion.",
-          "Oh, is that what we're going with? Bold choice, crawler.",
-          "Identity verification complete. Preparing for inevitable termination."
-        ],
-        "Species": [
-          "Your biological template, complete with perks, flaws, and cultural baggage you will absolutely validate.",
-          "Includes gait, posture, and footwear expectations. Yes, I noticed how you walk.",
-          "What flavor of meat puppet are you?",
-          "Genetics! The reason you're ugly/short/pointy-eared.",
-          "Ah, playing the meta, or just hate having feet that fit in standard shoes?",
-          "Biological classification. Useful for knowing which poisons kill you faster.",
-          "Don't blame me for your racial modifiers. Blame your parents.",
-          "I hope you picked one with darkvision. It's dark down here."
-        ],
-        "Class": [
-          "Your problem-solving philosophy. Also determines whether you die heroically, stupidly, or on fire.",
-          "Your job description. Spoiler: It involves murder.",
-          "How you solve problems. If 'violence' isn't the answer, you're playing wrong.",
-          "Ah, the specific way you intend to disappoint your party.",
-          "Career choice? More like suicide method of choice.",
-          "Pick something with good survivability. Or don't. I like splatters.",
-          "Are you the meat shield or the glass cannon? Place your bets!"
-        ],
-        "Subclass": [
-          "Your niche within your niche. Because being competent wasn’t specific enough.",
-          "Specialization! For when general incompetence isn't enough.",
-          "Niche skills. Very fancy. Does it help you run faster?",
-          "Oh, you're *that* kind of crawler. Gross.",
-          "Flavor text for your combat mechanics.",
-          "The fine print of your contract with death.",
-          "Specifics matter. Especially when calculating explosion radius."
-        ],
-        "Level": [
-          "A numeric estimate of how many catastrophes you’ve endured without learning the lesson.",
-          "A measure of how much you've murdered.",
-          "Higher number = juicier target.",
-          "Don't get cocky. The dungeon scales with you.",
-          "You survived this long? Glitch detected.",
-          "Level up! Now with 5% more existential dread.",
-          "Keep grinding. Daddy needs new content."
-        ],
-        "XP": [
-          "Invisible progress points earned through violence, trauma, and unpaid emotional labor.",
-          "Crawler Score! Make the number go up!",
-          "Experience points. Earned by traumatizing local wildlife.",
-          "The grind never ends. Unlike your life.",
-          "Collect them all! (Before you die).",
-          "Did you kill the goblin babies? Be honest. They're worth 10xp each.",
-          "Numerical validation of your violent tendencies."
-        ],
-        "AC": [
-          "How difficult you are to hit. Does not reflect how wise it was to be standing there.",
-          "Armor Class. Or: 'How hard is it to squish you?'",
-          "Metal plating won't save you from emotional damage.",
-          "Try not to get hit. The viewers hate short seasons.",
-          "The number the DM has to roll to ruin your day.",
-          "Is that high? It doesn't look high. You should wear more metal.",
-          "If this is below 15, you're basically walking dog food."
-        ],
-        "Proficiency": [
-          "The dungeon acknowledging you’ve practiced enough to fail slightly less often.",
-          "Things you aren't completely incompetent at. Congratulations.",
-          "A participation trophy that actually affects math.",
-          "You're 'Proficient'. That's a nice way of saying 'mediocre'.",
-          "Look at you, having skills! Adorable.",
-          "Bonus points for not failing. Don't get used to it.",
-          "The only scaling mechanic you can rely on."
-        ],
-        "Strength": [
-          "Measures raw physical force and how many doors you believe are optional.",
-          "Do you lift, bro?",
-          "For smashing things. And carrying the corpses of your friends.",
-          "Useless for typing, essential for head-crushing.",
-          "Muscle mass. Good for intimidation, bad for fitting in vents.",
-          "Dump stat? Enjoy being pinned by a small rock.",
-          "Raw power. Show me those glutes."
-        ],
-        "Dexterity": [
-          "Agility, reflexes, and the ability to look impressive while doing reckless things.",
-          "Dodge! weave! Die tired!",
-          "Hand stuff. And foot coordination. Very important.",
-          "The 'don't get hit by the fireball' stat.",
-          "Sleight of hand? Are you stealing from me?",
-          "Acrobatics won't save you from bad decision making.",
-          "How wiggly are you? The fans love wiggly."
-        ],
-        "Constitution": [
-          "How long your organs keep working after they’ve been insulted.",
-          "How much poison can you drink? Let's find out!",
-          "Stomach contents retention ability.",
-          "The only stat that keeps your insides on the inside.",
-          "Don't dump this unless you have a death wish.",
-          "Liver durability. Necessary for dwarven ale.",
-          "Health points are stored in the Constitution balls."
-        ],
-        "Intelligence": [
-          "Academic competence. Knowing the rules you will later ignore.",
-          "Book smarts. Nerd.",
-          "Knowing that a tomato is a fruit.",
-          "Investigation checks: For finding the trap with your face.",
-          "Can you do math? No? Then you're a barbarian.",
-          "Used for wizard stuff. And insults.",
-          "Brain size matters. Allegedly."
-        ],
-        "Wisdom": [
-          "Situational awareness. The stat responsible for survival instincts and regret avoidance.",
-          "Knowing not to put a tomato in a fruit salad.",
-          "Perception: Spotting the mimic before it eats your hand.",
-          "Street smarts. Or dungeon smarts. Whatever.",
-          "Insight: Realizing the NPC is lying to you (they always are).",
-          "Noticing that the silence is suspicious.",
-          "Common sense. Surprisingly rare in crawlers."
-        ],
-        "Charisma": [
-          "Your capacity to convince others this was their idea.",
-          "Hotness check. Show me the feet.",
-          "Seducing the dragon? Don't do it. Seriously.",
-          "How pretty are you when you cry?",
-          "Force of personality. Or just being loud.",
-          "Deception. Lying is a valid survival strategy.",
-          "Performance art. Dance for me, monkey!"
-        ],
-        "Initiative": [
-          "How fast you react when diplomacy inevitably fails.",
-          "Who shoots first?",
-          "Reaction time. Are you a mongoose or a sloth?",
-          "Go fast, kill first, ask questions never.",
-          "Determines if you die before or after the bard.",
-          "Speed is key. Hesitation is defeat.",
-          "Surprise round! Just kidding, you rolled a 2."
-        ],
-        "Speed": [
-          "How quickly you can flee from your poor choices.",
-          "Running away is a valid tactic. Coward.",
-          "Zoom zoom.",
-          "Can you outrun the bear? No, just the halfling.",
-          "Movement per turn. Boring, but necessary.",
-          "Don't trip.",
-          "Is that with or without shoes? (Asking for a friend)."
-        ],
-        "Size": [
-          "Your physical footprint. Larger sizes attract attention. Smaller sizes attract underestimation.",
-          "Medium? Boring. Be Large. Be Huge.",
-          "Hitbox size.",
-          "Small creatures fit in better hiding spots.",
-          "Does size matter? The ogre seems to think so.",
-          "Physical volume displacement.",
-          "Are you a chonker or a stick?"
-        ],
-        "Passive Perception": [
-          "What you notice when distracted. Often danger. Sometimes loot.",
-          "What you see when you aren't paying attention.",
-          "The 'Did I hear a twig snap?' stat.",
-          "Spoiler: It was an assassin.",
-          "Your radar. It's probably jamming.",
-          "Nothing to see here. Move along.",
-          "Alertness level: Caffeinated squirrel."
-        ],
-        "Hit Points": [
-          "A finite supply of forgiveness from the universe.",
-          "Your meat points. When they hit 0, you're content.",
-          "Blood volume indicator.",
-          "The capacity of your body to sustain abuse.",
-          "Keep this number above 0. Ideally.",
-          "A resource to be spent. Usually painfully.",
-          "Tis but a scratch! (It's a mortal wound)."
-        ],
-        "Death Saves": [
-          "The dungeon flipping a coin to decide if you’re still entertaining.",
-          "Three strikes and you're dead! Literally.",
-          "The viewers love a close call!",
-          "Don't die, I have bets on you.",
-          "Clinging to the mortal coil? Pathetic.",
-          "Heads you live, tails you rot.",
-          "Stabilize! Or don't. Splatters get more views."
-        ],
-        "Successes": [
-          "Moments where death sighed and waited.",
-          "You get to live... for now.",
-          "Delaying the inevitable.",
-          "One step away from the light.",
-          "Lucky roll. Don't push it.",
-          "Breathe, crawler. Breathe.",
-          "Not today, Satan."
-        ],
-        "Failures": [
-          "Moments where death leaned closer.",
-          "Ooh, that looks bad.",
-          "One foot in the grave!",
-          "Do you see the light? Walk towards it!",
-          "Grim Reaper is knocking.",
-          "Fail again, I dare you.",
-          "NEW ACHIEVEMENT: Nearly Dead!"
-        ],
-        "Weapons": [
-          "Purpose-built arguments with sharp rebuttals.",
-          "Tools of the trade.",
-          "Pointy end goes into the bad guy.",
-          "How do you prefer to inflict trauma?",
-          "Click click boom? Or slash slash squish?",
-          "Keep them sharp. Dull blades hurt more (which is good, actually).",
-          "Grip matters. Balance matters. Feet planted—yes, like that."
-        ],
-        "Damage": [
-          "A numeric summary of suffering inflicted.",
-          "The ouchie number.",
-          "DPS check!",
-          "Big numbers make brain release happy chemicals.",
-          "How much blood comes out?",
-          "Calculate the pain.",
-          "Transfer of force begins at the ground up."
-        ],
-        "Proficiencies_List": [
-          "Tasks you’re officially allowed to attempt without embarrassment.",
-          "What you actually know how to use.",
-          "Don't touch things you aren't proficient with. You'll hurt yourself.",
-          "Training montage results.",
-          "Tools? Who uses tools? Use your fists!",
-          "Armor training. Prevents chafing.",
-          "The list of things you won't fumble."
-        ],
-        "Features": [
-          "Your class-granted cheat codes.",
-          "The cool stuff your class gives you.",
-          "Superpowers! Sort of.",
-          "Read the manual. Seriously, read it.",
-          "Button mashing capabilities.",
-          "Unique mechanics. Use them or lose them.",
-          "The reason you picked this class."
-        ],
-        "Background Features": [
-          "Evidence you existed before the violence started.",
-          "You had a life before this? Cute.",
-          "Trauma from your past gives you bonuses!",
-          "Narrative justification for your skills.",
-          "Who were you? Who cares. You're a crawler now.",
-          "Networking perks from your old job.",
-          "Did you used to be a baker? Make me a pie."
-        ],
-        "Species Traits": [
-          "Innate perks from your origin story.",
-          "Biological advantages.",
-          "Darkvision. Everyone has darkvision.",
-          "Racial bonuses. Sounds problematic out of context.",
-          "What makes you special (genetically).",
-          "Tail attacks? Breath weapons? Do tell.",
-          "Built-in hardware."
-        ],
-        "Feats": [
-          "Optional upgrades unlocked through pain and questionable decisions.",
-          "Extra credit skills.",
-          "You ignored an ASI for this? Bold.",
-          "Special moves.",
-          "Customization! Make your build weird.",
-          "Lucky? Sharpshooter? Sentinel? Be annoying.",
-          "Power gaming potential: High."
-        ],
-        "Spellcasting": [
-          "Reality modification via structured arrogance.",
-          "Wiggly fingers and mumbling.",
-          "Reality warping on a budget.",
-          "Mana management.",
-          "Don't sneeze while casting.",
-          "Magic: Science for people who hate consistent results.",
-          "Sparkle fingers!"
-        ],
-        "Spell Ability": [
-          "The stat you rely on to convince existence to cooperate.",
-          "The mental stat you abuse for magic.",
-          "Brain power source.",
-          "Charisma caster? Flirt the magic into existence.",
-          "Wisdom caster? Pray hard.",
-          "Int caster? Do the math.",
-          "Where the mojo comes from."
-        ],
-        "Save DC": [
-          "How hard it is for enemies to say 'no' to your nonsense.",
-          "Resist THIS!",
-          "Difficulty to avoid your glitter bomb.",
-          "Make them dance.",
-          "Mental domination threshold.",
-          "If they roll under this, they burn.",
-          "The 'Sit Down' number."
-        ],
-        "Spell Slots": [
-          "Daily charges before the universe tells you to stop.",
-          "Ammo for wizards.",
-          "Don't blow them all on the first goblin.",
-          "Resource management hell.",
-          "Long rest to recharge. Nappy time.",
-          "Use the big one! Do it!",
-          "Out of slots? Use a cantrip, peasant."
-        ],
-        "Cantrips": [
-          "Magic you can spam without consequences. Allegedly.",
-          "Spam these.",
-          "Baby spells.",
-          "Infinite ammo.",
-          "Eldritch Blast? Again?",
-          "Utility magic. Clean your clothes.",
-          "When you're out of juice, use these."
-        ],
-        "Verbal": [
-          "You shout arcane nonsense. Loudly.",
-          "You have to speak to cast. Silence spells suck.",
-          "Say the magic words.",
-          "Abra-cadabra!",
-          "Screaming counts as a verbal component.",
-          "Don't mumble.",
-          "Vocal cord usage required."
-        ],
-        "Somatic": [
-          "Mystical hand waving. Looks ridiculous. Works anyway.",
-          "Jazz hands!",
-          "Wiggly fingers required.",
-          "If your hands are tied, you're screwed.",
-          "Interpretive dance magic.",
-          "Don't drop your wand.",
-          "Yes, foot placement matters. Stop shifting."
-        ],
-        "Concentration": [
-          "Multitasking under stress. Failure encouraged.",
-          "Don't get hit or the spell ends.",
-          "Focus! Focus!",
-          "Hold the thought. Hold it...",
-          "One cool thing at a time.",
-          "Mental juggling.",
-          "Stable stance improves results. Just saying."
-        ],
-        "Ritual": [
-          "Slower magic. Cheaper. Usually interrupted.",
-          "Takes 10 minutes. Hope you have time.",
-          "Slow magic. Cheaper, but boring.",
-          "Book reading time.",
-          "Ceremonial casting.",
-          "Save a slot, spend an hour.",
-          "Drawing circles on the ground."
-        ],
-        "Material": [
-          "Consumable trinkets sacrificed so magic feels expensive.",
-          "Do you have the bat guano?",
-          "Components pouch check.",
-          "Costly components? There goes your gold.",
-          "Stuff you need to burn to make magic happen.",
-          "Eye of newt, toe of frog.",
-          "Focus item required."
-        ],
-        "Appearance": [
-          "Your visual branding. Influences targeting priority.",
-          "Selfie description.",
-          "Vanity project.",
-          "How ugly are you?",
-          "Do you have scars? You will.",
-          "Fashion souls.",
-          "Footwear noted. Style logged."
-        ],
-        "Backstory": [
-          "Why your therapist charges extra.",
-          "Why are you so messed up?",
-          "Tragic past? Check.",
-          "Dead parents? Classic.",
-          "Motivation for murder-hoboing.",
-          "The lies you tell yourself.",
-          "Lore dump area."
-        ],
-        "Alignment": [
-          "A suggestion. Not a guarantee.",
-          "Moral compass. Usually broken.",
-          "Chaotic Stupid is not an alignment.",
-          "Good? Evil? Just get loot.",
-          "Cosmic team jersey.",
-          "Does this actually change anything?",
-          "Paladins care about this. Nobody else does."
-        ],
-        "Languages": [
-          "Additional ways to misunderstand threats.",
-          "Who can you insult in their native tongue?",
-          "Rosetta Stone.",
-          "Talk to the monsters.",
-          "Don't speak Deep Speech. It stains.",
-          "Communication skills.",
-          "Can you read the warning signs?"
-        ],
-        "Equipment": [
-          "Items you hoard, forget, and desperately need at the wrong moment.",
-          "Hoarder inventory.",
-          "What's in your pockets?",
-          "Carrying capacity check.",
-          "Rope. Always bring rope.",
-          "Loot bag.",
-          "Weight distribution could be better."
-        ],
-        "Coins": [
-          "Proof capitalism survived the apocalypse.",
-          "Shiny things!",
-          "Capitalism tokens.",
-          "Money can be exchanged for goods and services.",
-          "High score.",
-          "Dragon bait.",
-          "Don't eat them."
-        ],
-        "CP": [
-          "Technically money. Emotionally worthless.",
-          "Copper. Peasants' money.",
-          "Throw these at beggars.",
-          "Not worth the weight.",
-          "Pocket change.",
-          "Brown coins. Gross.",
-          "Save 100 to get 1 gold!"
-        ],
-        "SP": [
-          "Still embarrassing, but less so.",
-          "Silver. Good for werewolves.",
-          "Mid-tier change.",
-          "Shiny, but not yellow.",
-          "Second place money.",
-          "Better than copper."
-        ],
-        "EP": [
-          "Currency designed to confuse everyone.",
-          "Electrum. Why does this exist?",
-          "The annoying coin.",
-          "Nobody accepts this.",
-          "Exchange rate nightmare.",
-          "Fake money.",
-          "Ancient currency."
-        ],
-        "GP": [
-          "The standard unit of greed.",
-          "Gold! The good stuff.",
-          "Standard currency of murder.",
-          "Buy cool stuff.",
-          "Shiny yellow discs.",
-          "We love gold.",
-          "Heavy pockets change your walk."
-        ],
-        "PP": [
-          "Wealth you pretend you earned honestly.",
-          "Platinum. Big money.",
-          "Baller status.",
-          "Don't flash these around.",
-          "High value targets carry these.",
-          "Concentrated wealth.",
-          "The VIP coin."
-        ]
-        };
+        let AI_COMMENTS = {}; // Initialize as empty
 
-        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
           apiKey: "AIzaSyAMfAkyUevv3BDKSO3yBjRra3jZ_uV5OlA",
           authDomain: "dnd-character-sheet-5e.firebaseapp.com",
@@ -794,19 +321,14 @@
         let currentUser = null;
         let currentCharacterId = localStorage.getItem('dnd_char_id') || generateUUID();
         let isCloudOwner = true;
+        let isLoading = false;
+        let lastAutoSaveTime = 0;
 
         localStorage.setItem('dnd_char_id', currentCharacterId);
 
-        // --- AUTH EXPORTS ---
-        window.login = async () => {
-            try { await signInWithPopup(auth, provider); } 
-            catch (error) { alert("Login failed: " + error.message); }
-        };
-
-        window.logout = () => {
-            signOut(auth);
-            window.location.reload();
-        };
+        // --- AUTH ---
+        window.login = async () => { try { await signInWithPopup(auth, provider); } catch (e) { alert("Login failed: " + e.message); } };
+        window.logout = () => { signOut(auth); window.location.reload(); };
 
         onAuthStateChanged(auth, (user) => {
             const authBtn = document.getElementById('auth-btn');
@@ -817,18 +339,77 @@
                 authBtn.onclick = window.logout;
                 if (isCloudOwner) {
                     statusEl.innerText = "Online - Syncing...";
-                    saveToCloud();
+                    setupRealtimeListener(); 
                 }
             } else {
                 currentUser = null;
                 authBtn.innerText = "Login with Google";
                 authBtn.onclick = window.login;
-                statusEl.innerText = "Offline Mode (Local Storage)";
+                statusEl.innerText = "Offline Mode";
             }
         });
 
-        // --- TOOLTIP LOGIC ---
-        function setupTooltips() {
+        // --- DYNAMIC CONTENT GENERATION (Restored to fix Traits & Tooltips) ---
+        function generateStaticContent() {
+            // Ability Scores with Tooltips
+            const abilityData = {
+                "Strength": ["Athletics"], "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"], "Constitution": [],
+                "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"],
+                "Wisdom": ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"],
+                "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"]
+            };
+            const abilitiesContainer = document.getElementById('ability-scores-container');
+            if(abilitiesContainer) {
+                let html = '';
+                for (const [stat, skills] of Object.entries(abilityData)) {
+                    const lowStat = stat.toLowerCase();
+                    let skillsHtml = '';
+                    skills.forEach(skill => {
+                        const skillId = skill.replace(/\s+/g, '-').toLowerCase();
+                        skillsHtml += `<div class="skill-row"><input type="number" class="save-val-input" id="val-${lowStat}-${skillId}" placeholder="0"><input type="checkbox" class="prof-bubble" id="prof-${lowStat}-${skillId}"><span>${skill}</span></div>`;
+                    });
+                    html += `
+                    <div class="ability-box">
+                        <span class="box-title" data-tip="${stat}" tabindex="0">${stat}</span>
+                        <div style="position: relative;">
+                            <input type="number" id="${lowStat}-score" class="ability-score" placeholder="10"><span class="label-sm">Score</span>
+                            <input type="text" id="${lowStat}-mod" class="ability-mod" placeholder="+0"><span class="label-sm">Modifier</span>
+                        </div>
+                        <div class="skills-list">
+                            <div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;">
+                                <input type="text" class="save-val-input" id="save-val-${lowStat}" placeholder="0"><input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}"><span>Saving Throw</span>
+                            </div>${skillsHtml}
+                        </div>
+                    </div>`;
+                }
+                abilitiesContainer.innerHTML = html;
+            }
+
+            // Spell Slots
+            const slotContainer = document.getElementById('spell-slots-container');
+            if(slotContainer) {
+                const slotCounts = [0, 4, 3, 3, 3, 3, 2, 2, 1, 1];
+                let html = '';
+                for(let i=1; i<=9; i++) {
+                    html += `<div>${i}${i===1?'st':i===2?'nd':i===3?'rd':'th'} `;
+                    for(let j=0; j<slotCounts[i]; j++) html += `<input type="checkbox" class="diamond-check" id="slot-${i}-${j}">`;
+                    html += `</div>`;
+                }
+                slotContainer.innerHTML = html;
+            }
+        }
+
+        // --- TOOLTIPS (Restored) ---
+        async function setupTooltips() {
+            try {
+                const response = await fetch('./ai_comments.json');
+                if (!response.ok) throw new Error('Failed to load AI comments');
+                AI_COMMENTS = await response.json();
+            } catch (err) {
+                console.error("Tooltip data error:", err);
+                return; // Exit if file is missing to prevent errors
+            }
+
             const tooltipEl = document.getElementById('ai-tooltip');
             let currentTarget = null;
 
@@ -840,13 +421,12 @@
             }
 
             function moveTip(e) {
+                if (!e.clientX) return; // Guard for keyboard events mostly
                 const x = e.clientX + 15;
                 const y = e.clientY + 15;
-                // Boundary check
                 const rect = tooltipEl.getBoundingClientRect();
                 const safeX = (x + rect.width > window.innerWidth) ? x - rect.width - 20 : x;
                 const safeY = (y + rect.height > window.innerHeight) ? y - rect.height - 20 : y;
-                
                 tooltipEl.style.left = `${safeX}px`;
                 tooltipEl.style.top = `${safeY}px`;
             }
@@ -856,7 +436,6 @@
                 currentTarget = null;
             }
 
-            // Delegation for static and dynamic elements
             document.body.addEventListener('mouseover', (e) => {
                 const target = e.target.closest('[data-tip]');
                 if (target && AI_COMMENTS[target.dataset.tip]) {
@@ -865,31 +444,58 @@
                 }
             });
 
-            document.body.addEventListener('mousemove', (e) => {
-                if (currentTarget) moveTip(e);
-            });
-
-            document.body.addEventListener('mouseout', (e) => {
-                if (e.target.closest('[data-tip]')) hideTip();
-            });
+            document.body.addEventListener('mousemove', (e) => { if (currentTarget) moveTip(e); });
+            document.body.addEventListener('mouseout', (e) => { if (e.target.closest('[data-tip]')) hideTip(); });
             
-            // Accessibility focus support
+            // Accessibility
             document.body.addEventListener('focusin', (e) => {
                  const target = e.target.closest('[data-tip]');
                  if (target && AI_COMMENTS[target.dataset.tip]) {
                     const rect = target.getBoundingClientRect();
-                    // Fake a mouse event structure for positioning
                     showTip({ clientX: rect.right, clientY: rect.bottom }, AI_COMMENTS[target.dataset.tip], target.dataset.tip);
                  }
             });
             document.body.addEventListener('focusout', hideTip);
         }
 
-        // --- CLOUD SYNC LOGIC ---
-        async function saveToCloud() {
+        // --- CLOUD SYNC & RACE CONDITION FIXES ---
+        function setupRealtimeListener() {
+            if (!currentUser) return;
+            onSnapshot(doc(db, "characters", currentCharacterId), (docSnap) => {
+                if (docSnap.exists()) {
+                    const cloudData = docSnap.data();
+                    if (!isLoading) {
+                        const localTime = parseInt(localStorage.getItem('dnd_last_edit_ts') || '0');
+                        const cloudTime = new Date(cloudData.lastUpdated || 0).getTime();
+                        if (cloudTime > localTime + 2000) { 
+                            if(confirm("Newer version found on server. Load it?")) {
+                                isLoading = true;
+                                populateData(cloudData.sheetData);
+                                isLoading = false;
+                                document.getElementById('status').innerText = "Synced with Cloud";
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function saveToCloud(force = false) {
             if (!currentUser || !isCloudOwner) return;
+            if (isLoading) return;
+
+            // Protection: Don't save completely empty new sheets over existing data
+            const charName = document.getElementById('charName').value;
+            const charClass = document.getElementById('class').value;
+            if (!force && !charName && !charClass) return;
+
+            const now = Date.now();
+            if (!force && (now - lastAutoSaveTime < 60000)) return; 
+
             const data = collectData();
             const statusEl = document.getElementById('status');
+            statusEl.innerText = "Saving...";
+
             try {
                 await setDoc(doc(db, "characters", currentCharacterId), {
                     lastUpdated: new Date().toISOString(),
@@ -898,18 +504,23 @@
                     ownerEmail: currentUser.email,
                     characterName: data.charName || "Unnamed"
                 }, { merge: true });
-                statusEl.innerText = 'Cloud Synced ' + new Date().toLocaleTimeString();
+                
+                lastAutoSaveTime = now;
+                localStorage.setItem('dnd_last_edit_ts', now);
+                statusEl.innerText = 'Saved ' + new Date().toLocaleTimeString();
                 statusEl.style.color = '#28a745';
             } catch (e) {
-                console.error("Cloud save error:", e);
-                statusEl.innerText = 'Sync Failed (Offline?)';
+                console.error("Save error:", e);
+                statusEl.innerText = 'Save Failed';
                 statusEl.style.color = '#dc3545';
             }
         }
 
         async function loadSharedCharacter(sharedId) {
+            isLoading = true;
             const statusEl = document.getElementById('status');
-            statusEl.innerText = "Loading Shared Sheet...";
+            statusEl.innerText = "Loading...";
+            
             try {
                 const docRef = doc(db, "characters", sharedId);
                 const docSnap = await getDoc(docRef);
@@ -917,89 +528,91 @@
                     const data = docSnap.data();
                     if (currentUser && data.ownerId === currentUser.uid) {
                         isCloudOwner = true;
-                        statusEl.innerText = "Loaded Your Cloud Sheet";
+                        statusEl.innerText = "Online";
+                        setupRealtimeListener();
                     } else {
                         isCloudOwner = false;
-                        statusEl.innerText = "Viewing Shared Sheet (Read Only)";
+                        statusEl.innerText = "Read Only";
                         document.getElementById('app-controls').style.borderBottom = "3px solid orange";
-                        alert("You are viewing a shared character. Changes will NOT save to the cloud unless you copy it.");
                     }
                     populateData(data.sheetData);
-                    currentCharacterId = sharedId; 
-                    updatePageTitle();
-                    return true;
+                    currentCharacterId = sharedId;
+                    localStorage.setItem('dnd_last_edit_ts', new Date(data.lastUpdated).getTime());
                 } else {
-                    alert("Character not found or deleted.");
-                    return false;
+                    alert("Character not found.");
                 }
-            } catch (e) {
-                console.error("Load error:", e);
-                alert("Could not load character. Check your internet connection.");
-                return false;
-            }
+            } catch (e) { console.error(e); } 
+            finally { isLoading = false; updateModifiers(); }
         }
 
-        window.addEventListener('online', () => { document.getElementById('status').innerText = "Back Online!"; saveToCloud(); });
-        window.addEventListener('offline', () => { document.getElementById('status').innerText = "You are Offline"; });
-
-        window.shareSheet = async function() {
-            if (!currentUser) { alert("You must be logged in to generate a cloud link."); return; }
-            await saveToCloud();
-            const shareUrl = `${window.location.origin}${window.location.pathname}?charId=${currentCharacterId}`;
-            try { await navigator.clipboard.writeText(shareUrl); alert("Cloud Link copied! \nAnyone with this link can view (but not edit) this character."); } catch (err) { prompt("Copy this link:", shareUrl); }
-        }
-
-        window.addWeaponRow = function() {
-            const tbody = document.getElementById('weapons-body');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>`;
-            tbody.appendChild(tr);
-            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', debounce(handleAutoSave, 1000)));
-        }
-
-        window.addSpellRow = function() {
-            const tbody = document.getElementById('spells-body');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><input type="text" style="width:25px; text-align:center;"></td>
-                <td><input type="text"></td>
-                <td style="white-space: nowrap; text-align: center;">
-                    <input type="checkbox" class="diamond-check" title="Verbal">
-                    <input type="checkbox" class="diamond-check" title="Somatic">
-                    <input type="checkbox" class="diamond-check" title="Concentration">
-                    <input type="checkbox" class="diamond-check" title="Ritual">
-                    <input type="checkbox" class="diamond-check" title="Material">
-                </td>`;
-            tbody.appendChild(tr);
-            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', debounce(handleAutoSave, 1000)));
-        }
-
-        window.saveVersion = function() {
-            const name = prompt("Version Name:");
+        // --- HANDLERS ---
+        window.manualSave = () => saveToCloud(true);
+        window.saveVersion = (force) => {
+             const name = prompt("Version Name:");
             if(!name) return;
             let versions = JSON.parse(localStorage.getItem('dnd_versions') || "[]");
             versions.push({ name: name, timestamp: new Date().toISOString(), data: collectData() });
             localStorage.setItem('dnd_versions', JSON.stringify(versions));
             updateVersionDropdown();
-        }
+        };
 
-        window.loadSelectedVersion = function() {
-            const idx = document.getElementById('versionSelect').value;
-            if(idx === "") return;
-            if(confirm("Overwrite current data?")) {
-                populateData(JSON.parse(localStorage.getItem('dnd_versions'))[idx].data);
-                handleAutoSave();
-            }
-        }
-
-        window.resetSheet = function() {
-            if(confirm("Clear all?")) {
-                document.querySelectorAll('input').forEach(i => { if(i.type==='checkbox')i.checked=false; else i.value=""; });
-                document.querySelectorAll('textarea').forEach(t=>t.value="");
-                handleAutoSave();
-            }
+        window.shareSheet = async function() {
+            if (!currentUser) { alert("Login required."); return; }
+            await saveToCloud(true); 
+            const shareUrl = `${window.location.origin}${window.location.pathname}?charId=${currentCharacterId}`;
+            try { await navigator.clipboard.writeText(shareUrl); alert("Link copied!"); } catch (err) { prompt("Copy:", shareUrl); }
         }
         
+        // --- DATA COLLECTION & POPULATION ---
+        function collectData() {
+            const data = {};
+            document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => {
+                data[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
+            });
+            data['weapons'] = [];
+            document.querySelectorAll('#weapons-body tr').forEach(tr => {
+                const i = tr.querySelectorAll('input');
+                data['weapons'].push({name: i[0].value, atk: i[1].value, dmg: i[2].value, notes: i[3].value});
+            });
+            data['spells'] = [];
+            document.querySelectorAll('#spells-body tr').forEach(tr => {
+                const i = tr.querySelectorAll('input');
+                data['spells'].push({lvl: i[0].value, name: i[1].value, conc: i[2].checked, rit: i[3].checked, mat: i[4].checked});
+            });
+            data['spellSlots'] = {};
+            document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => { data['spellSlots'][cb.id] = cb.checked; });
+            return data;
+        }
+
+        function populateData(data) {
+            if(!data) return;
+            for (const [key, value] of Object.entries(data)) {
+                if(key === 'spellSlots') continue;
+                const el = document.getElementById(key);
+                if (el) { if(el.type === 'checkbox') el.checked = value; else el.value = value; }
+            }
+            if(data.weapons) {
+                document.getElementById('weapons-body').innerHTML = '';
+                for(let i=0; i<Math.max(5, data.weapons.length); i++) window.addWeaponRow();
+                const rows = document.querySelectorAll('#weapons-body tr');
+                data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.name; inputs[1].value=r.atk; inputs[2].value=r.dmg; inputs[3].value=r.notes; }});
+            }
+            if(data.spells) {
+                document.getElementById('spells-body').innerHTML = '';
+                for(let i=0; i<Math.max(15, data.spells.length); i++) window.addSpellRow();
+                const rows = document.querySelectorAll('#spells-body tr');
+                data.spells.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.lvl; inputs[1].value=r.name; inputs[2].checked=r.conc; inputs[3].checked=r.rit; inputs[4].checked=r.mat; }});
+            }
+            if(data.spellSlots) {
+                for (const [slotId, checked] of Object.entries(data.spellSlots)) {
+                    const el = document.getElementById(slotId);
+                    if(el) el.checked = checked;
+                }
+            }
+            updatePageTitle();
+        }
+
+        // --- HELPERS ---
         function updateModifiers() {
             const stats = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
             const profBonus = parseInt(document.getElementById('prof-bonus').value) || 0;
@@ -1037,73 +650,53 @@
             if (passPercEl) passPercEl.value = 10 + percVal;
         }
 
-        function handleAutoSave() {
-            localStorage.setItem('dnd_current_sheet', JSON.stringify(collectData()));
-            const statusEl = document.getElementById('status');
-            if(!statusEl.innerText.includes('Sync')) statusEl.innerText = 'Local Saved ' + new Date().toLocaleTimeString();
-            saveToCloud();
+        function handleInput(e) {
+            if (e.target.id.endsWith('-score') || e.target.id === 'prof-bonus' || e.target.type === 'checkbox' || e.target.id === 'spell-ability') {
+                updateModifiers();
+            }
+            debounce(() => saveToCloud(false), 2000)();
         }
 
-        function generateUUID() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-        }
-        
-        function collectData() {
-            const data = {};
-            document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => {
-                data[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
-            });
-            data['weapons'] = [];
-            document.querySelectorAll('#weapons-body tr').forEach(tr => {
-                const i = tr.querySelectorAll('input');
-                data['weapons'].push({name: i[0].value, atk: i[1].value, dmg: i[2].value, notes: i[3].value});
-            });
-            data['spells'] = [];
-            document.querySelectorAll('#spells-body tr').forEach(tr => {
-                const i = tr.querySelectorAll('input');
-                data['spells'].push({lvl: i[0].value, name: i[1].value, conc: i[2].checked, rit: i[3].checked, mat: i[4].checked});
-            });
-            data['spellSlots'] = {};
-            document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => {
-                data['spellSlots'][cb.id] = cb.checked;
-            });
-            return data;
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); };
         }
 
-        function populateData(data) {
-            if(!data) return;
-            for (const [key, value] of Object.entries(data)) {
-                if(key === 'spellSlots') continue;
-                const el = document.getElementById(key);
-                if (el) {
-                    if(el.type === 'checkbox') el.checked = value;
-                    else if(el.tagName === 'SELECT') el.value = value;
-                    else el.value = value;
-                }
-            }
-            if(data.weapons) {
-                document.getElementById('weapons-body').innerHTML = '';
-                for(let i=0; i<Math.max(5, data.weapons.length); i++) window.addWeaponRow();
-                const rows = document.querySelectorAll('#weapons-body tr');
-                data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.name; inputs[1].value=r.atk; inputs[2].value=r.dmg; inputs[3].value=r.notes; }});
-            }
-            if(data.spells) {
-                document.getElementById('spells-body').innerHTML = '';
-                for(let i=0; i<Math.max(15, data.spells.length); i++) window.addSpellRow();
-                const rows = document.querySelectorAll('#spells-body tr');
-                data.spells.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.lvl; inputs[1].value=r.name; inputs[2].checked=r.conc; inputs[3].checked=r.rit; inputs[4].checked=r.mat; }});
-            }
-            if(data.spellSlots) {
-                for (const [slotId, checked] of Object.entries(data.spellSlots)) {
-                    const el = document.getElementById(slotId);
-                    if(el) el.checked = checked;
-                }
-            }
+        function generateUUID() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => (c=='x'?Math.random()*16|0:(Math.random()*16|0)&0x3|0x8).toString(16)); }
+        function updatePageTitle() { 
+             const name = document.getElementById('charName').value;
+             if(name) document.title = name + " - 5e";
         }
 
+        window.addWeaponRow = () => {
+            const tbody = document.getElementById('weapons-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>`;
+            tbody.appendChild(tr);
+            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', handleInput));
+        };
+        window.addSpellRow = () => {
+             const tbody = document.getElementById('spells-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><input type="text" style="width:25px; text-align:center;"></td><td><input type="text"></td><td style="white-space: nowrap; text-align: center;"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></td>`;
+            tbody.appendChild(tr);
+            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', handleInput));
+        };
+        window.resetSheet = function() {
+            if(confirm("Clear all?")) {
+                document.querySelectorAll('input').forEach(i => { if(i.type==='checkbox')i.checked=false; else i.value=""; });
+                document.querySelectorAll('textarea').forEach(t=>t.value="");
+                debounce(() => saveToCloud(false), 500)();
+            }
+        };
+        window.loadSelectedVersion = function() {
+            const idx = document.getElementById('versionSelect').value;
+            if(idx === "") return;
+            if(confirm("Overwrite current data?")) {
+                populateData(JSON.parse(localStorage.getItem('dnd_versions'))[idx].data);
+                debounce(() => saveToCloud(true), 500)(); // Force save on manual version load
+            }
+        };
         function updateVersionDropdown() {
             const select = document.getElementById('versionSelect');
             select.innerHTML = '<option value="">Load Version...</option>';
@@ -1116,74 +709,13 @@
             });
         }
 
-        function debounce(func, wait) {
-            let timeout;
-            return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); };
-        }
-
-        function updatePageTitle() {
-            const name = document.getElementById('charName').value.trim();
-            const charClass = document.getElementById('class').value.trim();
-            if (name && charClass) document.title = `${name} (${charClass}) - 5e`;
-            else if (name) document.title = `${name} - 5e`;
-        }
-
-        // --- CONTENT GENERATION (UPDATED WITH DATA-TIP) ---
-        function generateStaticContent() {
-            const abilityData = {
-                "Strength": ["Athletics"], "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"], "Constitution": [],
-                "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"],
-                "Wisdom": ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"],
-                "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"]
-            };
-            const abilitiesContainer = document.getElementById('ability-scores-container');
-            if(abilitiesContainer) {
-                let html = '';
-                for (const [stat, skills] of Object.entries(abilityData)) {
-                    const lowStat = stat.toLowerCase();
-                    let skillsHtml = '';
-                    skills.forEach(skill => {
-                        const skillId = skill.replace(/\s+/g, '-').toLowerCase();
-                        skillsHtml += `<div class="skill-row"><input type="number" class="save-val-input" id="val-${lowStat}-${skillId}" placeholder="0"><input type="checkbox" class="prof-bubble" id="prof-${lowStat}-${skillId}"><span>${skill}</span></div>`;
-                    });
-                    // Added data-tip to the Box Title
-                    html += `
-                    <div class="ability-box">
-                        <span class="box-title" data-tip="${stat}" tabindex="0">${stat}</span>
-                        <div style="position: relative;">
-                            <input type="number" id="${lowStat}-score" class="ability-score" placeholder="10"><span class="label-sm">Score</span>
-                            <input type="text" id="${lowStat}-mod" class="ability-mod" placeholder="+0"><span class="label-sm">Modifier</span>
-                        </div>
-                        <div class="skills-list">
-                            <div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;">
-                                <input type="text" class="save-val-input" id="save-val-${lowStat}" placeholder="0"><input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}"><span>Saving Throw</span>
-                            </div>${skillsHtml}
-                        </div>
-                    </div>`;
-                }
-                abilitiesContainer.innerHTML = html;
-            }
-
-            const slotContainer = document.getElementById('spell-slots-container');
-            if(slotContainer) {
-                const slotCounts = [0, 4, 3, 3, 3, 3, 2, 2, 1, 1];
-                let html = '';
-                for(let i=1; i<=9; i++) {
-                    html += `<div>${i}${i===1?'st':i===2?'nd':i===3?'rd':'th'} `;
-                    for(let j=0; j<slotCounts[i]; j++) html += `<input type="checkbox" class="diamond-check" id="slot-${i}-${j}">`;
-                    html += `</div>`;
-                }
-                slotContainer.innerHTML = html;
-            }
-        }
-
-        // --- INITIALIZATION ---
+        // --- INIT ---
         document.addEventListener('DOMContentLoaded', async () => {
             generateStaticContent();
-            setupTooltips(); // Initialize tooltips
-            
-            for(let i=0; i<5; i++) window.addWeaponRow();
-            for(let i=0; i<15; i++) window.addSpellRow();
+            await setupTooltips();
+
+            const allInputs = document.querySelectorAll('input, textarea, select');
+            allInputs.forEach(input => { input.addEventListener('input', handleInput); });
 
             const urlParams = new URLSearchParams(window.location.search);
             const sharedId = urlParams.get('charId');
@@ -1193,25 +725,9 @@
             } else {
                 const stored = localStorage.getItem('dnd_current_sheet');
                 if(stored) populateData(JSON.parse(stored));
-                updatePageTitle();
             }
-
-            const allInputs = document.querySelectorAll('input, textarea, select');
-            allInputs.forEach(input => {
-                input.addEventListener('input', debounce(handleAutoSave, 1000));
-                if (input.id.endsWith('-score') || input.id === 'prof-bonus') input.addEventListener('input', updateModifiers);
-                if (input.id === 'spell-ability') input.addEventListener('change', updateModifiers);
-                if (input.type === 'checkbox' && (input.id.includes('prof-') || input.id.includes('save-prof-'))) input.onchange = updateModifiers;
-                input.addEventListener('change', handleAutoSave);
-            });
-            ['charName', 'class'].forEach(id => {
-                document.getElementById(id)?.addEventListener('input', updatePageTitle);
-            });
-
-            updateModifiers();
-            updatePageTitle();
             updateVersionDropdown();
         });
     </script>
-  </body>
+</body>
 </html>
