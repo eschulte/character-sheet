@@ -395,12 +395,15 @@
                     // Update current ID to match the shared one so we don't overwrite our local "default" immediately
                     currentCharacterId = sharedId; 
                     updatePageTitle();
+                    return true;
                 } else {
                     alert("Character not found or deleted.");
+                    return false;
                 }
             } catch (e) {
                 console.error("Load error:", e);
                 alert("Could not load character. Check your internet connection.");
+                return false;
             }
         }
 
@@ -699,7 +702,7 @@
         }
 
         // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             generateStaticContent();
             
             for(let i=0; i<5; i++) window.addWeaponRow();
@@ -711,7 +714,7 @@
 
             if (sharedId) {
                 // If ID is in URL, fetch from cloud
-                loadSharedCharacter(sharedId);
+                await loadSharedCharacter(sharedId);
             } else {
                 // Otherwise load local storage
                 const stored = localStorage.getItem('dnd_current_sheet');
@@ -719,29 +722,29 @@
                 updatePageTitle();
             }
 
-            setTimeout(() => {
-                const allInputs = document.querySelectorAll('input, textarea, select');
-                allInputs.forEach(input => {
-                    input.addEventListener('input', debounce(handleAutoSave, 1000));
+            const allInputs = document.querySelectorAll('input, textarea, select');
+            allInputs.forEach(input => {
+                input.addEventListener('input', debounce(handleAutoSave, 1000));
 
-                    // Trigger math on Score, Prof Bonus, or Checkbox clicks
-                    if (input.id.endsWith('-score') || input.id === 'prof-bonus') {
-                        input.addEventListener('input', updateModifiers);
-                    }
-                    if (input.id === 'spell-ability') {
-                        input.addEventListener('change', updateModifiers);
-                    }
-                    if (input.type === 'checkbox' && (input.id.includes('prof-') || input.id.includes('save-prof-'))) {
-                        input.onchange = updateModifiers;
-                    }
+                // Trigger math on Score, Prof Bonus, or Checkbox clicks
+                if (input.id.endsWith('-score') || input.id === 'prof-bonus') {
+                    input.addEventListener('input', updateModifiers);
+                }
+                if (input.id === 'spell-ability') {
+                    input.addEventListener('change', updateModifiers);
+                }
+                if (input.type === 'checkbox' && (input.id.includes('prof-') || input.id.includes('save-prof-'))) {
+                    input.onchange = updateModifiers;
+                }
 
-                    input.addEventListener('change', handleAutoSave);
-                });
-                ['charName', 'class'].forEach(id => {
-                    document.getElementById(id)?.addEventListener('input', updatePageTitle);
-                });
-            }, 100);
+                input.addEventListener('change', handleAutoSave);
+            });
+            ['charName', 'class'].forEach(id => {
+                document.getElementById(id)?.addEventListener('input', updatePageTitle);
+            });
 
+            updateModifiers();
+            updatePageTitle();
             updateVersionDropdown();
 
             if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
