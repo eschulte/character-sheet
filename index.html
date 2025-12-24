@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="D&D 5e Character Sheet PWA">
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -121,6 +123,8 @@
         <select class="app-btn" id="versionSelect" onchange="loadSelectedVersion()">
             <option value="">Load Version...</option>
         </select>
+        <button class="app-btn" onclick="shortRest()" style="background: #6b46c1;">Short Rest</button>
+        <button class="app-btn" onclick="longRest()" style="background: #2d3748;">Long Rest</button>
         <button class="app-btn" onclick="resetSheet()" style="background: #800;">New</button>
         <button class="app-btn" onclick="window.print()" style="background: #005f80;">Print</button>
         <button class="app-btn" onclick="shareSheet()" style="background: #28a745;">Share URL</button>
@@ -463,19 +467,25 @@
                     isCloudOwner = (currentUser.uid === data.ownerId);
                     document.getElementById('status').innerText = isCloudOwner ? "Online (Owner)" : "Online (Read Only)";
 
-                    // Check Logic 6: Conflict Detection
-                    const cloudTime = new Date(data.lastUpdated || 0).getTime();
+                    // Conflict Detection
+                    const cloudTime = new Date(data.lastUpdated).getTime() || 0;
 
                     // If cloud is newer than what we last loaded...
                     if (cloudTime > lastLoadedRemoteTimestamp) {
+                        console.log("data.lastUpdated: "+data.lastUpdated)
+                        console.log("CloudTime: "+cloudTime)
+                        console.log("lastLoadedRemoteTimestamp: "+lastLoadedRemoteTimestamp)
                         // ...and we have made local edits since the last load...
                         if (lastLocalChangeTimestamp > lastLoadedRemoteTimestamp) {
                             // CONFLICT!
                             if (confirm("New version available! Local edits detected. Overwrite local changes?")) {
                                 loadHeadData(data, cloudTime);
                             } else {
-                                // User chose to keep local. We don't update lastLoadedRemoteTimestamp,
-                                // so this check will happen again next sync unless we save.
+                                // User chose to keep local. We don't
+                                // update lastLoadedRemoteTimestamp,
+                                // so this check will happen again
+                                // next sync unless we save.
+                                lastLoadedRemoteTimestamp = Date.now()
                             }
                         } else {
                             // NO CONFLICT (Silent Load)
@@ -508,7 +518,7 @@
         function loadHeadData(data, timestamp) {
             isLoading = true;
             populateData(data.sheetData);
-            lastLoadedRemoteTimestamp = timestamp;
+            lastLoadedRemoteTimestamp = typeof timestamp === 'number' ? timestamp : new Date(timestamp).getTime();
             isLoading = false;
         }
 
@@ -519,7 +529,7 @@
 
             const data = collectData();
             const now = new Date();
-            const nowIso = now.toISOString();
+            const nowIso = now.getTime();
             const charRef = doc(db, "characters", currentCharacterId);
 
             try {
@@ -584,6 +594,7 @@
                 if(snapDoc.exists()) {
                     const d = snapDoc.data();
                     populateData(d.sheetData);
+                    lastLoadedRemoteTimestamp = Date.now()
                     // We treat loading a snapshot like a local edit effectively,
                     // so the next save becomes the new "Current"
                     lastLocalChangeTimestamp = Date.now();
@@ -625,7 +636,7 @@
         async function updateSnapshotSelect() {
             if (!currentUser) return;
 
-            const snapshotsCol = getSnapshotsCollection(currentUser.uid);
+            const snapshotsCol = collection(db, "characters", currentCharacterId, "snapshots");
             try {
                 // Now 'await' will work correctly
                 const snapDocs = await getDocs(snapshotsCol);
@@ -818,6 +829,51 @@
                 slotContainer.innerHTML = html;
             }
         }
+
+        // --- RESTING LOGIC ---
+
+        window.shortRest = function() {
+            const hpMax = parseInt(document.getElementById('hp-max').value) || 0;
+            const hpCurr = parseInt(document.getElementById('hp-curr').value) || 0;
+
+            if (hpCurr >= hpMax) {
+                return;
+            }
+
+            const roll = prompt("Short Rest: Enter total HP regained (Hit Dice rolls + Con mod):", "0");
+            if (roll === null) return;
+
+            const regained = parseInt(roll) || 0;
+            const newHp = Math.min(hpMax, hpCurr + regained);
+
+            document.getElementById('hp-curr').value = newHp;
+
+            // Trigger auto-save
+            handleInput({ target: document.getElementById('hp-curr') });
+        };
+
+        window.longRest = function() {
+            if (!confirm("Confirm Long Rest? This will reset HP, Spell Slots, and remove Temp HP.")) return;
+
+            // 1. Reset Health
+            const hpMax = document.getElementById('hp-max').value;
+            document.getElementById('hp-curr').value = hpMax;
+            document.getElementById('hp-temp').value = "";
+
+            // 2. Clear Death Saves
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`ds-s-${i}`).checked = false;
+                document.getElementById(`ds-f-${i}`).checked = false;
+            }
+
+            // 3. Reset Spell Slots
+            document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+
+            // 4. Trigger Save
+            handleInput({ target: document.getElementById('hp-curr') });
+        };
 
         // --- TOOLTIPS ---
          window.toggleTips = () => {
