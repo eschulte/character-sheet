@@ -71,21 +71,21 @@
 
         @media screen and (max-width: 768px) {
             body { display: block; padding: 0; }
-            #app-controls { 
-                position: absolute; 
-                flex-wrap: nowrap; 
-                overflow: hidden; 
-                max-height: 45px; 
-                transition: max-height 0.3s ease; 
+            #app-controls {
+                position: absolute;
+                flex-wrap: nowrap;
+                overflow: hidden;
+                max-height: 45px;
+                transition: max-height 0.3s ease;
             }
-            #app-controls.expanded { 
-                max-height: 500px; 
-                flex-wrap: wrap; 
+            #app-controls.expanded {
+                max-height: 500px;
+                flex-wrap: wrap;
             }
             /* Hide all app-btns except status and hamburger toggle */
             #app-controls .app-btn { display: none; }
             #app-controls.expanded .app-btn { display: inline-block; }
-            #status, #auth-btn, #app-toggle-hamburger { display: inline-block; } 
+            #status, #auth-btn, #app-toggle-hamburger { display: inline-block; }
             #app-controls button { padding: 3px 5px; font-size: 0.75rem; }
             .sheet-container { margin-top: 0; padding: 10px; padding-top: 100px; border-radius: 0; box-shadow: none; }
             .main-grid, .spell-grid-layout, .main-header, .combat-row-1, .combat-row-2, .spell-header, .bottom-sections, .prof-grid { display: flex; flex-direction: column; }
@@ -112,14 +112,18 @@
         <span><b>D&D 5e</b></span>
         <button id="auth-btn">Login with Google</button>
         <button class="app-btn" id="toggle-tips" onclick="toggleTips()" style="background: #222;">Tips: OFF</button>
+
+        <select class="app-btn" id="charSelect" onchange="loadMyCharacter()" style="max-width: 150px; display:none;">
+            <option value="">My Characters...</option>
+        </select>
+
         <button class="app-btn" onclick="saveVersion(true)">Save Snapshot</button>
         <select class="app-btn" id="versionSelect" onchange="loadSelectedVersion()">
             <option value="">Load Version...</option>
         </select>
-        <button class="app-btn" onclick="resetSheet()" style="background: #800;">Reset</button>
+        <button class="app-btn" onclick="resetSheet()" style="background: #800;">New</button>
         <button class="app-btn" onclick="window.print()" style="background: #005f80;">Print</button>
         <button class="app-btn" onclick="shareSheet()" style="background: #28a745;">Share URL</button>
-        <button class="app-btn" onclick="manualSave()" style="background: #444;">Manual Save</button>
 
         <span id="status" style="font-size: 0.8rem; color: #aaa; margin-left: auto;">Offline Mode</span>
 
@@ -288,10 +292,10 @@
                                 <th width="30">Lvl</th>
                                 <th>Name</th>
                                 <th width="120" style="text-align: center;">
-                                    <span title="Verbal" data-tip="Verbal" tabindex="0">V</span> / 
-                                    <span title="Somatic" data-tip="Somatic" tabindex="0">S</span> / 
-                                    <span title="Concentration" data-tip="Concentration" tabindex="0">C</span> / 
-                                    <span title="Ritual" data-tip="Ritual" tabindex="0">R</span> / 
+                                    <span title="Verbal" data-tip="Verbal" tabindex="0">V</span> /
+                                    <span title="Somatic" data-tip="Somatic" tabindex="0">S</span> /
+                                    <span title="Concentration" data-tip="Concentration" tabindex="0">C</span> /
+                                    <span title="Ritual" data-tip="Ritual" tabindex="0">R</span> /
                                     <span title="Material" data-tip="Material" tabindex="0">M</span>
                                 </th>
                             </tr>
@@ -330,12 +334,12 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, addDoc, query, where, orderBy, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // --- DUNGEON AI DICTIONARY ---
+        // --- CONFIG ---
         let tipsEnabled = false;
-        let AI_COMMENTS = {}; // Initialize as empty
+        let AI_COMMENTS = {};
 
         const firebaseConfig = {
           apiKey: "AIzaSyAMfAkyUevv3BDKSO3yBjRra3jZ_uV5OlA",
@@ -351,60 +355,436 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
+        // --- STATE ---
         let currentUser = null;
         let currentCharacterId = localStorage.getItem('dnd_char_id') || generateUUID();
         let isCloudOwner = true;
         let isLoading = false;
-        let lastAutoSaveTime = 0;
-        let hasUnsavedChanges = false;
 
-        // --- MOBILE APP-CONTROLS TOGGLE ---
+        // Conflict/Sync State
+        let lastLoadedRemoteTimestamp = 0;
+        let lastLocalChangeTimestamp = 0;
+        let lastAutoSnapshotTime = 0;
+
+        // UI Helpers
         const appControls = document.getElementById('app-controls');
         const toggleHandle = document.getElementById('app-toggle-hamburger');
-        toggleHandle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            appControls.classList.toggle('expanded');
-        });
-        function updateMobileToggle() {
-            if (window.innerWidth <= 768) toggleHandle.style.display = 'inline-block';
-            else toggleHandle.style.display = 'none';
-        }
-        updateMobileToggle();
-        window.addEventListener('resize', updateMobileToggle);
+        toggleHandle.addEventListener('click', (e) => { e.stopPropagation(); appControls.classList.toggle('expanded'); });
+        function updateMobileToggle() { toggleHandle.style.display = (window.innerWidth <= 768) ? 'inline-block' : 'none'; }
+        updateMobileToggle(); window.addEventListener('resize', updateMobileToggle);
 
         localStorage.setItem('dnd_char_id', currentCharacterId);
 
-        // --- AUTH ---
+        // --- AUTH & INITIALIZATION ---
         window.login = async () => { try { await signInWithPopup(auth, provider); } catch (e) { alert("Login failed: " + e.message); } };
         window.logout = () => { signOut(auth); window.location.reload(); };
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             const authBtn = document.getElementById('auth-btn');
             const statusEl = document.getElementById('status');
+            const charSelect = document.getElementById('charSelect');
+
             if (user) {
                 currentUser = user;
                 authBtn.innerText = `Logout (${user.displayName.split(' ')[0]})`;
                 authBtn.onclick = window.logout;
-                if (isCloudOwner) {
-                    statusEl.innerText = "Online - Syncing...";
-                    setupRealtimeListener(); 
-                }
+                statusEl.innerText = "Online";
+                charSelect.style.display = "inline-block";
+
+                await updateMyCharactersList(); // Load list of owned chars
+                await setupRealtimeListener();  // Sync current char
+                updateSnapshotSelect();         // Load history
             } else {
                 currentUser = null;
                 authBtn.innerText = "Login with Google";
                 authBtn.onclick = window.login;
                 statusEl.innerText = "Offline Mode";
+                charSelect.style.display = "none";
             }
         });
 
+        // --- MAIN VERSIONED STORAGE LOGIC IMPLEMENTATION ---
+
+        // 1. List Owned Characters
+        async function updateMyCharactersList() {
+            if(!currentUser) return;
+            const select = document.getElementById('charSelect');
+            try {
+                // Query: Characters where ownerId == uid
+                const q = query(collection(db, "characters"), where("ownerId", "==", currentUser.uid));
+                const snap = await getDocs(q);
+
+                select.innerHTML = '<option value="">My Characters...</option>';
+                snap.forEach(docSnap => {
+                    const d = docSnap.data();
+                    const name = d.sheetData?.charName || "Unnamed";
+                    const opt = document.createElement('option');
+                    opt.value = docSnap.id;
+                    opt.text = name;
+                    select.appendChild(opt);
+                });
+                // Add option to start new
+                const newOpt = document.createElement('option');
+                newOpt.value = "NEW";
+                newOpt.text = "+ Create New Character";
+                select.appendChild(newOpt);
+
+            } catch(e) { console.error("Error listing characters", e); }
+        }
+
+        window.loadMyCharacter = async function() {
+            const select = document.getElementById('charSelect');
+            const val = select.value;
+            if(!val) return;
+
+            if(val === "NEW") {
+                window.resetSheet(); // Generates new ID internally
+                return;
+            }
+
+            // Load the Head Document of the selected character
+            currentCharacterId = val;
+            localStorage.setItem('dnd_char_id', currentCharacterId);
+
+            // Reload page to reset state cleanly or just call load logic
+            // For stability in this migration, let's reload with query param
+            window.location.href = `${window.location.pathname}?charId=${val}`;
+        }
+
+        // 2. Realtime Sync (Head Document)
+        function setupRealtimeListener() {
+            if (!currentUser || !currentCharacterId) return;
+
+            onSnapshot(doc(db, "characters", currentCharacterId), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+
+                    // Determine ownership
+                    isCloudOwner = (currentUser.uid === data.ownerId);
+                    document.getElementById('status').innerText = isCloudOwner ? "Online (Owner)" : "Online (Read Only)";
+
+                    // Check Logic 6: Conflict Detection
+                    const cloudTime = new Date(data.lastUpdated || 0).getTime();
+
+                    // If cloud is newer than what we last loaded...
+                    if (cloudTime > lastLoadedRemoteTimestamp) {
+                        // ...and we have made local edits since the last load...
+                        if (lastLocalChangeTimestamp > lastLoadedRemoteTimestamp) {
+                            // CONFLICT!
+                            if (confirm("New version available! Local edits detected. Overwrite local changes?")) {
+                                loadHeadData(data, cloudTime);
+                            } else {
+                                // User chose to keep local. We don't update lastLoadedRemoteTimestamp,
+                                // so this check will happen again next sync unless we save.
+                            }
+                        } else {
+                            // NO CONFLICT (Silent Load)
+                            loadHeadData(data, cloudTime);
+                        }
+                    }
+                } else {
+                    // Document doesn't exist yet (new character)
+                    isCloudOwner = true;
+                    document.getElementById('status').innerText = "Online (New)";
+                }
+            });
+
+            // Also listen for snapshots to update dropdown
+            const snapsCol = collection(db, "characters", currentCharacterId, "snapshots");
+            const snapsQ = query(snapsCol, orderBy("createdAt", "desc"), limit(20));
+            onSnapshot(snapsQ, (qSnap) => {
+                const select = document.getElementById('versionSelect');
+                select.innerHTML = '<option value="">Load Version...</option>';
+                qSnap.forEach(doc => {
+                    const d = doc.data();
+                    const opt = document.createElement('option');
+                    opt.value = doc.id;
+                    opt.text = `${d.name || 'Auto'} (${new Date(d.createdAt).toLocaleTimeString()})`;
+                    select.appendChild(opt);
+                });
+            });
+        }
+
+        function loadHeadData(data, timestamp) {
+            isLoading = true;
+            populateData(data.sheetData);
+            lastLoadedRemoteTimestamp = timestamp;
+            isLoading = false;
+        }
+
+        // 3. Saving & Auto-Save
+        window.saveVersion = async function(isManualSnapshot = false) {
+            if (!currentUser) return alert("Login required.");
+            if (!isCloudOwner) return alert("You can only save characters you own.");
+
+            const data = collectData();
+            const now = new Date();
+            const nowIso = now.toISOString();
+            const charRef = doc(db, "characters", currentCharacterId);
+
+            try {
+                // A. Update HEAD document (Always)
+                // This keeps the "Current State" for sharing and listing
+                await setDoc(charRef, {
+                    ownerId: currentUser.uid, // Claim ownership
+                    lastUpdated: nowIso,
+                    sheetData: data
+                }, { merge: true }); // Merge to avoid overwriting creation fields if any
+
+                lastLoadedRemoteTimestamp = now.getTime(); // Update our sync baseline
+
+                // B. Create Snapshot (Periodically or Manually)
+                // Logic: Save snapshot if manual button OR if > 5 mins since last auto-snap
+                if (isManualSnapshot || (now.getTime() - lastAutoSnapshotTime > 5 * 60 * 1000)) {
+
+                    let name = "Auto-Save";
+                    if (isManualSnapshot) {
+                        name = prompt("Snapshot Name:", `Version ${now.toLocaleTimeString()}`);
+                        if (!name) return; // Cancelled
+                    }
+
+                    await addDoc(collection(db, "characters", currentCharacterId, "snapshots"), {
+                        name: name,
+                        createdAt: nowIso,
+                        sheetData: data,
+                        createdBy: currentUser.uid
+                    });
+
+                    lastAutoSnapshotTime = now.getTime();
+                    if(isManualSnapshot) alert("Snapshot Saved!");
+                }
+
+                // Refresh list if this was a new character creation
+                updateMyCharactersList();
+
+            } catch (e) {
+                console.error("Save error:", e);
+                alert("Error saving: " + e.message);
+            }
+        };
+
+        // Load a specific historical snapshot
+        window.loadSelectedVersion = async function() {
+            const select = document.getElementById('versionSelect');
+            const snapId = select.value;
+            if(!snapId) return;
+
+            if(!confirm("Load this historical version? Unsaved changes will be lost.")) return;
+
+            isLoading = true;
+            try {
+                const snapDoc = await getDoc(doc(db, "characters", currentCharacterId, "snapshots", snapId));
+                if(snapDoc.exists()) {
+                    const d = snapDoc.data();
+                    populateData(d.sheetData);
+                    // We treat loading a snapshot like a local edit effectively,
+                    // so the next save becomes the new "Current"
+                    lastLocalChangeTimestamp = Date.now();
+                    alert(`Loaded: ${d.name}`);
+                }
+            } catch(e) { console.error(e); }
+            finally { isLoading = false; }
+        }
+
+        // --- EXISTING UTILS ---
+
+        async function loadSharedCharacter(sharedId) {
+            isLoading = true;
+            document.getElementById('status').innerText = "Loading Shared...";
+            try {
+                const docRef = doc(db, "characters", sharedId);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    currentCharacterId = sharedId;
+                    localStorage.setItem('dnd_char_id', currentCharacterId);
+
+                    const data = docSnap.data();
+                    populateData(data.sheetData);
+                    lastLoadedRemoteTimestamp = new Date(data.lastUpdated).getTime();
+
+                    if (currentUser && data.ownerId === currentUser.uid) {
+                        setupRealtimeListener();
+                    } else {
+                        isCloudOwner = false;
+                        document.getElementById('status').innerText = "Read Only Mode";
+                    }
+                } else {
+                    alert("Character not found.");
+                }
+            } catch (e) { console.error(e); }
+            finally { isLoading = false; updateModifiers(); }
+        }
+
+        async function updateSnapshotSelect() {
+            if (!currentUser) return;
+
+            const snapshotsCol = getSnapshotsCollection(currentUser.uid);
+            try {
+                // Now 'await' will work correctly
+                const snapDocs = await getDocs(snapshotsCol);
+                const select = document.getElementById('versionSelect');
+
+                // Clear existing options except the placeholder
+                select.innerHTML = '<option value="">Load Version...</option>';
+
+                snapDocs.forEach(d => {
+                    const data = d.data();
+                    const opt = document.createElement('option');
+                    opt.value = d.id; // This is the Firestore Document ID
+
+                    // Format the date for a better UI experience
+                    const date = data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'Unknown Date';
+                    opt.text = `${data.name} (${date})`;
+
+                    select.appendChild(opt);
+                });
+            } catch(e) {
+                console.error("Snapshot load error:", e);
+            }
+        }
+
+        // --- DATA COLLECTION ---
+        function collectData() {
+            const data = { charName: document.getElementById('charName').value }; // Ensure name is top level
+            document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => {
+                data[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
+            });
+            data['weapons'] = [];
+            document.querySelectorAll('#weapons-body tr').forEach(tr => {
+                const i = tr.querySelectorAll('input');
+                data['weapons'].push({name: i[0].value, atk: i[1].value, dmg: i[2].value, notes: i[3].value});
+            });
+            data['spells'] = [];
+            document.querySelectorAll('#spells-body tr').forEach(tr => {
+                const i = tr.querySelectorAll('input');
+                data['spells'].push({lvl: i[0].value, name: i[1].value, conc: i[2].checked, rit: i[3].checked, mat: i[4].checked});
+            });
+            data['spellSlots'] = {};
+            document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => { data['spellSlots'][cb.id] = cb.checked; });
+            return data;
+        }
+
+        function populateData(data) {
+            if(!data) return;
+            for (const [key, value] of Object.entries(data)) {
+                if(key === 'spellSlots' || key === 'weapons' || key === 'spells') continue;
+                const el = document.getElementById(key);
+                if (el) { if(el.type === 'checkbox') el.checked = value; else el.value = value; }
+            }
+            if(data.weapons) {
+                document.getElementById('weapons-body').innerHTML = '';
+                for(let i=0; i<Math.max(5, data.weapons.length); i++) window.addWeaponRow();
+                const rows = document.querySelectorAll('#weapons-body tr');
+                data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.name; inputs[1].value=r.atk; inputs[2].value=r.dmg; inputs[3].value=r.notes; }});
+            }
+            if(data.spells) {
+                document.getElementById('spells-body').innerHTML = '';
+                for(let i=0; i<Math.max(15, data.spells.length); i++) window.addSpellRow();
+                const rows = document.querySelectorAll('#spells-body tr');
+                data.spells.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.lvl; inputs[1].value=r.name; inputs[2].checked=r.conc; inputs[3].checked=r.rit; inputs[4].checked=r.mat; }});
+            }
+            if(data.spellSlots) {
+                for (const [slotId, checked] of Object.entries(data.spellSlots)) {
+                    const el = document.getElementById(slotId);
+                    if(el) el.checked = checked;
+                }
+            }
+            updateModifiers();
+            updatePageTitle();
+        }
+
+        // --- HELPERS ---
+        function updateModifiers() {
+            const stats = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+            const profBonus = parseInt(document.getElementById('prof-bonus').value) || 0;
+            stats.forEach(stat => {
+                const scoreEl = document.getElementById(`${stat}-score`);
+                const modEl = document.getElementById(`${stat}-mod`);
+                if (scoreEl && modEl) {
+                   const score = parseInt(scoreEl.value);
+                   if (isNaN(score)) { modEl.value = ""; } else {
+                       const mod = Math.floor((score - 10) / 2);
+                       modEl.value = (mod >= 0 ? "+" : "") + mod;
+                       const saveProf = document.getElementById(`save-prof-${stat}`).checked;
+                       const saveVal = document.getElementById(`save-val-${stat}`);
+                       const totalSave = mod + (saveProf ? profBonus : 0);
+                       saveVal.value = (totalSave >= 0 ? "+" : "") + totalSave;
+                       document.querySelectorAll(`[id^="val-${stat}-"]`).forEach(skillInput => {
+                           const skillId = skillInput.id.replace('val-', 'prof-');
+                           const isProficient = document.getElementById(skillId).checked;
+                           const totalSkill = mod + (isProficient ? profBonus : 0);
+                           skillInput.value = (totalSkill >= 0 ? "+" : "") + totalSkill;
+                       });
+                    }
+                }
+            });
+            // Spell Mods
+            const selectedStat = document.getElementById('spell-ability').value;
+            if (selectedStat) {
+                const scoreEl = document.getElementById(`${selectedStat}-score`);
+                const mod = Math.floor((parseInt(scoreEl.value || 10) - 10) / 2);
+                document.getElementById('spell-mod').value = (mod >= 0 ? "+" : "") + mod;
+                document.getElementById('spell-save-dc').value = 8 + profBonus + mod;
+                document.getElementById('spell-atk').value = (profBonus + mod >= 0 ? "+" : "") + (profBonus + mod);
+            }
+            const percVal = parseInt(document.getElementById('val-wisdom-perception').value) || 0;
+            const passPercEl = document.getElementById('pass-perc');
+            if (passPercEl) passPercEl.value = 10 + percVal;
+        }
+
+        function handleInput(e) {
+            if (e.target.id.endsWith('-score') || e.target.id === 'prof-bonus' || e.target.type === 'checkbox' || e.target.id === 'spell-ability') {
+                updateModifiers();
+            }
+            if (!isLoading) {
+                lastLocalChangeTimestamp = Date.now();
+                // Debounce saving: updates Head doc (and potentially creates snapshot)
+                debounce(() => window.saveVersion(false), 2000)();
+            }
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); };
+        }
+
+        function generateUUID() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => (c=='x'?Math.random()*16|0:(Math.random()*16|0)&0x3|0x8).toString(16)); }
+        function updatePageTitle() {
+             const name = document.getElementById('charName').value;
+             if(name) document.title = name + " - 5e";
+        }
+
+        window.shareSheet = async function() {
+            if (!currentUser) { alert("Login required."); return; }
+            await window.saveVersion(false); // Ensure head is up to date
+            const shareUrl = `${window.location.origin}${window.location.pathname}?charId=${currentCharacterId}`;
+            try { await navigator.clipboard.writeText(shareUrl); alert("Link copied!"); } catch (err) { prompt("Copy:", shareUrl); }
+        }
+
+        window.addWeaponRow = () => {
+            const tbody = document.getElementById('weapons-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>`;
+            tbody.appendChild(tr);
+            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', handleInput));
+        };
+        window.addSpellRow = () => {
+             const tbody = document.getElementById('spells-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><input type="text" style="width:25px; text-align:center;"></td><td><input type="text"></td><td style="white-space: nowrap; text-align: center;"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></td>`;
+            tbody.appendChild(tr);
+            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', handleInput));
+        };
+        window.resetSheet = function() {
+            if(confirm("Create new character? Unsaved changes will be lost.")) {
+                currentCharacterId = generateUUID();
+                localStorage.setItem('dnd_char_id', currentCharacterId);
+                window.location.href = window.location.pathname; // Reload clean
+            }
+        };
+
         function generateStaticContent() {
-            // Ability Scores with Tooltips
-            const abilityData = {
-                "Strength": ["Athletics"], "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"], "Constitution": [],
-                "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"],
-                "Wisdom": ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"],
-                "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"]
-            };
+            const abilityData = { "Strength": ["Athletics"], "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"], "Constitution": [], "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"], "Wisdom": ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"], "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"] };
             const abilitiesContainer = document.getElementById('ability-scores-container');
             if(abilitiesContainer) {
                 let html = '';
@@ -415,24 +795,10 @@
                         const skillId = skill.replace(/\s+/g, '-').toLowerCase();
                         skillsHtml += `<div class="skill-row"><input type="number" class="save-val-input" id="val-${lowStat}-${skillId}" placeholder="0"><input type="checkbox" class="prof-bubble" id="prof-${lowStat}-${skillId}"><span>${skill}</span></div>`;
                     });
-                    html += `
-                    <div class="ability-box">
-                        <span class="box-title" data-tip="${stat}" tabindex="0">${stat}</span>
-                        <div style="position: relative;">
-                            <input type="number" id="${lowStat}-score" class="ability-score" placeholder="10"><span class="label-sm">Score</span>
-                            <input type="text" id="${lowStat}-mod" class="ability-mod" placeholder="+0"><span class="label-sm">Modifier</span>
-                        </div>
-                        <div class="skills-list">
-                            <div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;">
-                                <input type="text" class="save-val-input" id="save-val-${lowStat}" placeholder="0"><input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}"><span>Saving Throw</span>
-                            </div>${skillsHtml}
-                        </div>
-                    </div>`;
+                    html += `<div class="ability-box"><span class="box-title" data-tip="${stat}" tabindex="0">${stat}</span><div style="position: relative;"><input type="number" id="${lowStat}-score" class="ability-score" placeholder="10"><span class="label-sm">Score</span><input type="text" id="${lowStat}-mod" class="ability-mod" placeholder="+0"><span class="label-sm">Modifier</span></div><div class="skills-list"><div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;"><input type="text" class="save-val-input" id="save-val-${lowStat}" placeholder="0"><input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}"><span>Saving Throw</span></div>${skillsHtml}</div></div>`;
                 }
                 abilitiesContainer.innerHTML = html;
             }
-
-            // Spell Slots
             const slotContainer = document.getElementById('spell-slots-container');
             if(slotContainer) {
                 const slotCounts = [0, 4, 3, 3, 3, 3, 2, 2, 1, 1];
@@ -509,271 +875,10 @@
             document.body.addEventListener('focusout', hideTip);
         }
 
-        // --- CLOUD SYNC & RACE CONDITION FIXES ---
-        let initialLoadNoAsk = true;
-        function setupRealtimeListener() {
-            if (!currentUser) return;
-            onSnapshot(doc(db, "characters", currentCharacterId), (docSnap) => {
-                if (docSnap.exists()) {
-                    const cloudData = docSnap.data();
-                    if (!isLoading && !hasUnsavedChanges) {
-                        const localTime = parseInt(localStorage.getItem('dnd_last_edit_ts') || '0');
-                        const cloudTime = new Date(cloudData.lastUpdated || 0).getTime();
-                        if (cloudTime > localTime + 2000) { 
-                            if(initialLoadNoAsk || confirm("Newer version found on server. Load it?")) {
-                                initialLoadNoAsk = false;
-                                isLoading = true;
-                                populateData(cloudData.sheetData);
-                                isLoading = false;
-                                document.getElementById('status').innerText = "Synced with Cloud";
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        async function saveToCloud(force = false) {
-            if (!currentUser || !isCloudOwner) return;
-            if (isLoading) return;
-
-            // Protection: Don't save completely empty new sheets over existing data
-            const charName = document.getElementById('charName').value;
-            const charClass = document.getElementById('class').value;
-            if (!force && !charName && !charClass) return;
-
-            const now = Date.now();
-            if (!force && (now - lastAutoSaveTime < 60000)) return; 
-
-            const data = collectData();
-            const statusEl = document.getElementById('status');
-            statusEl.innerText = "Saving...";
-
-            try {
-                await setDoc(doc(db, "characters", currentCharacterId), {
-                    lastUpdated: new Date().toISOString(),
-                    sheetData: data,
-                    ownerId: currentUser.uid,
-                    ownerEmail: currentUser.email,
-                    characterName: data.charName || "Unnamed"
-                }, { merge: true });
-                
-                lastAutoSaveTime = now;
-                hasUnsavedChanges = false;
-                localStorage.setItem('dnd_last_edit_ts', now);
-                statusEl.innerText = 'Saved ' + new Date().toLocaleTimeString();
-                statusEl.style.color = '#28a745';
-            } catch (e) {
-                console.error("Save error:", e);
-                statusEl.innerText = 'Save Failed';
-                statusEl.style.color = '#dc3545';
-            }
-        }
-
-        async function loadSharedCharacter(sharedId) {
-            isLoading = true;
-            const statusEl = document.getElementById('status');
-            statusEl.innerText = "Loading...";
-            
-            try {
-                const docRef = doc(db, "characters", sharedId);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    if (currentUser && data.ownerId === currentUser.uid) {
-                        isCloudOwner = true;
-                        statusEl.innerText = "Online";
-                        setupRealtimeListener();
-                    } else {
-                        isCloudOwner = false;
-                        statusEl.innerText = "Read Only";
-                        document.getElementById('app-controls').style.borderBottom = "3px solid orange";
-                    }
-                    populateData(data.sheetData);
-                    currentCharacterId = sharedId;
-                    localStorage.setItem('dnd_last_edit_ts', new Date(data.lastUpdated).getTime());
-                } else {
-                    alert("Character not found.");
-                }
-            } catch (e) { console.error(e); } 
-            finally { isLoading = false; updateModifiers(); }
-        }
-
-        // --- HANDLERS ---
-        window.manualSave = () => saveToCloud(true);
-        window.saveVersion = (force) => {
-             const name = prompt("Version Name:");
-            if(!name) return;
-            let versions = JSON.parse(localStorage.getItem('dnd_versions') || "[]");
-            versions.push({ name: name, timestamp: new Date().toISOString(), data: collectData() });
-            localStorage.setItem('dnd_versions', JSON.stringify(versions));
-            updateVersionDropdown();
-        };
-
-        window.shareSheet = async function() {
-            if (!currentUser) { alert("Login required."); return; }
-            await saveToCloud(true); 
-            const shareUrl = `${window.location.origin}${window.location.pathname}?charId=${currentCharacterId}`;
-            try { await navigator.clipboard.writeText(shareUrl); alert("Link copied!"); } catch (err) { prompt("Copy:", shareUrl); }
-        }
-        
-        // --- DATA COLLECTION & POPULATION ---
-        function collectData() {
-            const data = {};
-            document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => {
-                data[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
-            });
-            data['weapons'] = [];
-            document.querySelectorAll('#weapons-body tr').forEach(tr => {
-                const i = tr.querySelectorAll('input');
-                data['weapons'].push({name: i[0].value, atk: i[1].value, dmg: i[2].value, notes: i[3].value});
-            });
-            data['spells'] = [];
-            document.querySelectorAll('#spells-body tr').forEach(tr => {
-                const i = tr.querySelectorAll('input');
-                data['spells'].push({lvl: i[0].value, name: i[1].value, conc: i[2].checked, rit: i[3].checked, mat: i[4].checked});
-            });
-            data['spellSlots'] = {};
-            document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => { data['spellSlots'][cb.id] = cb.checked; });
-            return data;
-        }
-
-        function populateData(data) {
-            if(!data) return;
-            for (const [key, value] of Object.entries(data)) {
-                if(key === 'spellSlots') continue;
-                const el = document.getElementById(key);
-                if (el) { if(el.type === 'checkbox') el.checked = value; else el.value = value; }
-            }
-            if(data.weapons) {
-                document.getElementById('weapons-body').innerHTML = '';
-                for(let i=0; i<Math.max(5, data.weapons.length); i++) window.addWeaponRow();
-                const rows = document.querySelectorAll('#weapons-body tr');
-                data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.name; inputs[1].value=r.atk; inputs[2].value=r.dmg; inputs[3].value=r.notes; }});
-            }
-            if(data.spells) {
-                document.getElementById('spells-body').innerHTML = '';
-                for(let i=0; i<Math.max(15, data.spells.length); i++) window.addSpellRow();
-                const rows = document.querySelectorAll('#spells-body tr');
-                data.spells.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.lvl; inputs[1].value=r.name; inputs[2].checked=r.conc; inputs[3].checked=r.rit; inputs[4].checked=r.mat; }});
-            }
-            if(data.spellSlots) {
-                for (const [slotId, checked] of Object.entries(data.spellSlots)) {
-                    const el = document.getElementById(slotId);
-                    if(el) el.checked = checked;
-                }
-            }
-            updatePageTitle();
-        }
-
-        // --- HELPERS ---
-        function updateModifiers() {
-            const stats = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
-            const profBonus = parseInt(document.getElementById('prof-bonus').value) || 0;
-            stats.forEach(stat => {
-                const scoreEl = document.getElementById(`${stat}-score`);
-                const modEl = document.getElementById(`${stat}-mod`);
-                if (scoreEl && modEl) {
-                   const score = parseInt(scoreEl.value);
-                   if (isNaN(score)) { modEl.value = ""; } else {
-                       const mod = Math.floor((score - 10) / 2);
-                       modEl.value = (mod >= 0 ? "+" : "") + mod;
-                       const saveProf = document.getElementById(`save-prof-${stat}`).checked;
-                       const saveVal = document.getElementById(`save-val-${stat}`);
-                       const totalSave = mod + (saveProf ? profBonus : 0);
-                       saveVal.value = (totalSave >= 0 ? "+" : "") + totalSave;
-                       document.querySelectorAll(`[id^="val-${stat}-"]`).forEach(skillInput => {
-                           const skillId = skillInput.id.replace('val-', 'prof-');
-                           const isProficient = document.getElementById(skillId).checked;
-                           const totalSkill = mod + (isProficient ? profBonus : 0);
-                           skillInput.value = (totalSkill >= 0 ? "+" : "") + totalSkill;
-                       });
-                    }
-                }
-            });
-            const selectedStat = document.getElementById('spell-ability').value;
-            if (selectedStat) {
-                const scoreEl = document.getElementById(`${selectedStat}-score`);
-                const mod = Math.floor((parseInt(scoreEl.value || 10) - 10) / 2);
-                document.getElementById('spell-mod').value = (mod >= 0 ? "+" : "") + mod;
-                document.getElementById('spell-save-dc').value = 8 + profBonus + mod;
-                document.getElementById('spell-atk').value = (profBonus + mod >= 0 ? "+" : "") + (profBonus + mod);
-            }
-            const percVal = parseInt(document.getElementById('val-wisdom-perception').value) || 0;
-            const passPercEl = document.getElementById('pass-perc');
-            if (passPercEl) passPercEl.value = 10 + percVal;
-        }
-
-        function handleInput(e) {
-            if (e.target.id.endsWith('-score') || e.target.id === 'prof-bonus' || e.target.type === 'checkbox' || e.target.id === 'spell-ability') {
-                updateModifiers();
-            }
-            hasUnsavedChanges = true;
-            debounce(() => saveToCloud(false), 2000)();
-        }
-
-        function debounce(func, wait) {
-            let timeout;
-            return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); };
-        }
-
-        function generateUUID() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => (c=='x'?Math.random()*16|0:(Math.random()*16|0)&0x3|0x8).toString(16)); }
-        function updatePageTitle() { 
-             const name = document.getElementById('charName').value;
-             if(name) document.title = name + " - 5e";
-        }
-
-        window.addWeaponRow = () => {
-            const tbody = document.getElementById('weapons-body');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td>`;
-            tbody.appendChild(tr);
-            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', handleInput));
-        };
-        window.addSpellRow = () => {
-             const tbody = document.getElementById('spells-body');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td><input type="text" style="width:25px; text-align:center;"></td><td><input type="text"></td><td style="white-space: nowrap; text-align: center;"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"><input type="checkbox" class="diamond-check"></td>`;
-            tbody.appendChild(tr);
-            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', handleInput));
-        };
-        window.resetSheet = function() {
-            if(confirm("Clear all?")) {
-                document.querySelectorAll('input').forEach(i => { if(i.type==='checkbox')i.checked=false; else i.value=""; });
-                document.querySelectorAll('textarea').forEach(t=>t.value="");
-                debounce(() => saveToCloud(false), 500)();
-            }
-        };
-        window.loadSelectedVersion = function() {
-            const idx = document.getElementById('versionSelect').value;
-            if(idx === "") return;
-            if(confirm("Overwrite current data?")) {
-                populateData(JSON.parse(localStorage.getItem('dnd_versions'))[idx].data);
-                debounce(() => saveToCloud(true), 500)(); // Force save on manual version load
-            }
-        };
-        function updateVersionDropdown() {
-            const select = document.getElementById('versionSelect');
-            select.innerHTML = '<option value="">Load Version...</option>';
-            const versions = JSON.parse(localStorage.getItem('dnd_versions') || "[]");
-            versions.forEach((v, idx) => {
-                const opt = document.createElement('option');
-                opt.value = idx;
-                opt.text = `${v.name} (${new Date(v.timestamp).toLocaleDateString()})`;
-                select.appendChild(opt);
-            });
-        }
-
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', async () => {
             generateStaticContent();
             await setupTooltips();
-
-            const allInputs = document.querySelectorAll('input, textarea, select');
-            allInputs.forEach(input => { input.addEventListener('input', handleInput); });
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const sharedId = urlParams.get('charId');
 
             document.body.addEventListener('mouseover', (e) => {
                 const target = e.target.closest('[data-tip]');
@@ -788,13 +893,18 @@
             document.body.addEventListener('mousemove', (e) => { if (currentTarget) moveTip(e); });
             document.body.addEventListener('mouseout', (e) => { if (e.target.closest('[data-tip]')) hideTip(); });
 
+            const allInputs = document.querySelectorAll('input, textarea, select');
+            allInputs.forEach(input => { input.addEventListener('input', handleInput); });
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedId = urlParams.get('charId');
+
             if (sharedId) {
                 await loadSharedCharacter(sharedId);
             } else {
-                const stored = localStorage.getItem('dnd_current_sheet');
-                if(stored) populateData(JSON.parse(stored));
+                // If local storage has a backup, maybe use it?
+                // For this migration, we rely on Cloud first if logged in.
             }
-            updateVersionDropdown();
         });
     </script>
 </body>
