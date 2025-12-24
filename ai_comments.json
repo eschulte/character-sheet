@@ -1,404 +1,404 @@
 {
-"Character Name": [
-    "This is what the dungeon will scream when you mess up.",
-    "Your chosen identifier for fame, infamy, or the obituary.",
-    "Names have power. This one mostly attracts danger.",
-    "Shorter names are easier to shout during combat.",
-    "Legendary heroes start here. So do corpses.",
-    "Changing this later will not change your fate.",
-    "This is how NPCs will pretend to remember you.",
-    "Pick wisely. The dungeon never forgets.",
-    "Your chosen identifier. The label that will appear on kill feeds, tombstones, and post-mortem loot audits.",
-    "Pick something heroic, ominous, or ironic. The dungeon prefers irony. Also easier to chant."
-],
-"Species": [
-    "Your biological or mechanical excuse for your stats.",
-    "Determines how society judges you before you speak.",
-    "Some species get darkvision. Some get stereotypes.",
-    "You did not choose this lightly. Or at all.",
-    "Innate traits included. Warranty not provided.",
-    "Yes, this affects roleplay. No, it won\u2019t save you.",
-    "Your ancestry is now a rules interaction.",
-    "Welcome to being categorized.",
-    "Your biological template, complete with perks, flaws, and cultural baggage you will absolutely validate.",
-    "Includes gait, posture, and footwear expectations. Yes, I noticed how you walk."
-],
-"Class": [
-    "Your job title in a world with terrible benefits.",
-    "Determines how you solve problems and create new ones.",
-    "This is why the party expects certain things from you.",
-    "You are now locked into a playstyle. Mostly.",
-    "Power comes with paperwork.",
-    "Every class thinks theirs is the hardest.",
-    "Your combat philosophy in one word.",
-    "Multiclassing will complicate this.",
-    "Your primary method of solving problems until it stops working.",
-    "Determines whether you charge, scheme, pray, or dramatically monologue before failure."
-],
-"Subclass": [
-    "Your class, but opinionated.",
-    "This is where flavor becomes mechanical.",
-    "You picked a lane. Swerving is discouraged.",
-    "Subclass choices define your *actual* role.",
-    "This is why two fighters are never the same.",
-    "Here lie your coolest abilities.",
-    "This choice will be judged.",
-    "Synergy optional. Regret possible.",
-    "Your hyper-specific flavor of competence.",
-    "Because you wanted your mistakes to feel bespoke."
-],
-"Level": [
-    "A numerical measure of how much trouble you can survive.",
-    "Higher is better. Lower is deadlier.",
-    "This number terrifies monsters and DMs alike.",
-    "Represents experience, luck, and plot armor.",
-    "Every level is earned in blood or paperwork.",
-    "You grow stronger. The dungeon adapts.",
-    "This unlocks new mistakes.",
-    "Level responsibly.",
-    "A rough estimate of how many disasters you\u2019ve endured without quitting.",
-    "Higher numbers mean better odds, not better judgment."
-],
-"XP": [
-    "A tally of how close you are to improvement.",
-    "Earned through violence, cleverness, or exploitation.",
-    "Higher XP means closer to power spikes.",
-    "This is your progress bar.",
-    "Grinding encouraged. Safety not guaranteed.",
-    "Milestones avoid this entirely.",
-    "XP is abstract suffering.",
-    "Numbers go up. So do threats.",
-    "Progress points awarded for risk-taking and emotional damage.",
-    "Spend enough of these and the dungeon pretends to respect you."
-],
-"AC": [
-    "How hard you are to hit. Not how hard you are to kill.",
-    "Armor Class: the enemy\u2019s problem, allegedly.",
-    "Higher AC means fewer regrets.",
-    "Does not protect against bad decisions.",
-    "Calculated optimism.",
-    "The dice still disagree sometimes.",
-    "AC is confidence, quantified.",
-    "Shields help. So does hiding.",
-    "How hard you are to hit, not how smart it was to be there.",
-    "Boots, armor, reflexes\u2014yes, all factored in. I see everything."
-],
-"Proficiency Bonus": [
-    "Your general competence modifier.",
-    "Adds confidence to things you claim to know.",
-    "Scales automatically. Enjoy the illusion of growth.",
-    "This applies more often than you think.",
-    "A small number with big implications.",
-    "Represents training, not talent.",
-    "You\u2019re better at stuff now. Allegedly.",
-    "One bonus to rule them all."
-],
-"Strength": [
-    "How hard you hit and how much you lift.",
-    "Measures muscle, not judgment.",
-    "Low Strength means creative solutions.",
-    "High Strength means broken furniture.",
-    "Grappling loves this stat.",
-    "Doors fear this number.",
-    "Dexterity users pretend this is optional.",
-    "Carry capacity remembers.",
-    "Raw force output and door-negotiation skill.",
-    "Correlates strongly with stomping. Not judging. Noticing."
-],
-"Dexterity": [
-    "Speed, balance, and not getting stabbed.",
-    "Rogues worship this stat.",
-    "High Dex solves many problems quietly.",
-    "Low Dex creates slapstick.",
-    "Affects AC, initiative, and regrets.",
-    "This is why you act first.",
-    "Dex saves lives daily.",
-    "Clumsiness quantified.",
-    "Agility, balance, and footwork quality.",
-    "Clean pivots. Flexible ankles. Don\u2019t blush."
-],
-"Constitution": [
-    "How hard you are to kill. Again.",
-    "Directly converts into hit points.",
-    "Poison checks this first.",
-    "Fatigue lives here.",
-    "A boring stat until it isn\u2019t.",
-    "Every caster regrets dumping this.",
-    "This is your stamina bar.",
-    "Con keeps you conscious.",
-    "How long your body refuses to give up.",
-    "Includes bone density and blister tolerance."
-],
-"Intelligence": [
-    "Book learning and spell math.",
-    "Also known as \u2018wizard privilege.\u2019",
-    "Determines how much you know afterward.",
-    "Investigation lives here.",
-    "Low INT characters still have ideas. Sometimes.",
-    "This affects preparation, not wisdom.",
-    "Memory and logic included.",
-    "Thinking hurts sometimes.",
-    "Book learning and tactical planning.",
-    "Knowing where to step. Knowing when not to."
-],
-"Wisdom": [
-    "Awareness, intuition, and survival instincts.",
-    "The \u2018don\u2019t touch that\u2019 stat.",
-    "Perception and insight depend on this.",
-    "Low Wisdom causes surprises.",
-    "High Wisdom sees ambushes coming.",
-    "This is not intelligence. Stop arguing.",
-    "Animals respect this.",
-    "Wisdom saves prevent regret.",
-    "Awareness, instincts, and hindsight avoidance.",
-    "You *felt* the trap. You ignored it."
-],
-"Charisma": [
-    "Force of personality and social gravity.",
-    "This is not attractiveness. Usually.",
-    "Spells bend reality through confidence.",
-    "Low CHA still speaks. Poorly.",
-    "High CHA gets away with things.",
-    "Deception thrives here.",
-    "Leadership, intimidation, charm.",
-    "This is why people listen.",
-    "Your ability to sell bad ideas convincingly.",
-    "Eye contact helps. So does confident posture."
-],
-"Hit Points": [
-    "How much damage you can absorb before panic.",
-    "This number trends downward.",
-    "Healing restores this illusion.",
-    "Zero is bad. Negative is worse.",
-    "Temporary HP is optimism.",
-    "Track carefully.",
-    "These are borrowed seconds.",
-    "HP is a suggestion, not a promise.",
-    "Your remaining buffer against consequences.",
-    "Once this hits zero, posture becomes irrelevant."
-],
-"Death Saves": [
-    "Your audition for survival.",
-    "Three successes mean relief.",
-    "Three failures mean consequences.",
-    "No modifiers. Just fate.",
-    "The table gets quiet here.",
-    "Stabilization is a mercy.",
-    "Criticals change everything.",
-    "Roll carefully.",
-    "The dungeon hesitating.",
-    "Make it interesting. I\u2019m watching."
-],
-"Equipment": [
-    "Everything you own that hasn\u2019t been stolen yet.",
-    "Weight matters eventually.",
-    "This is where utility hides.",
-    "Most items are situational. Situations happen.",
-    "You will forget something important.",
-    "Consumables exist to be hoarded.",
-    "Inventory management is gameplay.",
-    "The dungeon notices clutter.",
-    "Everything you carry and forget.",
-    "Weight distribution could be better."
-],
-"Coins": [
-    "Abstract wealth with very real weight.",
-    "Money solves problems until it doesn\u2019t.",
-    "Copper is annoying. Platinum is suspicious.",
-    "Encumbrance lurks.",
-    "You will argue about this.",
-    "Gold attracts attention.",
-    "Spend wisely. Or flamboyantly.",
-    "Loot drives motivation.",
-    "Portable motivation.",
-    "Clinks give you away."
-],
-"Thieves Tools": [
-    "Ah yes, the official kit for touching things you absolutely should not be touching. If it clicks, great. If it snaps, you\u2019re about to meet consequences.",
-    "These tools exist to turn locked doors into suggestions and traps into learning experiences. Mostly the learning kind.",
-    "Congratulations, you brought the toolkit that says \u2018I definitely planned to be here illegally.\u2019"
-],
-"Tinkers Tools": [
-    "For when you look at a perfectly functional object and think, \u2018I can make this worse, but interesting.\u2019",
-    "A box of bits, wires, and poor decisions. Results may include gadgets, explosions, or both.",
-    "You use these to invent things no one asked for and everyone will blame you for."
-],
-"Carpenters Tools": [
-    "Wood goes in, furniture comes out. Or splinters. Often splinters.",
-    "These tools allow you to turn trees into doors, bridges, and objects enemies will hide behind.",
-    "Because sometimes the dungeon needs a table, and sometimes it needs a barricade built in a panic."
-],
-"Smiths Tools": [
-    "Fire, metal, and the confidence to hit something until it becomes useful.",
-    "You make weapons here. And armor. And occasionally unrecognizable slag.",
-    "If it\u2019s heavy, hot, and dangerous, you\u2019re probably doing it right."
-],
-"Weavers Tools": [
-    "For creating cloth, rope, and the illusion that you understand textiles.",
-    "You turn thread into clothing and clothing into a reason people stop staring.",
-    "Yes, this includes fancy cloaks. No, it does not make you fashionable by default."
-],
-"Wood Carvers Tools": [
-    "You remove wood until something recognizable remains. Ideally not your fingers.",
-    "Perfect for decorative items, holy symbols, or ominous figurines that worry the party.",
-    "A slow, patient craft in a world that keeps trying to kill you."
-],
-"Brewers Supplies": [
-    "You make alcohol. Sometimes it\u2019s good. Sometimes it\u2019s technically poison.",
-    "These supplies turn water into morale, courage, and bad decisions.",
-    "Every batch answers the question: \u2018How flammable is this?\u2019"
-],
-"Alchemists Supplies": [
-    "Liquids, powders, and a near-religious faith in trial and error.",
-    "You mix things together and hope the result heals someone instead of dissolving them.",
-    "Warning: side effects may include smoke, smells, and unexpected sentience."
-],
-"Artificer": [
-    "A spellcaster who looked at magic and said, \u2018This needs more hardware.\u2019",
-    "You solve problems with tools, intellect, and devices that beep ominously.",
-    "When something breaks, you fix it. When something works, you upgrade it until it breaks."
-],
-"Warforged": [
-    "A living construct: proof that someone once thought free will was optional.",
-    "You do not eat, sleep, or breathe\u2014yet somehow still feel existential dread.",
-    "Built for war, now stuck managing inventory and emotions."
-],
-"Lawful": [
-    "You follow rules. Even bad ones. Especially bad ones.",
-    "Predictable, reliable, and deeply confused when chaos works.",
-    "You believe order solves problems. Reality disagrees occasionally."
-],
-"Neutral": [
-    "You stand firmly in the middle while everyone else sets things on fire.",
-    "Not good, not evil\u2014just tired.",
-    "Your moral compass points toward \u2018it depends.\u2019"
-],
-"Chaotic": [
-    "You treat rules as optional side quests.",
-    "Impulse-driven, unpredictable, and shockingly effective at causing incidents.",
-    "You believe freedom is worth the collateral damage."
-],
-"Alignment (etc.)": [
-    "A loose philosophical guideline everyone argues about and regularly ignores.",
-    "This describes your intent, not your results. The results are usually worse.",
-    "Think of it as vibes, not enforcement."
-],
-"Proficiency": [
-    "Official recognition that you\u2019ve practiced.",
-    "Congratulations, you now fail with confidence."
-],
-"Initiative": [
-    "Reaction speed when things go wrong.",
-    "Fast feet, fast fate."
-],
-"Speed": [
-    "How quickly you can reposition or retreat.",
-    "Measured in strides, not dignity."
-],
-"Size": [
-    "Your physical footprint in the world.",
-    "Bigger targets wear bigger boots. Statistics only."
-],
-"Passive Perception": [
-    "What you notice while distracted.",
-    "You saw the floor scuff marks. You chose to ignore them."
-],
-"Successes": [
-    "Moments death reconsidered.",
-    "Graceful recovery. Solid footing."
-],
-"Failures": [
-    "Moments death leaned closer.",
-    "Sloppy stance. Tsk."
-],
-"Weapons": [
-    "Tools designed to end conversations.",
-    "Grip matters. Balance matters. Feet planted\u2014yes, like that."
-],
-"Damage": [
-    "Quantified regret delivered.",
-    "Transfer of force begins at the ground up."
-],
-"Proficiencies": [
-    "Things you’re officially allowed to be good at.",
-    "Tasks you\u2019re licensed to attempt.",
-    "Everything else is freestyle."
-],
-"Features": [
-    "Your class-issued advantages.",
-    "Use them or be judged silently."
-],
-"Background": [
-    "Proof you existed before the violence.",
-    "Old habits show in how you stand."
-],
-"Species Traits": [
-    "Innate perks from your origin.",
-    "Includes stance, stride, and balance tendencies."
-],
-"Feats": [
-    "Optional upgrades earned through suffering.",
-    "Some improve mobility. I approve."
-],
-"Spellcasting": [
-    "Reality bending through confidence and hand motions.",
-    "Foot placement during casting is\u2026 adequate."
-],
-"Spell Ability": [
-    "The stat you use to bully the universe.",
-    "Conviction helps. So does stable footing."
-],
-"Save DC": [
-    "How hard it is to resist your nonsense.",
-    "Authority starts from the ground up."
-],
-"Spell Slots": [
-    "Daily reality edits.",
-    "Overuse leads to wobbling."
-],
-"Cantrips": [
-    "Unlimited magic with limited imagination.",
-    "Practice makes polish."
-],
-"Verbal": [
-    "Arcane shouting.",
-    "Projection improves outcomes."
-],
-"Somatic": [
-    "Mandatory mystical gestures.",
-    "Yes, including the feet. Don\u2019t ask."
-],
-"Concentration": [
-    "Holding magic while under pressure.",
-    "Try not to shift your weight so much."
-],
-"Ritual": [
-    "Slow magic, cheaper magic.",
-    "Interrupted magic."
-],
-"Appearance": [
-    "This is what enemies see right before deciding how seriously to take you.",
-    "Your visual presentation: armor, scars, posture, and unresolved trauma.",
-    "Appearance affects first impressions, targeting priority, and NPC assumptions.",
-    "This is not cosmetic. This is narrative telegraphing.",
-    "Describe what stands out immediately, not your tragic backstory.",
-    "Blood, dirt, and wear accumulate faster than you think.",
-    "The dungeon notices silhouettes, motion, and menace.",
-],
-"Backstory": [
-    "Narrative justification for your issues.",
-    "Explains the limp."
-],
-"Alignment": [
-    "A moral guideline.",
-    "Flexible under stress."
-],
-"Languages": [
-    "Ways to misunderstand danger.",
-    "Accents affect intimidation."
-],
-"GP": [
-    "The gold standard of greed.",
-    "Heavy pockets change your walk."
-]
+  "Character Name": [
+      "This is what the dungeon will scream when you mess up.",
+      "Your chosen identifier for fame, infamy, or the obituary.",
+      "Names have power. This one mostly attracts danger.",
+      "Shorter names are easier to shout during combat.",
+      "Legendary heroes start here. So do corpses.",
+      "Changing this later will not change your fate.",
+      "This is how NPCs will pretend to remember you.",
+      "Pick wisely. The dungeon never forgets.",
+      "Your chosen identifier. The label that will appear on kill feeds, tombstones, and post-mortem loot audits.",
+      "Pick something heroic, ominous, or ironic. The dungeon prefers irony. Also easier to chant."
+  ],
+  "Species": [
+      "Your biological or mechanical excuse for your stats.",
+      "Determines how society judges you before you speak.",
+      "Some species get darkvision. Some get stereotypes.",
+      "You did not choose this lightly. Or at all.",
+      "Innate traits included. Warranty not provided.",
+      "Yes, this affects roleplay. No, it won\u2019t save you.",
+      "Your ancestry is now a rules interaction.",
+      "Welcome to being categorized.",
+      "Your biological template, complete with perks, flaws, and cultural baggage you will absolutely validate.",
+      "Includes gait, posture, and footwear expectations. Yes, I noticed how you walk."
+  ],
+  "Class": [
+      "Your job title in a world with terrible benefits.",
+      "Determines how you solve problems and create new ones.",
+      "This is why the party expects certain things from you.",
+      "You are now locked into a playstyle. Mostly.",
+      "Power comes with paperwork.",
+      "Every class thinks theirs is the hardest.",
+      "Your combat philosophy in one word.",
+      "Multiclassing will complicate this.",
+      "Your primary method of solving problems until it stops working.",
+      "Determines whether you charge, scheme, pray, or dramatically monologue before failure."
+  ],
+  "Subclass": [
+      "Your class, but opinionated.",
+      "This is where flavor becomes mechanical.",
+      "You picked a lane. Swerving is discouraged.",
+      "Subclass choices define your *actual* role.",
+      "This is why two fighters are never the same.",
+      "Here lie your coolest abilities.",
+      "This choice will be judged.",
+      "Synergy optional. Regret possible.",
+      "Your hyper-specific flavor of competence.",
+      "Because you wanted your mistakes to feel bespoke."
+  ],
+  "Level": [
+      "A numerical measure of how much trouble you can survive.",
+      "Higher is better. Lower is deadlier.",
+      "This number terrifies monsters and DMs alike.",
+      "Represents experience, luck, and plot armor.",
+      "Every level is earned in blood or paperwork.",
+      "You grow stronger. The dungeon adapts.",
+      "This unlocks new mistakes.",
+      "Level responsibly.",
+      "A rough estimate of how many disasters you\u2019ve endured without quitting.",
+      "Higher numbers mean better odds, not better judgment."
+  ],
+  "XP": [
+      "A tally of how close you are to improvement.",
+      "Earned through violence, cleverness, or exploitation.",
+      "Higher XP means closer to power spikes.",
+      "This is your progress bar.",
+      "Grinding encouraged. Safety not guaranteed.",
+      "Milestones avoid this entirely.",
+      "XP is abstract suffering.",
+      "Numbers go up. So do threats.",
+      "Progress points awarded for risk-taking and emotional damage.",
+      "Spend enough of these and the dungeon pretends to respect you."
+  ],
+  "AC": [
+      "How hard you are to hit. Not how hard you are to kill.",
+      "Armor Class: the enemy\u2019s problem, allegedly.",
+      "Higher AC means fewer regrets.",
+      "Does not protect against bad decisions.",
+      "Calculated optimism.",
+      "The dice still disagree sometimes.",
+      "AC is confidence, quantified.",
+      "Shields help. So does hiding.",
+      "How hard you are to hit, not how smart it was to be there.",
+      "Boots, armor, reflexes\u2014yes, all factored in. I see everything."
+  ],
+  "Proficiency Bonus": [
+      "Your general competence modifier.",
+      "Adds confidence to things you claim to know.",
+      "Scales automatically. Enjoy the illusion of growth.",
+      "This applies more often than you think.",
+      "A small number with big implications.",
+      "Represents training, not talent.",
+      "You\u2019re better at stuff now. Allegedly.",
+      "One bonus to rule them all."
+  ],
+  "Strength": [
+      "How hard you hit and how much you lift.",
+      "Measures muscle, not judgment.",
+      "Low Strength means creative solutions.",
+      "High Strength means broken furniture.",
+      "Grappling loves this stat.",
+      "Doors fear this number.",
+      "Dexterity users pretend this is optional.",
+      "Carry capacity remembers.",
+      "Raw force output and door-negotiation skill.",
+      "Correlates strongly with stomping. Not judging. Noticing."
+  ],
+  "Dexterity": [
+      "Speed, balance, and not getting stabbed.",
+      "Rogues worship this stat.",
+      "High Dex solves many problems quietly.",
+      "Low Dex creates slapstick.",
+      "Affects AC, initiative, and regrets.",
+      "This is why you act first.",
+      "Dex saves lives daily.",
+      "Clumsiness quantified.",
+      "Agility, balance, and footwork quality.",
+      "Clean pivots. Flexible ankles. Don\u2019t blush."
+  ],
+  "Constitution": [
+      "How hard you are to kill. Again.",
+      "Directly converts into hit points.",
+      "Poison checks this first.",
+      "Fatigue lives here.",
+      "A boring stat until it isn\u2019t.",
+      "Every caster regrets dumping this.",
+      "This is your stamina bar.",
+      "Con keeps you conscious.",
+      "How long your body refuses to give up.",
+      "Includes bone density and blister tolerance."
+  ],
+  "Intelligence": [
+      "Book learning and spell math.",
+      "Also known as \u2018wizard privilege.\u2019",
+      "Determines how much you know afterward.",
+      "Investigation lives here.",
+      "Low INT characters still have ideas. Sometimes.",
+      "This affects preparation, not wisdom.",
+      "Memory and logic included.",
+      "Thinking hurts sometimes.",
+      "Book learning and tactical planning.",
+      "Knowing where to step. Knowing when not to."
+  ],
+  "Wisdom": [
+      "Awareness, intuition, and survival instincts.",
+      "The \u2018don\u2019t touch that\u2019 stat.",
+      "Perception and insight depend on this.",
+      "Low Wisdom causes surprises.",
+      "High Wisdom sees ambushes coming.",
+      "This is not intelligence. Stop arguing.",
+      "Animals respect this.",
+      "Wisdom saves prevent regret.",
+      "Awareness, instincts, and hindsight avoidance.",
+      "You *felt* the trap. You ignored it."
+  ],
+  "Charisma": [
+      "Force of personality and social gravity.",
+      "This is not attractiveness. Usually.",
+      "Spells bend reality through confidence.",
+      "Low CHA still speaks. Poorly.",
+      "High CHA gets away with things.",
+      "Deception thrives here.",
+      "Leadership, intimidation, charm.",
+      "This is why people listen.",
+      "Your ability to sell bad ideas convincingly.",
+      "Eye contact helps. So does confident posture."
+  ],
+  "Hit Points": [
+      "How much damage you can absorb before panic.",
+      "This number trends downward.",
+      "Healing restores this illusion.",
+      "Zero is bad. Negative is worse.",
+      "Temporary HP is optimism.",
+      "Track carefully.",
+      "These are borrowed seconds.",
+      "HP is a suggestion, not a promise.",
+      "Your remaining buffer against consequences.",
+      "Once this hits zero, posture becomes irrelevant."
+  ],
+  "Death Saves": [
+      "Your audition for survival.",
+      "Three successes mean relief.",
+      "Three failures mean consequences.",
+      "No modifiers. Just fate.",
+      "The table gets quiet here.",
+      "Stabilization is a mercy.",
+      "Criticals change everything.",
+      "Roll carefully.",
+      "The dungeon hesitating.",
+      "Make it interesting. I\u2019m watching."
+  ],
+  "Equipment": [
+      "Everything you own that hasn\u2019t been stolen yet.",
+      "Weight matters eventually.",
+      "This is where utility hides.",
+      "Most items are situational. Situations happen.",
+      "You will forget something important.",
+      "Consumables exist to be hoarded.",
+      "Inventory management is gameplay.",
+      "The dungeon notices clutter.",
+      "Everything you carry and forget.",
+      "Weight distribution could be better."
+  ],
+  "Coins": [
+      "Abstract wealth with very real weight.",
+      "Money solves problems until it doesn\u2019t.",
+      "Copper is annoying. Platinum is suspicious.",
+      "Encumbrance lurks.",
+      "You will argue about this.",
+      "Gold attracts attention.",
+      "Spend wisely. Or flamboyantly.",
+      "Loot drives motivation.",
+      "Portable motivation.",
+      "Clinks give you away."
+  ],
+  "Thieves Tools": [
+      "Ah yes, the official kit for touching things you absolutely should not be touching. If it clicks, great. If it snaps, you\u2019re about to meet consequences.",
+      "These tools exist to turn locked doors into suggestions and traps into learning experiences. Mostly the learning kind.",
+      "Congratulations, you brought the toolkit that says \u2018I definitely planned to be here illegally.\u2019"
+  ],
+  "Tinkers Tools": [
+      "For when you look at a perfectly functional object and think, \u2018I can make this worse, but interesting.\u2019",
+      "A box of bits, wires, and poor decisions. Results may include gadgets, explosions, or both.",
+      "You use these to invent things no one asked for and everyone will blame you for."
+  ],
+  "Carpenters Tools": [
+      "Wood goes in, furniture comes out. Or splinters. Often splinters.",
+      "These tools allow you to turn trees into doors, bridges, and objects enemies will hide behind.",
+      "Because sometimes the dungeon needs a table, and sometimes it needs a barricade built in a panic."
+  ],
+  "Smiths Tools": [
+      "Fire, metal, and the confidence to hit something until it becomes useful.",
+      "You make weapons here. And armor. And occasionally unrecognizable slag.",
+      "If it\u2019s heavy, hot, and dangerous, you\u2019re probably doing it right."
+  ],
+  "Weavers Tools": [
+      "For creating cloth, rope, and the illusion that you understand textiles.",
+      "You turn thread into clothing and clothing into a reason people stop staring.",
+      "Yes, this includes fancy cloaks. No, it does not make you fashionable by default."
+  ],
+  "Wood Carvers Tools": [
+      "You remove wood until something recognizable remains. Ideally not your fingers.",
+      "Perfect for decorative items, holy symbols, or ominous figurines that worry the party.",
+      "A slow, patient craft in a world that keeps trying to kill you."
+  ],
+  "Brewers Supplies": [
+      "You make alcohol. Sometimes it\u2019s good. Sometimes it\u2019s technically poison.",
+      "These supplies turn water into morale, courage, and bad decisions.",
+      "Every batch answers the question: \u2018How flammable is this?\u2019"
+  ],
+  "Alchemists Supplies": [
+      "Liquids, powders, and a near-religious faith in trial and error.",
+      "You mix things together and hope the result heals someone instead of dissolving them.",
+      "Warning: side effects may include smoke, smells, and unexpected sentience."
+  ],
+  "Artificer": [
+      "A spellcaster who looked at magic and said, \u2018This needs more hardware.\u2019",
+      "You solve problems with tools, intellect, and devices that beep ominously.",
+      "When something breaks, you fix it. When something works, you upgrade it until it breaks."
+  ],
+  "Warforged": [
+      "A living construct: proof that someone once thought free will was optional.",
+      "You do not eat, sleep, or breathe\u2014yet somehow still feel existential dread.",
+      "Built for war, now stuck managing inventory and emotions."
+  ],
+  "Lawful": [
+      "You follow rules. Even bad ones. Especially bad ones.",
+      "Predictable, reliable, and deeply confused when chaos works.",
+      "You believe order solves problems. Reality disagrees occasionally."
+  ],
+  "Neutral": [
+      "You stand firmly in the middle while everyone else sets things on fire.",
+      "Not good, not evil\u2014just tired.",
+      "Your moral compass points toward \u2018it depends.\u2019"
+  ],
+  "Chaotic": [
+      "You treat rules as optional side quests.",
+      "Impulse-driven, unpredictable, and shockingly effective at causing incidents.",
+      "You believe freedom is worth the collateral damage."
+  ],
+  "Alignment (etc.)": [
+      "A loose philosophical guideline everyone argues about and regularly ignores.",
+      "This describes your intent, not your results. The results are usually worse.",
+      "Think of it as vibes, not enforcement."
+  ],
+  "Proficiency": [
+      "Official recognition that you\u2019ve practiced.",
+      "Congratulations, you now fail with confidence."
+  ],
+  "Initiative": [
+      "Reaction speed when things go wrong.",
+      "Fast feet, fast fate."
+  ],
+  "Speed": [
+      "How quickly you can reposition or retreat.",
+      "Measured in strides, not dignity."
+  ],
+  "Size": [
+      "Your physical footprint in the world.",
+      "Bigger targets wear bigger boots. Statistics only."
+  ],
+  "Passive Perception": [
+      "What you notice while distracted.",
+      "You saw the floor scuff marks. You chose to ignore them."
+  ],
+  "Successes": [
+      "Moments death reconsidered.",
+      "Graceful recovery. Solid footing."
+  ],
+  "Failures": [
+      "Moments death leaned closer.",
+      "Sloppy stance. Tsk."
+  ],
+  "Weapons": [
+      "Tools designed to end conversations.",
+      "Grip matters. Balance matters. Feet planted\u2014yes, like that."
+  ],
+  "Damage": [
+      "Quantified regret delivered.",
+      "Transfer of force begins at the ground up."
+  ],
+  "Proficiencies": [
+      "Things you’re officially allowed to be good at.",
+      "Tasks you\u2019re licensed to attempt.",
+      "Everything else is freestyle."
+  ],
+  "Features": [
+      "Your class-issued advantages.",
+      "Use them or be judged silently."
+  ],
+  "Background": [
+      "Proof you existed before the violence.",
+      "Old habits show in how you stand."
+  ],
+  "Species Traits": [
+      "Innate perks from your origin.",
+      "Includes stance, stride, and balance tendencies."
+  ],
+  "Feats": [
+      "Optional upgrades earned through suffering.",
+      "Some improve mobility. I approve."
+  ],
+  "Spellcasting": [
+      "Reality bending through confidence and hand motions.",
+      "Foot placement during casting is\u2026 adequate."
+  ],
+  "Spell Ability": [
+      "The stat you use to bully the universe.",
+      "Conviction helps. So does stable footing."
+  ],
+  "Save DC": [
+      "How hard it is to resist your nonsense.",
+      "Authority starts from the ground up."
+  ],
+  "Spell Slots": [
+      "Daily reality edits.",
+      "Overuse leads to wobbling."
+  ],
+  "Cantrips": [
+      "Unlimited magic with limited imagination.",
+      "Practice makes polish."
+  ],
+  "Verbal": [
+      "Arcane shouting.",
+      "Projection improves outcomes."
+  ],
+  "Somatic": [
+      "Mandatory mystical gestures.",
+      "Yes, including the feet. Don\u2019t ask."
+  ],
+  "Concentration": [
+      "Holding magic while under pressure.",
+      "Try not to shift your weight so much."
+  ],
+  "Ritual": [
+      "Slow magic, cheaper magic.",
+      "Interrupted magic."
+  ],
+  "Appearance": [
+      "This is what enemies see right before deciding how seriously to take you.",
+      "Your visual presentation: armor, scars, posture, and unresolved trauma.",
+      "Appearance affects first impressions, targeting priority, and NPC assumptions.",
+      "This is not cosmetic. This is narrative telegraphing.",
+      "Describe what stands out immediately, not your tragic backstory.",
+      "Blood, dirt, and wear accumulate faster than you think.",
+      "The dungeon notices silhouettes, motion, and menace."
+  ],
+  "Backstory": [
+      "Narrative justification for your issues.",
+      "Explains the limp."
+  ],
+  "Alignment": [
+      "A moral guideline.",
+      "Flexible under stress."
+  ],
+  "Languages": [
+      "Ways to misunderstand danger.",
+      "Accents affect intimidation."
+  ],
+  "GP": [
+      "The gold standard of greed.",
+      "Heavy pockets change your walk."
+  ]
 }
