@@ -13,19 +13,32 @@ https://eschulte.github.io/character-sheet
 - Automate modifier calculation
 - Conflict Detection with modification on multiple devices add a "last updated" field to check on update
 - Add a "New Version available - Click to Update" button in the status element when applicable
-
-Features:
-- Use the status element to indicate if the current changes have sync'd to firebase
-- Switch to a tabbed interface on mobile with tabs like "Combat," "Skills," "Spells," "Bio"
-- Touch friendly interface on mobile with "+" and "-" buttons to avoid raising the keyboard as much
-- Make some section collapsible on mobile to save space
 - Automate Skill/Save calculation
 - Add short/long rest buttons for automatic reset
-- Add lookup from https://open5e.com for completion of spells, equipment, and anything else
 - Update the status element to indicate when offline
 - Tool tips on hover
 - Suggested smart completion for spell names
+- Use the status element to indicate if the current changes have sync'd to firebase
 
+Features:
+- Switch to a tabbed interface on mobile with tabs like "Combat," "Skills," "Spells," "Bio"
+- Touch friendly interface on mobile with "+" and "-" buttons to avoid raising the keyboard as much
+- Make some section collapsible on mobile to save space
+- Add lookup from https://open5e.com for completion of spells, equipment, and anything else
+
+Needed Tool Tips:
+- Need tool tips for the following:
+- simple weapons
+- Alchemist's Supplies
+- Tool Proficiencies
+- Tool Profeciency
+- Languages
+- Dungeoneer's Pack
+- Traveler's Clothes
+- Quarterstaff
+- Pouches
+- Catapult
+- Poison Spray
 
 
 ```js

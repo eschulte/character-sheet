@@ -252,7 +252,7 @@
     "Your class-issued advantages.",
     "Use them or be judged silently."
   ],
-  "Background Features": [
+  "Background": [
     "Background is your sob story before you became a dungeon meatbag. Noble, urchin, whatever. Gives you skills, gear, and a reason to whine about your past. Nobody cares, but write it down.",
     "This is where you pretend your character has depth. Sailor? You get a rope. Criminal? You know a guy. Pick one, get some perks, and stop crying about your lost farm.",
     "Proof you existed before the violence."
@@ -575,16 +575,3 @@
     "Add your Int modifier to a save or check. It’s 'actually, you'll find...' weaponized to save lives. You are the smartest person in the room, and now you have the mechanics to prove it."
   ]
 }
-// Need tool tips for the following:
-// simple weapons
-// Alchemist's Supplies
-// Tool Proficiencies
-// Tool Profeciency
-// Languages
-// Dungeoneer's Pack
-// Traveler's Clothes
-// Quarterstaff
-// Pouches
-// Catapult
-// Poison Spray
-// 
