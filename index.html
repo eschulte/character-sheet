@@ -65,7 +65,7 @@
             word-wrap: break-word; padding: 5px; font-family: inherit; font-size: 1rem;
             border: 1px solid transparent; overflow: hidden;
         }
-        .ghost-mirror span.highlight { border-bottom: 2px dotted #800; pointer-events: auto; cursor: help; color: rgba(128,0,0,0.3); }
+        .ghost-mirror span.highlight { border-bottom: 2px dotted #800; pointer-events: auto; cursor: help; }
         .ghost-mirror span.suggestion { color: #aaa; }
         .prof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem; margin-bottom: 10px; }
         .prof-check-row { display: flex; gap: 10px; align-items: center; }
@@ -627,77 +627,71 @@
         });
 
         /**
-         * Generates HTML with <span> tags for keywords found in the text.
-         * Supports multi-word phrases.
+         * Global highlighter - Run this on Load and on every Change.
          */
-        function getHighlightedHTML(text) {
-            if (!AI_COMMENTS || Object.keys(AI_COMMENTS).length === 0) return text;
+        function applyHighlights(text) {
+            if (!AI_COMMENTS || Object.keys(AI_COMMENTS).length === 0 || !tipsEnabled) return text;
 
-            // 1. Sort keys by length (descending) to match "Thieves' Tools" before "Thieves"
+            // Normalize function to remove trailing 's and s (see getMatch)
             const keys = Object.keys(AI_COMMENTS).sort((a, b) => b.length - a.length);
 
-            // 2. Escape special regex characters in keys and join with OR
-            const patternStr = keys.map(k => k.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|');
+            const patternStr = keys.map(k => k.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&').replaceAll(/'s(\b)/g, "'?s").replaceAll(/s(\b)/g, "s?")).join('|');
             const pattern = new RegExp(`\\b(${patternStr})\\b`, 'gi');
 
-            // 3. Escape HTML to prevent XSS/Injection
             let html = text.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
 
-            // 4. Wrap matches in spans
             return html.replace(pattern, (matched) => {
+                // We pass the RAW matched text (like "Tinker's") to the data-tip
                 return `<span class="highlight" data-tip="${matched.toLowerCase()}">${matched}</span>`;
             });
         }
 
-        function updateGhostOverlay() {
+        /**
+         * UI Sync - Run this on Input to handle the ghost suggestion.
+         */
+        function updateTabCompleteGhost() {
             const text = equipmentArea.value;
             const cursorIdx = equipmentArea.selectionStart;
 
-            // Find the word currently being typed for the suggestion
+            // Calculate suggestion
+            let suggestion = "";
             const wordsBefore = text.slice(0, cursorIdx).split(/[\s\n]+/);
             const lastWord = wordsBefore[wordsBefore.length - 1];
-            let suggestion = "";
 
             if (lastWord.length >= 3) {
-                // Use your existing AI_COMMENTS lookup
                 const match = Object.keys(AI_COMMENTS).find(k => k.toLowerCase().startsWith(lastWord.toLowerCase()));
-                if (match) {
-                    suggestion = match.slice(lastWord.length);
-                }
+                if (match) suggestion = match.slice(lastWord.length);
             }
 
-            // Prepare Mirror HTML
-            // We split the text into 'head' (before cursor) and 'tail' (after cursor)
-            const head = text.slice(0, cursorIdx);
-            const tail = text.slice(cursorIdx);
-
-            // Function to escape HTML and wrap known keywords in highlight spans
-            const highlightWords = (str) => {
-                return str.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))
-                          .replace(/(\w+)/g, (word) => {
-                              return AI_COMMENTS[word.toLowerCase()] 
-                                  ? `<span class="highlight">${word}</span>` 
-                                  : word;
-                          });
-            };
-
-            // The key: The suggestion MUST follow 'head' immediately in the HTML flow
+            // Splice the suggestion into the highlighted text
+            // We highlight 'head' and 'tail' separately to ensure the suggestion 
+            // span is inserted exactly at the cursor's visual position.
             equipmentMirror.innerHTML = 
-                highlightWords(head) + 
+                applyHighlights(text.slice(0, cursorIdx)) + 
                 `<span class="suggestion">${suggestion}</span>` + 
-                highlightWords(tail);
-
-            // Sync scroll
-            equipmentMirror.scrollTop = equipmentArea.scrollTop;
-
-            // Set the mirror content using the new highlighting tool
-            // If you are using head/tail for tab-complete, wrap them:
-            equipmentMirror.innerHTML = getHighlightedHTML(text.slice(0, cursorIdx)) + 
-                                        `<span class="suggestion">${suggestion}</span>` + 
-                                        getHighlightedHTML(text.slice(cursorIdx));
+                applyHighlights(text.slice(cursorIdx));
 
             equipmentMirror.scrollTop = equipmentArea.scrollTop;
         }
+
+        // A. When data is first loaded or auto-saved
+        function refreshOverlays() {
+            updateTabCompleteGhost(); // This effectively handles both highlighting and ghosting
+        }
+
+        // B. Active typing listeners
+        equipmentArea.addEventListener('input', updateTabCompleteGhost);
+        equipmentArea.addEventListener('scroll', () => {
+            equipmentMirror.scrollTop = equipmentArea.scrollTop;
+        });
+
+        // C. IMPORTANT: Listen for cursor clicks/arrow keys to update ghost position
+        equipmentArea.addEventListener('keyup', (e) => {
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'End', 'Home'].includes(e.key)) {
+                updateTabCompleteGhost();
+            }
+        });
+        equipmentArea.addEventListener('click', updateTabCompleteGhost);
 
         // Intercept Tab key
         equipmentArea.addEventListener('keydown', (e) => {
@@ -714,32 +708,43 @@
                         const newValue = equipmentArea.value.slice(0, start) + match + equipmentArea.value.slice(cursorIdx);
                         equipmentArea.value = newValue;
                         equipmentArea.selectionStart = equipmentArea.selectionEnd = start + match.length;
-                        updateGhostOverlay();
+                        updateTabCompleteGhost();
                     }
                 }
             }
         });
 
         // Forward mouse events from Textarea to the Mirror below
+        let lastTipKey = ""; // Track state to prevent jitter
+
         equipmentArea.addEventListener('mousemove', (e) => {
-            // Hide textarea momentarily to see what is under the cursor
+            // 1. "Peek" through the textarea
             equipmentArea.style.pointerEvents = 'none';
             const under = document.elementFromPoint(e.clientX, e.clientY);
             equipmentArea.style.pointerEvents = 'auto';
 
             if (under && under.classList.contains('highlight')) {
-                // Manually trigger your existing tooltip logic
-                const match = getMatch(under.dataset.tip);
-                if (match) {
-                    currentTarget = under;
-                    showTip(e, match.text, match.title);
+                const tipKey = under.dataset.tip;
+
+                // 2. Only trigger if we aren't already showing THIS tip
+                if (tipKey !== lastTipKey) {
+                    const match = getMatch(tipKey);
+                    if (match) {
+                        lastTipKey = tipKey;
+                        currentTarget = under;
+                        showTip(e, match.text, match.title);
+                    }
+                } else {
+                    // Just move the existing tip
+                    moveTip(e);
                 }
             } else {
-                hideTip();
+                if (lastTipKey !== "") {
+                    lastTipKey = "";
+                    hideTip();
+                }
             }
         });
-
-        equipmentArea.addEventListener('input', updateGhostOverlay);
 
         // --- EXISTING UTILS ---
 
@@ -846,6 +851,7 @@
             }
             updateModifiers();
             updatePageTitle();
+            updateTabCompleteGhost();
         }
 
         // --- HELPERS ---
@@ -1049,8 +1055,11 @@
 
         // Helper to find matches in dictionary (case-insensitive)
         function getMatch(str) {
-            const search = str.trim().toLowerCase();
-            const key = Object.keys(AI_COMMENTS).find(k => k.toLowerCase() === search);
+            if (!str) return null;
+            // Normalize function to remove trailing 's and s (see applyHighlights)
+            const normalize = (s) => s.trim().toLowerCase().replaceAll(/'s(\b)/g, '').replaceAll(/s(\b)/g, '')
+            const search = normalize(str);
+            const key = Object.keys(AI_COMMENTS).find(k => normalize(k) === search);
             return key ? { title: key, text: AI_COMMENTS[key] } : null;
         }
 
