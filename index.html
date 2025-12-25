@@ -57,6 +57,16 @@
         .bottom-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .tall-box { height: 200px; display: flex; flex-direction: column;}
         .panel { border: 2px solid var(--border-color); border-radius: 5px; padding: 10px; }
+        /* Ghost Overlay Styles */
+        .ghost-container { position: relative; width: 100%; height: 300px; }
+        .ghost-mirror {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            color: transparent; pointer-events: none; white-space: pre-wrap;
+            word-wrap: break-word; padding: 5px; font-family: inherit; font-size: 1rem;
+            border: 1px solid transparent; overflow: hidden;
+        }
+        .ghost-mirror span.highlight { border-bottom: 2px dotted #800; pointer-events: auto; cursor: help; color: rgba(128,0,0,0.3); }
+        .ghost-mirror span.suggestion { color: #aaa; }
         .prof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem; margin-bottom: 10px; }
         .prof-check-row { display: flex; gap: 10px; align-items: center; }
         .spell-grid-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-top: 20px; border-top: 3px double var(--border-color); padding-top: 20px; }
@@ -321,7 +331,9 @@
                     </div>
                 </div>
                 <div class="panel"><span class="box-title" data-tip="Languages" tabindex="0">Languages</span><textarea id="languages" style="height: 50px; border:none;"></textarea></div>
-                <div class="panel" style="flex-grow: 1;"><span class="box-title" data-tip="Equipment" tabindex="0">Equipment</span><textarea id="equipment" style="height: 300px; border:none;"></textarea></div>
+                <div class="panel" style="flex-grow: 1;"><span class="box-title" data-tip="Equipment" tabindex="0">Equipment</span>
+                <div class="ghost-container"><div id="equipment-mirror" class="ghost-mirror"></div><textarea id="equipment" style="height: 300px; border:none; position:relative; background:transparent; z-index:1;"></textarea></div>
+                </div>
                 <div class="coins-container">
                     <span class="box-title" data-tip="Coins" tabindex="0">COINS</span>
                     <div class="coins">
@@ -604,6 +616,130 @@
             } catch(e) { console.error(e); }
             finally { isLoading = false; }
         }
+
+        // --- FANCY PANTS in TEXT AREAS ---
+        const equipmentArea = document.getElementById('equipment');
+        const equipmentMirror = document.getElementById('equipment-mirror');
+
+        // Sync Scroll
+        equipmentArea.addEventListener('scroll', () => {
+            equipmentMirror.scrollTop = equipmentArea.scrollTop;
+        });
+
+        /**
+         * Generates HTML with <span> tags for keywords found in the text.
+         * Supports multi-word phrases.
+         */
+        function getHighlightedHTML(text) {
+            if (!AI_COMMENTS || Object.keys(AI_COMMENTS).length === 0) return text;
+
+            // 1. Sort keys by length (descending) to match "Thieves' Tools" before "Thieves"
+            const keys = Object.keys(AI_COMMENTS).sort((a, b) => b.length - a.length);
+
+            // 2. Escape special regex characters in keys and join with OR
+            const patternStr = keys.map(k => k.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|');
+            const pattern = new RegExp(`\\b(${patternStr})\\b`, 'gi');
+
+            // 3. Escape HTML to prevent XSS/Injection
+            let html = text.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+
+            // 4. Wrap matches in spans
+            return html.replace(pattern, (matched) => {
+                return `<span class="highlight" data-tip="${matched.toLowerCase()}">${matched}</span>`;
+            });
+        }
+
+        function updateGhostOverlay() {
+            const text = equipmentArea.value;
+            const cursorIdx = equipmentArea.selectionStart;
+
+            // Find the word currently being typed for the suggestion
+            const wordsBefore = text.slice(0, cursorIdx).split(/[\s\n]+/);
+            const lastWord = wordsBefore[wordsBefore.length - 1];
+            let suggestion = "";
+
+            if (lastWord.length >= 3) {
+                // Use your existing AI_COMMENTS lookup
+                const match = Object.keys(AI_COMMENTS).find(k => k.toLowerCase().startsWith(lastWord.toLowerCase()));
+                if (match) {
+                    suggestion = match.slice(lastWord.length);
+                }
+            }
+
+            // Prepare Mirror HTML
+            // We split the text into 'head' (before cursor) and 'tail' (after cursor)
+            const head = text.slice(0, cursorIdx);
+            const tail = text.slice(cursorIdx);
+
+            // Function to escape HTML and wrap known keywords in highlight spans
+            const highlightWords = (str) => {
+                return str.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))
+                          .replace(/(\w+)/g, (word) => {
+                              return AI_COMMENTS[word.toLowerCase()] 
+                                  ? `<span class="highlight">${word}</span>` 
+                                  : word;
+                          });
+            };
+
+            // The key: The suggestion MUST follow 'head' immediately in the HTML flow
+            equipmentMirror.innerHTML = 
+                highlightWords(head) + 
+                `<span class="suggestion">${suggestion}</span>` + 
+                highlightWords(tail);
+
+            // Sync scroll
+            equipmentMirror.scrollTop = equipmentArea.scrollTop;
+
+            // Set the mirror content using the new highlighting tool
+            // If you are using head/tail for tab-complete, wrap them:
+            equipmentMirror.innerHTML = getHighlightedHTML(text.slice(0, cursorIdx)) + 
+                                        `<span class="suggestion">${suggestion}</span>` + 
+                                        getHighlightedHTML(text.slice(cursorIdx));
+
+            equipmentMirror.scrollTop = equipmentArea.scrollTop;
+        }
+
+        // Intercept Tab key
+        equipmentArea.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                const cursorIdx = equipmentArea.selectionStart;
+                const wordsBefore = equipmentArea.value.slice(0, cursorIdx).split(/\s+/);
+                const lastWord = wordsBefore[wordsBefore.length - 1];
+
+                if (lastWord.length >= 3) {
+                    const match = Object.keys(AI_COMMENTS).find(k => k.toLowerCase().startsWith(lastWord.toLowerCase()));
+                    if (match) {
+                        e.preventDefault();
+                        const start = cursorIdx - lastWord.length;
+                        const newValue = equipmentArea.value.slice(0, start) + match + equipmentArea.value.slice(cursorIdx);
+                        equipmentArea.value = newValue;
+                        equipmentArea.selectionStart = equipmentArea.selectionEnd = start + match.length;
+                        updateGhostOverlay();
+                    }
+                }
+            }
+        });
+
+        // Forward mouse events from Textarea to the Mirror below
+        equipmentArea.addEventListener('mousemove', (e) => {
+            // Hide textarea momentarily to see what is under the cursor
+            equipmentArea.style.pointerEvents = 'none';
+            const under = document.elementFromPoint(e.clientX, e.clientY);
+            equipmentArea.style.pointerEvents = 'auto';
+
+            if (under && under.classList.contains('highlight')) {
+                // Manually trigger your existing tooltip logic
+                const match = getMatch(under.dataset.tip);
+                if (match) {
+                    currentTarget = under;
+                    showTip(e, match.text, match.title);
+                }
+            } else {
+                hideTip();
+            }
+        });
+
+        equipmentArea.addEventListener('input', updateGhostOverlay);
 
         // --- EXISTING UTILS ---
 
