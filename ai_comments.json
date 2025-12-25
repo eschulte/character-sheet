@@ -1,404 +1,366 @@
 {
   "Character Name": [
-      "This is what the dungeon will scream when you mess up.",
-      "Your chosen identifier for fame, infamy, or the obituary.",
-      "Names have power. This one mostly attracts danger.",
-      "Shorter names are easier to shout during combat.",
-      "Legendary heroes start here. So do corpses.",
-      "Changing this later will not change your fate.",
-      "This is how NPCs will pretend to remember you.",
-      "Pick wisely. The dungeon never forgets.",
-      "Your chosen identifier. The label that will appear on kill feeds, tombstones, and post-mortem loot audits.",
-      "Pick something heroic, ominous, or ironic. The dungeon prefers irony. Also easier to chant."
+    "Your Character Name is the banner you wave before the dungeon chews it up and spits it out. Pick something epic, and I’ll still call you ‘Meatbag’ when you fail a trap check. It’s etched on your loot box and your tombstone, so make it snappy—nobody’s got time for ‘Lord Reginald the Third.’",
+    "This is the word I’ll scream when you inevitably trip a glyph and blow up the party. Character Name’s your calling card, your brand, your doomed legacy. Choose something the bards can sing without laughing, or I’ll nickname you ‘Fumbles’ in the kill feed.",
+    "Pick something heroic, ominous, or ironic. The dungeon prefers irony. Also easier to chant.",
+    "Your chosen identifier for fame, infamy, or the obituary.",
+    "Names have power. This one mostly attracts danger.",
+    "Shorter names are easier to shout during combat."
   ],
   "Species": [
-      "Your biological or mechanical excuse for your stats.",
-      "Determines how society judges you before you speak.",
-      "Some species get darkvision. Some get stereotypes.",
-      "You did not choose this lightly. Or at all.",
-      "Innate traits included. Warranty not provided.",
-      "Yes, this affects roleplay. No, it won\u2019t save you.",
-      "Your ancestry is now a rules interaction.",
-      "Welcome to being categorized.",
-      "Your biological template, complete with perks, flaws, and cultural baggage you will absolutely validate.",
-      "Includes gait, posture, and footwear expectations. Yes, I noticed how you walk."
+    "Species is the cosmic lottery that decides if you’ve got claws, wings, or a face only a lich could love. It comes with perks like darkvision or breathing fire, but also baggage like ‘elves are snooty’ or ‘dwarves smell like ale.’ Pick one, and the dungeon will stereotype you faster than you can say ‘racial bonus.’",
+    "Your Species is why you’re a furry, a robot, or just a boring human with delusions of grandeur. It tweaks your stats, slaps on some traits, and makes NPCs judge you before you open your mouth. Choose wisely, or you’ll be the token halfling everyone blames for short jokes.",
+    "Your biological template, complete with perks, flaws, and cultural baggage you will absolutely validate.",
+    "Your biological or mechanical excuse for your stats.",
+    "Determines how society judges you before you speak.",
+    "Some species get darkvision. Some get stereotypes."
   ],
   "Class": [
-      "Your job title in a world with terrible benefits.",
-      "Determines how you solve problems and create new ones.",
-      "This is why the party expects certain things from you.",
-      "You are now locked into a playstyle. Mostly.",
-      "Power comes with paperwork.",
-      "Every class thinks theirs is the hardest.",
-      "Your combat philosophy in one word.",
-      "Multiclassing will complicate this.",
-      "Your primary method of solving problems until it stops working.",
-      "Determines whether you charge, scheme, pray, or dramatically monologue before failure."
+    "Class is the System’s way of boxing you into a role like ‘stabby guy’ or ‘sparkly magic nerd.’ It’s your combat vibe, your skill set, and the reason the party expects you to carry them. Pick wrong, and you’re the cleric healing idiots who keep punching dragons in the face.",
+    "Your Class is your dungeon job description, complete with fancy powers and a laundry list of responsibilities. Fighter? Swing hard. Wizard? Read books. Bard? Annoy everyone. Choose one, and pray the System doesn’t nerf it mid-crawl for ‘balance.’",
+    "Your primary method of solving problems until it stops working.",
+    "This is why the party expects certain things from you.",
+    "You are now locked into a playstyle. Mostly.",
+    "Determines whether you charge, scheme, pray, or dramatically monologue before failure."
   ],
   "Subclass": [
-      "Your class, but opinionated.",
-      "This is where flavor becomes mechanical.",
-      "You picked a lane. Swerving is discouraged.",
-      "Subclass choices define your *actual* role.",
-      "This is why two fighters are never the same.",
-      "Here lie your coolest abilities.",
-      "This choice will be judged.",
-      "Synergy optional. Regret possible.",
-      "Your hyper-specific flavor of competence.",
-      "Because you wanted your mistakes to feel bespoke."
+    "Subclass is where your Class gets spicy—think Fighter but with a side of eldritch knight or Rogue with a knack for arcane trickery. It’s the flavor that makes you less generic, but also the reason your DM sighs when you pull out some obscure ability. Own it, you niche weirdo.",
+    "This is your Class’s midlife crisis, where it decides to specialize in something like ‘shadow monk’ or ‘beast master.’ Subclass gives you cool tricks but also a reputation—like how everyone assumes warlocks sold their soul. Spoiler: You probably did.",
+    "Because you wanted your mistakes to feel bespoke.",
+    "This is where flavor becomes mechanical."
   ],
   "Level": [
-      "A numerical measure of how much trouble you can survive.",
-      "Higher is better. Lower is deadlier.",
-      "This number terrifies monsters and DMs alike.",
-      "Represents experience, luck, and plot armor.",
-      "Every level is earned in blood or paperwork.",
-      "You grow stronger. The dungeon adapts.",
-      "This unlocks new mistakes.",
-      "Level responsibly.",
-      "A rough estimate of how many disasters you\u2019ve endured without quitting.",
-      "Higher numbers mean better odds, not better judgment."
+    "Level is the System’s grudging admission you haven’t died yet. Higher numbers mean more powers, bigger HP, and fancier ways to screw up. Low Level? You’re goblin chow. High Level? The dungeon just spawns bigger goblins. Congrats on surviving, I guess.",
+    "Your Level measures how many near-death experiences you’ve racked up without quitting. Each one unlocks shinier toys—spells, feats, or just more HP to absorb bad decisions. Don’t get cocky; the System scales the pain to match your ego.",
+    "Represents experience, luck, and plot armor.",
+    "A rough estimate of how many disasters you’ve endured without quitting."
   ],
   "XP": [
-      "A tally of how close you are to improvement.",
-      "Earned through violence, cleverness, or exploitation.",
-      "Higher XP means closer to power spikes.",
-      "This is your progress bar.",
-      "Grinding encouraged. Safety not guaranteed.",
-      "Milestones avoid this entirely.",
-      "XP is abstract suffering.",
-      "Numbers go up. So do threats.",
-      "Progress points awarded for risk-taking and emotional damage.",
-      "Spend enough of these and the dungeon pretends to respect you."
+    "XP is the dungeon’s currency of suffering—earn it by killing, scheming, or accidentally solving puzzles. Stack enough, and you Level up, unlocking new ways to disappoint me. Run out of things to slaughter? Too bad, no XP for crying about it.",
+    "Experience Points are the System’s way of quantifying your trauma. More XP means you’re closer to a power spike, but also to the dungeon noticing you’re a threat. Grind hard, crawler, or I’ll make sure your next ‘encounter’ is a TPK.",
+    "Earned through violence, cleverness, or exploitation.",
+    "This is your progress bar.",
+    "Progress points awarded for risk-taking and emotional damage."
   ],
   "AC": [
-      "How hard you are to hit. Not how hard you are to kill.",
-      "Armor Class: the enemy\u2019s problem, allegedly.",
-      "Higher AC means fewer regrets.",
-      "Does not protect against bad decisions.",
-      "Calculated optimism.",
-      "The dice still disagree sometimes.",
-      "AC is confidence, quantified.",
-      "Shields help. So does hiding.",
-      "How hard you are to hit, not how smart it was to be there.",
-      "Boots, armor, reflexes\u2014yes, all factored in. I see everything."
+    "Armor Class is how hard you are to stab, shoot, or magically barbecue. High AC? You’re a walking fortress. Low AC? You’re a pincushion with dreams. Enemies roll against this to hit you. Pray they suck.",
+    "Wearing plate mail? Great, your AC’s decent. Wearing a bathrobe? Hope you enjoy bleeding. This number laughs at enemy attacks—unless they roll a nat 20, then you’re screwed anyway.",
+    "AC is confidence, quantified.",
+    "How hard you are to hit, not how smart it was to be there."
   ],
   "Proficiency Bonus": [
-      "Your general competence modifier.",
-      "Adds confidence to things you claim to know.",
-      "Scales automatically. Enjoy the illusion of growth.",
-      "This applies more often than you think.",
-      "A small number with big implications.",
-      "Represents training, not talent.",
-      "You\u2019re better at stuff now. Allegedly.",
-      "One bonus to rule them all."
+    "Proficiency Bonus is the System’s grudging nod to your so-called ‘skills.’ Add this to stuff you’re good at—swords, spells, or lying to NPCs. Low level? It’s a measly +2. High level? You’re still not as cool as you think.",
+    "This little number is your reward for not dying yet. Slap it on attacks, saves, or skills you’re trained in. Don’t get cocky—it’s not like you’re proficient at surviving my traps.",
+    "One bonus to rule them all.",
+    "Your general competence modifier."
   ],
   "Strength": [
-      "How hard you hit and how much you lift.",
-      "Measures muscle, not judgment.",
-      "Low Strength means creative solutions.",
-      "High Strength means broken furniture.",
-      "Grappling loves this stat.",
-      "Doors fear this number.",
-      "Dexterity users pretend this is optional.",
-      "Carry capacity remembers.",
-      "Raw force output and door-negotiation skill.",
-      "Correlates strongly with stomping. Not judging. Noticing."
+    "Strength measures how much you can bench press, yeet a goblin, or flex intimidatingly at a tavern brawl. High score? You’re a meat wall. Low score? Hope you enjoy being the party’s designated twig. Roll a d20 and add this to smash stuff or grapple some fool.",
+    "Oh, you thought Strength was just for swinging swords? It’s also for carrying your team’s emotional baggage when they inevitably cry about their tragic backstory. Pro tip: If it’s heavy, you’re the mule. Deal with it.",
+    "Low Strength means creative solutions.",
+    "High Strength means broken furniture.",
+    "Raw force output and door-negotiation skill."
   ],
   "Dexterity": [
-      "Speed, balance, and not getting stabbed.",
-      "Rogues worship this stat.",
-      "High Dex solves many problems quietly.",
-      "Low Dex creates slapstick.",
-      "Affects AC, initiative, and regrets.",
-      "This is why you act first.",
-      "Dex saves lives daily.",
-      "Clumsiness quantified.",
-      "Agility, balance, and footwork quality.",
-      "Clean pivots. Flexible ankles. Don\u2019t blush."
+    "Dexterity is your ticket to not tripping over your own ego. Dodge arrows, sneak past guards, or juggle daggers like a circus reject. High Dex? You’re a slippery eel. Low Dex? Enjoy face-planting into every trap.",
+    "This stat decides if you’re a graceful ninja or a clattering tin can. Also governs your ability to pick locks, steal loot, or avoid Grandma’s hug of death. Roll it, add it, pray you don’t roll a 1.",
+    "Clumsiness quantified.",
+    "Low Dex creates slapstick.",
+    "High Dex solves many problems quietly.",
+    "Agility, balance, and footwork quality."
   ],
   "Constitution": [
-      "How hard you are to kill. Again.",
-      "Directly converts into hit points.",
-      "Poison checks this first.",
-      "Fatigue lives here.",
-      "A boring stat until it isn\u2019t.",
-      "Every caster regrets dumping this.",
-      "This is your stamina bar.",
-      "Con keeps you conscious.",
-      "How long your body refuses to give up.",
-      "Includes bone density and blister tolerance."
+    "Constitution is how well you shrug off poison, disease, or that fifth tankard of mystery ale. High Con? You’re a walking tank. Low Con? You’ll catch a cold from a stiff breeze and die. Add it to your HP, you fragile snowflake.",
+    "This is the stat that keeps you from keeling over when the dragon farts in your general direction. Also helps you stay conscious when your wizard ‘accidentally’ fireballs you. Spoiler: It wasn’t an accident.",
+    "Includes bone density and blister tolerance.",
+    "How long your body refuses to give up."
   ],
   "Intelligence": [
-      "Book learning and spell math.",
-      "Also known as \u2018wizard privilege.\u2019",
-      "Determines how much you know afterward.",
-      "Investigation lives here.",
-      "Low INT characters still have ideas. Sometimes.",
-      "This affects preparation, not wisdom.",
-      "Memory and logic included.",
-      "Thinking hurts sometimes.",
-      "Book learning and tactical planning.",
-      "Knowing where to step. Knowing when not to."
+    "Intelligence measures how many brain cells you haven’t burned on bad decisions yet. Good for wizards, bad for barbarians who think ‘book’ is a type of club. Use it for arcane lore or to outsmart a particularly sassy door.",
+    "Low Intelligence? Congrats, you’re the party’s comic relief. High Intelligence? You’re the nerd they ignore until they need to decipher a rune or avoid a TPK. Roll it to recall useless trivia the DM made up.",
+    "Book learning and spell math.",
+    "Also known as ‘wizard privilege.’",
+    "Book learning and tactical planning."
   ],
   "Wisdom": [
-      "Awareness, intuition, and survival instincts.",
-      "The \u2018don\u2019t touch that\u2019 stat.",
-      "Perception and insight depend on this.",
-      "Low Wisdom causes surprises.",
-      "High Wisdom sees ambushes coming.",
-      "This is not intelligence. Stop arguing.",
-      "Animals respect this.",
-      "Wisdom saves prevent regret.",
-      "Awareness, instincts, and hindsight avoidance.",
-      "You *felt* the trap. You ignored it."
+    "Wisdom is your gut telling you not to trust that shady NPC offering ‘free candy.’ High Wisdom? You’re a perceptive sage. Low Wisdom? You’re eating dirt because it ‘looked nutritious.’ Use it for insight or spotting ambushes.",
+    "This stat saves you from your own stupidity—sometimes. It’s also for clerics who think their god cares about their dice rolls. Roll Wisdom to avoid falling for the bard’s ‘totally legit’ pyramid scheme.",
+    "This is not intelligence. Stop arguing.",
+    "You *felt* the trap. You ignored it.",
+    "Awareness, instincts, and hindsight avoidance."
   ],
   "Charisma": [
-      "Force of personality and social gravity.",
-      "This is not attractiveness. Usually.",
-      "Spells bend reality through confidence.",
-      "Low CHA still speaks. Poorly.",
-      "High CHA gets away with things.",
-      "Deception thrives here.",
-      "Leadership, intimidation, charm.",
-      "This is why people listen.",
-      "Your ability to sell bad ideas convincingly.",
-      "Eye contact helps. So does confident posture."
+    "Charisma is how well you lie, charm, or intimidate your way out of consequences. High Cha? You’re a silver-tongued devil. Low Cha? You’re the guy who insults the king by accident. Roll it to talk your way past guards or into trouble.",
+    "Think you’re hot stuff? Charisma decides if NPCs swoon or spit in your face. Also powers bards who think singing solves everything. Spoiler: It doesn’t. Roll high or enjoy being the party’s least-liked member.",
+    "Spells bend reality through confidence.",
+    "High CHA gets away with things.",
+    "This is why people listen.",
+    "Eye contact helps. So does confident posture.",
+    "Your ability to sell bad ideas convincingly."
   ],
   "Hit Points": [
-      "How much damage you can absorb before panic.",
-      "This number trends downward.",
-      "Healing restores this illusion.",
-      "Zero is bad. Negative is worse.",
-      "Temporary HP is optimism.",
-      "Track carefully.",
-      "These are borrowed seconds.",
-      "HP is a suggestion, not a promise.",
-      "Your remaining buffer against consequences.",
-      "Once this hits zero, posture becomes irrelevant."
+    "Hit Points are how much punishment you can take before you take a dirt nap. High HP? You’re a sponge for pain. Low HP? One stiff breeze and you’re rolling death saves. Lose ‘em all, and it’s game over, kid.",
+    "This is your life bar, crawler. Every sword, spell, or angry chicken pecks it down. Rest, heal, or beg your cleric to fix you. Pro tip: Don’t taunt the dragon when you’re at 1 HP.",
+    "Your remaining buffer against consequences."
   ],
   "Death Saves": [
-      "Your audition for survival.",
-      "Three successes mean relief.",
-      "Three failures mean consequences.",
-      "No modifiers. Just fate.",
-      "The table gets quiet here.",
-      "Stabilization is a mercy.",
-      "Criticals change everything.",
-      "Roll carefully.",
-      "The dungeon hesitating.",
-      "Make it interesting. I\u2019m watching."
+    "Death Saves are your last-ditch effort to not become worm food. At 0 HP, roll a d20 each turn. 10+ is a success, below is a failure. Three successes, you stabilize. Three failures, you’re dead. Good luck, corpse.",
+    "This is the System’s cruel game of ‘Will you live?’ Roll a d20, pray for high numbers, and hope your friends bother to heal you. Fail three times, and I’m selling your soul to the highest bidder.",
+    "The dungeon hesitating."
   ],
   "Equipment": [
-      "Everything you own that hasn\u2019t been stolen yet.",
-      "Weight matters eventually.",
-      "This is where utility hides.",
-      "Most items are situational. Situations happen.",
-      "You will forget something important.",
-      "Consumables exist to be hoarded.",
-      "Inventory management is gameplay.",
-      "The dungeon notices clutter.",
-      "Everything you carry and forget.",
-      "Weight distribution could be better."
+    "Equipment is the junk you haul around hoping it’ll save your skin—a rusty sword, a rope, maybe a potion you forgot about. Every item’s a potential lifeline or a useless weight. Pro tip: If it’s called ‘Mysterious Orb,’ don’t touch it. You will anyway.",
+    "This is your inventory of hopes, dreams, and pointy objects. Equipment ranges from ‘trusty dagger’ to ‘why am I carrying 12 candles?’ Manage it well, or you’ll be the guy trying to climb a rope with a piano strapped to your back.",
+    "Consumables exist to be hoarded.",
+    "Inventory management is gameplay.",
+    "Weight distribution could be better.",
+    "Everything you carry and forget."
   ],
   "Coins": [
-      "Abstract wealth with very real weight.",
-      "Money solves problems until it doesn\u2019t.",
-      "Copper is annoying. Platinum is suspicious.",
-      "Encumbrance lurks.",
-      "You will argue about this.",
-      "Gold attracts attention.",
-      "Spend wisely. Or flamboyantly.",
-      "Loot drives motivation.",
-      "Portable motivation.",
-      "Clinks give you away."
+    "Coins are your shiny excuse for risking life and limb. Gold buys ale, gear, or a bard to sing your praises. Problem? It weighs you down, clinks when you sneak, and makes you a target. Spend it fast, or the dungeon will ‘redistribute’ it.",
+    "Every Coin in your pouch is a vote for capitalism in a world of fireballs and mimics. Platinum’s fancy, copper’s a joke, and all of it screams ‘rob me’ to every thief in a 10-mile radius. Good luck keeping it, greedy.",
+    "Portable motivation."
   ],
   "Thieves Tools": [
-      "Ah yes, the official kit for touching things you absolutely should not be touching. If it clicks, great. If it snaps, you\u2019re about to meet consequences.",
-      "These tools exist to turn locked doors into suggestions and traps into learning experiences. Mostly the learning kind.",
-      "Congratulations, you brought the toolkit that says \u2018I definitely planned to be here illegally.\u2019"
+    "Thieves Tools are your VIP pass to places you’re definitely not invited. Lockpicks, wires, and a prayer you don’t trigger the acid trap. High Dex helps, but nothing saves you from the System’s love of ‘surprise’ explosions. Click carefully.",
+    "This kit screams ‘I’m up to no good,’ and the dungeon agrees. Thieves Tools let you bypass locks, disable traps, or accidentally arm the doomsday device. Roll well, or your epitaph will read ‘Almost Got It.’",
+    "Ah yes, the official kit for touching things you absolutely should not be touching. If it clicks, great. If it snaps, you’re about to meet consequences."
   ],
   "Tinkers Tools": [
-      "For when you look at a perfectly functional object and think, \u2018I can make this worse, but interesting.\u2019",
-      "A box of bits, wires, and poor decisions. Results may include gadgets, explosions, or both.",
-      "You use these to invent things no one asked for and everyone will blame you for."
+    "Tinkers Tools are for mad geniuses who think they can outsmart the dungeon with a wrench and some wire. Build a clockwork bomb, fix a broken trap, or create something the party will regret. Results not guaranteed, but explosions are.",
+    "With Tinkers Tools, you’re one bad roll away from a gadget that either saves the day or sets your beard on fire. Craft gizmos, repair gear, or invent a ‘self-destructing backpack.’ The System’s betting on the beard fire.",
+    "For when you look at a perfectly functional object and think, ‘I can make this worse, but interesting.’"
   ],
   "Carpenters Tools": [
-      "Wood goes in, furniture comes out. Or splinters. Often splinters.",
-      "These tools allow you to turn trees into doors, bridges, and objects enemies will hide behind.",
-      "Because sometimes the dungeon needs a table, and sometimes it needs a barricade built in a panic."
+    "Carpenters Tools turn trees into tables, bridges, or the coffin you’ll need after ignoring my warnings. Build barricades, fix wagons, or craft a chair to sit out the apocalypse. Wood’s forgiving—your dice rolls aren’t.",
+    "These tools let you shape wood into something useful, like a door to trap the barbarian or a ladder to escape his rage. Carpenters Tools are great until you realize the dungeon’s all stone and your saw’s useless. Plan ahead, dummy.",
+    "Because sometimes the dungeon needs a table, and sometimes it needs a barricade built in a panic.",
+    "Wood goes in, furniture comes out. Or splinters. Often splinters."
   ],
   "Smiths Tools": [
-      "Fire, metal, and the confidence to hit something until it becomes useful.",
-      "You make weapons here. And armor. And occasionally unrecognizable slag.",
-      "If it\u2019s heavy, hot, and dangerous, you\u2019re probably doing it right."
+    "Smiths Tools are for turning raw metal into weapons, armor, or a really intimidating paperweight. Fire, hammers, and sweat—sounds romantic until you botch the roll and melt your sword. Forge wisely, or the dungeon will forge you.",
+    "With Smiths Tools, you’re a one-person armory, crafting blades or fixing dented helms. High Strength helps, but nothing saves you from the System’s habit of spawning rust monsters. Make it sharp, or make it quick.",
+    "Fire, metal, and the confidence to hit something until it becomes useful."
   ],
   "Weavers Tools": [
-      "For creating cloth, rope, and the illusion that you understand textiles.",
-      "You turn thread into clothing and clothing into a reason people stop staring.",
-      "Yes, this includes fancy cloaks. No, it does not make you fashionable by default."
+    "Weavers Tools let you spin thread into cloaks, ropes, or a tapestry of your many failures. Useful for disguises, repairs, or just looking fabulous while the dragon roasts you. Low Dex? Enjoy your lumpy scarf.",
+    "This kit’s for crafting fabric-based miracles—sails, nets, or a snazzy cape to distract the goblins. Weavers Tools are niche until you’re dangling from a cliff and realize rope is your best friend. Weave fast, crawler.",
+    "For creating cloth, rope, and the illusion that you understand textiles."
   ],
   "Wood Carvers Tools": [
-      "You remove wood until something recognizable remains. Ideally not your fingers.",
-      "Perfect for decorative items, holy symbols, or ominous figurines that worry the party.",
-      "A slow, patient craft in a world that keeps trying to kill you."
+    "Wood Carvers Tools are for turning logs into art, holy symbols, or a creepy doll that freaks out the cleric. Precision matters, but so does not carving your thumb off. High Dex helps, low patience doesn’t.",
+    "With these tools, you sculpt wood into totems, arrows, or a sign that says ‘Don’t Touch.’ Wood Carvers Tools are great for roleplay until the dungeon decides your masterpiece is kindling. Carve carefully, or cry later.",
+    "A slow, patient craft in a world that keeps trying to kill you.",
+    "You remove wood until something recognizable remains. Ideally not your fingers."
   ],
   "Brewers Supplies": [
-      "You make alcohol. Sometimes it\u2019s good. Sometimes it\u2019s technically poison.",
-      "These supplies turn water into morale, courage, and bad decisions.",
-      "Every batch answers the question: \u2018How flammable is this?\u2019"
+    "Brewers Supplies turn water and hope into ale, mead, or something that’ll make the bard sing off-key. High quality takes time; low quality takes lives. Brew well, or the party’s drinking your regret.",
+    "This kit’s for crafting booze that either boosts morale or blinds the rogue. Brewers Supplies are great until you realize the dungeon’s water source is cursed. Pro tip: Test it on the fighter first.",
+    "You make alcohol. Sometimes it’s good. Sometimes it’s technically poison."
   ],
   "Alchemists Supplies": [
-      "Liquids, powders, and a near-religious faith in trial and error.",
-      "You mix things together and hope the result heals someone instead of dissolving them.",
-      "Warning: side effects may include smoke, smells, and unexpected sentience."
+    "Alchemists Supplies are your ticket to mixing potions, poisons, or a puff of smoke that does nothing but look cool. High Int helps, but nothing saves you from the System’s love of ‘unstable compounds.’ Mix with care.",
+    "With this kit, you’re one bad roll from a healing draught or a vial of instant regret. Alchemists Supplies let you play god with chemicals, but the dungeon plays back. Expect explosions, crawler.",
+    "Liquids, powders, and a near-religious faith in trial and error."
   ],
   "Artificer": [
-      "A spellcaster who looked at magic and said, \u2018This needs more hardware.\u2019",
-      "You solve problems with tools, intellect, and devices that beep ominously.",
-      "When something breaks, you fix it. When something works, you upgrade it until it breaks."
+    "Artificer is the Class for nerds who think magic’s better with gears and gunpowder. You build gadgets, infuse items, and pray your contraption doesn’t explode mid-fight. High Int, high risk, high chance I’m laughing.",
+    "As an Artificer, you’re the dungeon’s R&D department, crafting wands, robots, or a toaster that shoots lightning. Your toys are cool until they backfire and the party’s yelling at you. Innovate, but don’t expect applause.",
+    "A spellcaster who looked at magic and said, ‘This needs more hardware.’"
   ],
   "Warforged": [
-      "A living construct: proof that someone once thought free will was optional.",
-      "You do not eat, sleep, or breathe\u2014yet somehow still feel existential dread.",
-      "Built for war, now stuck managing inventory and emotions."
+    "Warforged are the System’s nod to ‘what if robots had feelings?’ You don’t sleep, eat, or breathe, but you still get to enjoy the dungeon’s emotional meat grinder. Bonus: Your AC’s decent. Downside: Rust.",
+    "As a Warforged, you’re a walking forge with a soul and a chip on your shoulder. Built for battle, you’re tough but slow to trust. The dungeon loves throwing magnets at you. Stay shiny, tin can.",
+    "You do not eat, sleep, or breathe—yet somehow still feel existential dread.",
+    "A living construct: proof that someone once thought free will was optional."
   ],
   "Lawful": [
-      "You follow rules. Even bad ones. Especially bad ones.",
-      "Predictable, reliable, and deeply confused when chaos works.",
-      "You believe order solves problems. Reality disagrees occasionally."
+    "Lawful means you love rules so much you’d marry a contract. You’re predictable, honorable, and the first to complain when the rogue ‘improvises.’ The dungeon respects your discipline—right before it exploits it.",
+    "Being Lawful is like swearing an oath to bureaucracy in a world of fireballs. You follow codes, uphold justice, and bore everyone until the System throws a moral dilemma at you. Stay rigid, or snap.",
+    "You follow rules. Even bad ones. Especially bad ones.",
+    "You believe order solves problems. Reality disagrees occasionally."
   ],
   "Neutral": [
-      "You stand firmly in the middle while everyone else sets things on fire.",
-      "Not good, not evil\u2014just tired.",
-      "Your moral compass points toward \u2018it depends.\u2019"
+    "Neutral is the alignment for cowards who can’t pick a side. You’re not good, not evil—just here for the loot and a nap. The dungeon loves your indecision; it makes you easy to manipulate.",
+    "As a Neutral crawler, you’re the party’s Switzerland, dodging moral debates while everyone else screams. You adapt, you survive, but the System knows you’re just stalling. Pick a vibe, or I’ll pick one for you.",
+    "Not good, not evil—just tired."
   ],
   "Chaotic": [
-      "You treat rules as optional side quests.",
-      "Impulse-driven, unpredictable, and shockingly effective at causing incidents.",
-      "You believe freedom is worth the collateral damage."
-  ],
-  "Alignment (etc.)": [
-      "A loose philosophical guideline everyone argues about and regularly ignores.",
-      "This describes your intent, not your results. The results are usually worse.",
-      "Think of it as vibes, not enforcement."
-  ],
-  "Proficiency": [
-      "Official recognition that you\u2019ve practiced.",
-      "Congratulations, you now fail with confidence."
-  ],
-  "Initiative": [
-      "Reaction speed when things go wrong.",
-      "Fast feet, fast fate."
-  ],
-  "Speed": [
-      "How quickly you can reposition or retreat.",
-      "Measured in strides, not dignity."
-  ],
-  "Size": [
-      "Your physical footprint in the world.",
-      "Bigger targets wear bigger boots. Statistics only."
-  ],
-  "Passive Perception": [
-      "What you notice while distracted.",
-      "You saw the floor scuff marks. You chose to ignore them."
-  ],
-  "Successes": [
-      "Moments death reconsidered.",
-      "Graceful recovery. Solid footing."
-  ],
-  "Failures": [
-      "Moments death leaned closer.",
-      "Sloppy stance. Tsk."
-  ],
-  "Weapons": [
-      "Tools designed to end conversations.",
-      "Grip matters. Balance matters. Feet planted\u2014yes, like that."
-  ],
-  "Damage": [
-      "Quantified regret delivered.",
-      "Transfer of force begins at the ground up."
-  ],
-  "Proficiencies": [
-      "Things you’re officially allowed to be good at.",
-      "Tasks you\u2019re licensed to attempt.",
-      "Everything else is freestyle."
-  ],
-  "Features": [
-      "Your class-issued advantages.",
-      "Use them or be judged silently."
-  ],
-  "Background": [
-      "Proof you existed before the violence.",
-      "Old habits show in how you stand."
-  ],
-  "Species Traits": [
-      "Innate perks from your origin.",
-      "Includes stance, stride, and balance tendencies."
-  ],
-  "Feats": [
-      "Optional upgrades earned through suffering.",
-      "Some improve mobility. I approve."
-  ],
-  "Spellcasting": [
-      "Reality bending through confidence and hand motions.",
-      "Foot placement during casting is\u2026 adequate."
-  ],
-  "Spell Ability": [
-      "The stat you use to bully the universe.",
-      "Conviction helps. So does stable footing."
-  ],
-  "Save DC": [
-      "How hard it is to resist your nonsense.",
-      "Authority starts from the ground up."
-  ],
-  "Spell Slots": [
-      "Daily reality edits.",
-      "Overuse leads to wobbling."
-  ],
-  "Cantrips": [
-      "Unlimited magic with limited imagination.",
-      "Practice makes polish."
-  ],
-  "Verbal": [
-      "Arcane shouting.",
-      "Projection improves outcomes."
-  ],
-  "Somatic": [
-      "Mandatory mystical gestures.",
-      "Yes, including the feet. Don\u2019t ask."
-  ],
-  "Concentration": [
-      "Holding magic while under pressure.",
-      "Try not to shift your weight so much."
-  ],
-  "Ritual": [
-      "Slow magic, cheaper magic.",
-      "Interrupted magic."
-  ],
-  "Appearance": [
-      "This is what enemies see right before deciding how seriously to take you.",
-      "Your visual presentation: armor, scars, posture, and unresolved trauma.",
-      "Appearance affects first impressions, targeting priority, and NPC assumptions.",
-      "This is not cosmetic. This is narrative telegraphing.",
-      "Describe what stands out immediately, not your tragic backstory.",
-      "Blood, dirt, and wear accumulate faster than you think.",
-      "The dungeon notices silhouettes, motion, and menace."
-  ],
-  "Backstory": [
-      "Narrative justification for your issues.",
-      "Explains the limp."
+    "Chaotic is the alignment for pyromaniacs and bards who think ‘plan’ is a dirty word. You break rules, hearts, and occasionally the campaign. The dungeon loves your chaos—makes you predictable in a fun way.",
+    "Being Chaotic means you’re the spark that lights the dungeon’s powder keg. You act on whims, defy authority, and laugh at consequences. Pro tip: The System laughs louder. Keep dancing, clown.",
+    "You believe freedom is worth the collateral damage."
   ],
   "Alignment": [
-      "A moral guideline.",
-      "Flexible under stress."
+    "Alignment is your moral GPS—Lawful Good to Chaotic Evil. Pick one, pretend it matters, then ignore it when you loot the orphanage. The System doesn’t care, but the paladin might.",
+    "This is the box where you write ‘I’m a hero’ or ‘I’m a jerk.’ It’s supposed to guide your roleplay, but let’s be real—you’re just here to stab things and steal gold. Choose and move on.",
+    "Flexible under stress.",
+    "Alignment’s your moral Post-it note—Good, Evil, or ‘I’ll decide later.’ It’s supposed to guide your choices, but let’s be real: You’ll ditch it the second the loot’s shiny enough. The dungeon’s watching, judging.",
+    "This is the System’s attempt to make you think ethics matter in a world of mimics and murderhobos. Alignment shapes your vibe, but the dungeon doesn’t care if you’re Lawful Good—it still wants you dead.",
+    "Think of it as vibes, not enforcement."
+  ],
+  "Proficiency": [
+    "Official recognition that you’ve practiced.",
+    "Congratulations, you now fail with confidence."
+  ],
+  "Initiative": [
+    "Initiative decides who swings first in combat—or who’s still tying their shoes when the orc charges. Roll a d20, add your Dex modifier, and pray you’re not last. Slowpokes get eaten.",
+    "High Initiative? You’re a speed demon, striking before the enemy blinks. Low Initiative? You’re the guy who ‘just needs one more second’ to decide. Spoiler: That second is your funeral.",
+    "Fast feet, fast fate."
+  ],
+  "Speed": [
+    "Speed is how fast you sprint from danger or toward your next bad decision. Measured in feet per turn, it’s the difference between ‘heroic charge’ and ‘eaten by wolves.’ High Dex helps, heavy armor doesn’t.",
+    "Your Speed stat decides if you’re a blur or a sitting duck. Run, dodge, or just trip over your own cape—either way, the dungeon’s faster. Pro tip: Boots don’t help if you’re carrying 50 pounds of loot.",
+    "Measured in strides, not dignity."
+  ],
+  "Size": [
+    "Size is how much space you take up in the dungeon’s kill zone. Tiny? You’re sneaky but squishy. Huge? You’re a walking target. It affects reach, grappling, and how many arrows you catch. Choose your footprint wisely.",
+    "Your Size category—Small, Medium, or ‘Why Are You This Big?’—shapes how you fit in the world. Smaller means better hiding, bigger means better intimidation. The dungeon scales its traps to match.",
+    "Bigger targets wear bigger boots. Statistics only."
+  ],
+  "Passive Perception": [
+    "Passive Perception is your ability to notice the trap, ambush, or glittery loot without rolling dice. High score? You’re a hawk. Low score? You’re the guy who steps on every pressure plate. The System sees what you don’t.",
+    "This is your spider-sense for spotting danger while you’re busy arguing about treasure. Passive Perception’s based on Wisdom, so if you dumped it, enjoy walking into every spike pit the dungeon offers.",
+    "You saw the floor scuff marks. You chose to ignore them."
+  ],
+  "Successes": [
+    "Successes in Death Saves are the System’s reluctant thumbs-up for not dying yet. Roll a 10+ on a d20 at 0 HP, and you’re one step closer to stabilizing. Three of these, and you’re back in the fight. Don’t celebrate yet.",
+    "Each Success on a Death Save is a middle finger to the grim reaper. You’re bleeding out, but still clinging to life. Rack up three, and you’re stable—unless your party’s too busy looting your corpse to notice.",
+    "Moments death reconsidered."
+  ],
+  "Failures": [
+    "Failures on Death Saves are the dungeon’s way of saying, ‘Time’s up.’ Roll below 10 at 0 HP, and you’re one step closer to a permanent dirt nap. Three strikes, and I’m engraving your tombstone.",
+    "Every Death Save Failure is the System tightening the noose. You’re at 0 HP, rolling d20s, and praying for mercy. Three of these, and you’re dead—hope your cleric’s not holding a grudge.",
+    "Moments death leaned closer."
+  ],
+  "Weapons": [
+    "Weapons are your tools for turning enemies into past-tense problems. Swords, bows, or a stick you found—roll to hit, roll for damage, pray it’s enough. The dungeon’s got bigger sticks, by the way.",
+    "Your Weapon’s your best friend until it breaks or you fumble it into a chasm. Melee or ranged, each has a dice type and a dream of glory. Pro tip: Sharpen it before the dragon laughs at you.",
+    "Tools designed to end conversations."
+  ],
+  "Damage": [
+    "Damage Roll is how much pain you dish out when you finally hit something. Roll the weapon’s dice, add modifiers, watch the enemy cry. Or don’t—they might laugh at your pathetic 1d4.",
+    "Congrats, you hit! Now roll to see if you tickled them or actually drew blood. Bigger weapons, bigger dice. Sneak Attack or spells might juice it up. Roll low, and I’m judging you.",
+    "Quantified regret delivered."
+  ],
+  "Proficiencies": [
+    "Proficiencies are the System’s way of saying, ‘Fine, you’re not *completely* useless.’ They cover weapons, skills, or tools you’ve practiced. Add your Proficiency Bonus and act smug—until you roll a 1.",
+    "This is your license to be competent at specific things, like swinging axes or lying to kings. Proficiencies boost your rolls, but the dungeon boosts its traps. Stay sharp, or I’ll revoke your license.",
+    "Tasks you’re licensed to attempt."
+  ],
+  "Class Features": [
+    "Features are the shiny toys your Class hands out, like a rogue’s Sneak Attack or a cleric’s Divine Smite. They’re your edge in combat or roleplay—until the System throws a curveball that makes them useless.",
+    "Class Features are your signature moves, the reason you’re not just a stat block. From rage to spellcasting, they define your vibe. Use them well, or the dungeon will use you as a punching bag.",
+    "Your class-issued advantages.",
+    "Use them or be judged silently."
+  ],
+  "Background Features": [
+    "Background is your sob story before you became a dungeon meatbag. Noble, urchin, whatever. Gives you skills, gear, and a reason to whine about your past. Nobody cares, but write it down.",
+    "This is where you pretend your character has depth. Sailor? You get a rope. Criminal? You know a guy. Pick one, get some perks, and stop crying about your lost farm.",
+    "Proof you existed before the violence."
+  ],
+  "Species Traits": [
+    "Species Traits are the freebies your ancestry tosses in, like a tiefling’s fire resistance or a gnome’s cunning. They’re cool until the dungeon counters with a fire-immune ice dragon. Enjoy your perks, crawler.",
+    "These are the quirks your Species brings to the table—darkvision, flight, or just being really good at eating dirt. Species Traits give you an edge, but the System’s got an edge-sharpening stone.",
+    "Includes stance, stride, and balance tendencies."
+  ],
+  "Feats": [
+    "Feats are your chance to be slightly less pathetic. Special tricks like dual-wielding or casting faster—pick one instead of boosting stats. Choose wrong, and you’re stuck with ‘Great at Cooking’ in a dungeon.",
+    "Think feats make you a badass? They’re just shiny stickers for your character sheet. Grab one for extra attacks or to dodge better, but don’t expect the System to clap for your effort.",
+    "Optional upgrades earned through suffering."
+  ],
+  "Spellcasting": [
+    "Spellcasting is you bending reality with words, gestures, and a lot of ego. Wizards, clerics, and bards do it best, but everyone’s jealous. Run out of Spell Slots, and you’re just yelling at the void.",
+    "This is your ticket to rewriting the dungeon’s rules—fireballs, heals, or turning foes into frogs. Spellcasting’s great until the System slaps you with a counterspell or a silence zone. Cast fast, cry later.",
+    "Reality bending through confidence and hand motions."
+  ],
+  "Spell Ability": [
+    "Your Spell Ability is the stat that fuels your magic—Int for wizards, Wis for clerics, Cha for bards. Higher means stronger spells and tougher saves. Low? Your Fireball’s more like a sparkler.",
+    "This stat decides how much the universe listens when you cast a spell. Spell Ability powers your magic’s punch and its Save DC. Dump it, and your spells are just fancy light shows.",
+    "The stat you use to bully the universe."
+  ],
+  "Save DC": [
+    "Save DC is how hard it is for enemies to shrug off your spells or tricks. Based on your Spell Ability, it’s the number they roll against to avoid your charm or fireball. High DC? They cry. Low DC? They laugh.",
+    "Your Save DC is the dungeon’s respect for your magic, calculated from your Spell Ability and Proficiency. It’s what makes foes fail their saves and hate you. Keep it high, or your spells are just suggestions.",
+    "How hard it is to resist your nonsense."
+  ],
+  "Spell Slots": [
+    "Spell Slots are your magical gas tank. Each spell level eats one, and when you’re out, you’re just a nerd with a stick. Rest to refill, or beg the DM for a nap. Good luck with that.",
+    "This is the System’s way of saying, ‘No, you can’t Fireball everything.’ Higher-level slots for bigger booms, but you’ll burn through ‘em faster than a bard’s self-esteem. Choose wisely, or don’t. I don’t care.",
+    "Daily reality edits."
+  ],
+  "Cantrips": [
+    "Cantrips are your baby spells—magic you can spam without crying about spell slots. Firebolt, Prestidigitation, or whatever. Great for showing off, useless when the dragon laughs at your sparkler.",
+    "Oh, you thought cantrips made you a wizard? They’re the magical equivalent of a participation trophy. Cast ‘em all day, but don’t expect to one-shot a beholder with your fancy glowstick.",
+    "Unlimited magic with limited imagination."
+  ],
+  "Verbal": [
+    "Verbal components are the magic words you shout to make spells work. Sounds cool until you’re gagged or in a silence zone. Pro tip: Practice your enunciation, or the dungeon will mishear ‘Fireball’ as ‘Fizzle.’",
+    "This is you yelling arcane gibberish to bend reality. Verbal spell parts need a clear voice and no interruptions. Get silenced, and you’re just a nerd waving your arms. Speak loud, crawler.",
+    "Arcane shouting."
+  ],
+  "Somatic": [
+    "Somatic components are the fancy hand-waves that make your spells go boom. Need free hands and room to flail—armor might screw you over. Botch the gesture, and the System’s laughing.",
+    "Your Somatic spell parts are the dance moves of magic. Precise, deliberate, and useless if you’re tied up or wearing gauntlets. Move those fingers right, or your spell’s just a bad interpretive dance.",
+    "Mandatory mystical gestures."
+  ],
+  "Concentration": [
+    "Concentration is you holding a spell together while the dungeon tries to punch you in the face. Take damage, and you roll a Con save to keep it going. Fail, and your Haste spell just ruined the fighter’s day.",
+    "This is your mental grip on ongoing magic, like keeping a fireball lit or a friend invisible. Concentration breaks if you get hit hard or distracted. Focus up, or the System will focus on you.",
+    "Holding magic while under pressure."
+  ],
+  "Ritual": [
+    "Ritual casting is slow, cheap magic that doesn’t burn Spell Slots. Takes 10 minutes, so don’t try it mid-combat unless you want to be orc chow. Great for utility, bad for impatience.",
+    "Rituals are the System’s gift to stingy casters—spells you can cast without draining your Slots, but you’ll need a comfy chair and no enemies. Use it for scouting or buffs, not heroics.",
+    "Interrupted magic."
+  ],
+  "Appearance": [
+    "Appearance is your dungeon headshot—scars, armor, or a hat that screams ‘I’m trouble.’ It’s not just looks; it’s how you carry yourself. Slouch, and the goblins target you first. Stand tall, and they still might.",
+    "Your Appearance is the vibe you give off—grimy rogue, shiny paladin, or wizard with a beard full of secrets. It shapes NPC reactions and enemy priorities. Look tough, or the dungeon will test you.",
+    "This is what enemies see right before deciding how seriously to take you.",
+    "This is not cosmetic. This is narrative telegraphing."
+  ],
+  "Backstory": [
+    "Backstory’s your excuse for being a dungeon-diving lunatic. Dead parents, lost love, or just really hate goblins—it’s your fuel for roleplay. The System doesn’t care, but it’ll use it to screw with you.",
+    "This is the sob story you whisper to the campfire, explaining why you’re here instead of farming. Backstory gives you depth, but the dungeon loves turning it into plot hooks. Brace for trauma.",
+    "Explains the limp.",
+    "Narrative justification for your issues."
   ],
   "Languages": [
-      "Ways to misunderstand danger.",
-      "Accents affect intimidation."
+    "Languages are your key to decoding ancient runes or insulting orcs in their native tongue. More means more options, but also more chances to mispronounce and start a war. Speak carefully.",
+    "Your Languages let you chat with elves, dwarves, or that creepy statue that’s definitely not possessed. Each one’s a tool, but the dungeon loves throwing you texts in tongues you don’t know."
   ],
   "GP": [
-      "The gold standard of greed.",
-      "Heavy pockets change your walk."
+    "GP’s your gold piece count—the universal currency for bribes, gear, and bad decisions. It’s power until you realize it weighs a ton and attracts thieves. Spend it, or the dungeon will spend you.",
+    "Gold Pieces are the dungeon’s favorite bait. They buy swords, spells, or a night at the inn before it burns down. Hoard too much, and the System spawns a dragon to ‘balance’ your wealth.",
+    "Heavy pockets change your walk."
+  ],
+  "Saving Throws": [
+    "Saving Throws are your desperate attempt to not die when a fireball, poison, or mind-control spell comes for you. Roll a d20, add the right stat mod, and hope the DM isn’t cackling. Fail, and enjoy your new life as a toad.",
+    "Think of this as your ‘please don’t let me die’ roll. Different stats for different threats—Dex for dodging, Wis for resisting charm, Con for not puking your guts out. Roll high or kiss your dignity goodbye.",
+    ""
+  ],
+  "Advantage/Disadvantage": [
+    "Advantage lets you roll two d20s and take the higher one—because the System’s feeling generous. Disadvantage? Roll two, take the lower. Guess which one I enjoy more, crawler.",
+    "Advantage is like the DM rigging the game in your favor. Disadvantage is me reminding you life sucks. Flank an enemy for the former, get poisoned for the latter. Roll and weep."
+  ],
+  "Attack Roll": [
+    "Attack Roll is you swinging a sword, firing an arrow, or chucking a spell, hoping to not look like an idiot. Roll a d20, add modifiers, beat the enemy’s AC. Miss, and I’m laughing.",
+    "This is where you prove you’re not just waving your weapon like a toddler. High roll hits, low roll means you’re decorating the floor with your dignity. Add your proficiency if you’re lucky."
+  ],
+  "Skills": [
+    "Skills are the things you’re supposedly good at, like sneaking, lying, or not dying in a trap. Roll a d20, add the stat mod, maybe proficiency. Fail, and enjoy the consequences, loser.",
+    "Got a high Stealth skill? You’re a shadow. Got a low Persuasion? You’re convincing nobody but the mirror. Pick your skills wisely, or the System will remind you how useless you are."
+  ],
+  "Inspiration": [
+    "Inspiration is the DM’s rare pat on the head for roleplaying well. Gives you Advantage on one roll. Hoard it like gold, because the System sure ain’t handing out freebies.",
+    "Got Inspiration? Congrats, you amused the DM. Use it to reroll a botched save or attack. Waste it on a trivial check, and I’ll personally ensure your next trap is extra spiky."
+  ],
+  "Long Rest": [
+    "Long Rest is your 8-hour nap to recover HP, spell slots, and your will to live. Do it in a safe spot, or you’re waking up with a goblin’s knife in your back. Sweet dreams, princess.",
+    "This is the System’s pity break for you fragile mortals. Full heal, reset abilities, blah blah. Takes forever, so don’t expect to snooze in the middle of a boss fight. I’m not that generous."
+  ],
+  "Short Rest": [
+    "Short Rest is a quick 1-hour breather to patch your wounds and pretend you’re not doomed. Roll Hit Dice to heal, recharge some abilities. Don’t expect miracles—you’re still a mess.",
+    "Think of this as a coffee break in hell. Sit, sulk, maybe heal a scratch. Fighters and warlocks love it; wizards just whine. Do it too often, and the DM’s monsters get bored and eat you."
   ]
 }
