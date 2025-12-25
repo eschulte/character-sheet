@@ -366,6 +366,7 @@
         let isLoading = false;
 
         // Conflict/Sync State
+        const suggestLoadRemoteChanges = false;
         let lastLoadedRemoteTimestamp = 0;
         let lastLocalChangeTimestamp = 0;
         let lastAutoSnapshotTime = 0;
@@ -471,7 +472,7 @@
                     const cloudTime = new Date(data.lastUpdated).getTime() || 0;
 
                     // If cloud is newer than what we last loaded...
-                    if (cloudTime > lastLoadedRemoteTimestamp) {
+                    if (suggestLoadRemoteChanges && cloudTime > lastLoadedRemoteTimestamp) {
                         console.log("data.lastUpdated: "+data.lastUpdated)
                         console.log("CloudTime: "+cloudTime)
                         console.log("lastLoadedRemoteTimestamp: "+lastLoadedRemoteTimestamp)
