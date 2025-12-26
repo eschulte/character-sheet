@@ -618,13 +618,20 @@
         // --- SHARED UTILS ---
         async function loadSharedCharacter(sharedId) {
             isLoading = true;
-            document.getElementById('status').innerText = "Loading...";
+            document.getElementById('status').innerText = "Loading Shared...";
+
             try {
                 let targetData = null;
-                let finalId = null;
+                let finalId = sharedId;
+
+                // 1. Try direct lookup (Full ID)
                 const docRef = doc(db, "characters", sharedId);
                 const docSnap = await getDoc(docRef);
+
                 if (docSnap.exists()) {
+                    targetData = docSnap.data();
+                } else if (sharedId.length === 8) {
+                    // 2. Prefix search for Short ID
                     const q = query(
                         collection(db, "characters"),
                         where("__name__", ">=", sharedId),
@@ -634,25 +641,33 @@
                     const querySnap = await getDocs(q);
                     if (!querySnap.empty) {
                         targetData = querySnap.docs[0].data();
-                        finalId = querySnap.docs[0].id; // Get the actual full ID
+                        finalId = querySnap.docs[0].id;
                     }
                 }
-                if (targetData && finalId) {
+
+                if (targetData) {
                     currentCharacterId = finalId;
                     localStorage.setItem('dnd_char_id', currentCharacterId);
                     populateData(targetData.sheetData);
-                    lastLoadedRemoteTimestamp = new Date(targetData.lastUpdated).getTime();
 
                     if (currentUser && targetData.ownerId === currentUser.uid) {
+                        isCloudOwner = true;
                         setupRealtimeListener();
+                        document.getElementById('status').innerText = "Online (Owner)";
                     } else {
+                        // If not owner, just stop here. No listener = No "Access Control" error.
                         isCloudOwner = false;
                         document.getElementById('status').innerText = "Read Only Mode";
                     }
                 } else {
                     alert("Character not found.");
                 }
-            } catch (e) { console.error(e); } finally { isLoading = false; updateModifiers(); }
+            } catch (e) {
+                console.error("Shared load failed:", e);
+            } finally {
+                isLoading = false;
+                updateModifiers();
+            }
         }
 
         async function updateSnapshotSelect() {
