@@ -40,7 +40,17 @@ Needed Tool Tips:
 - Catapult
 - Poison Spray
 
+## Misc notes and helpful snippets
 
+### JSON DB Maintenance
+```bash
+# Merge two JSON files keeping keys unique.
+jq -nS 'reduce inputs as $item ({}; . + $item | to_entries | map({key, value: .value | unique}) | from_entries)' \
+   ai_comments.json new_ai_comments.json > merged_ai_comments.json
+mv merged_ai_comments.json ai_comments.json
+```
+
+### Firebase Config
 ```js
 // Your web app's Firebase configuration
 // https://console.firebase.google.com/project/dnd-character-sheet-5e/

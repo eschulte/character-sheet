@@ -1,577 +1,1147 @@
 {
-  "Character Name": [
-    "This is the word I’ll scream when you inevitably trip a glyph and blow up the party. Character Name’s your calling card, your brand, your doomed legacy. Choose something the bards can sing without laughing, or I’ll nickname you ‘Fumbles’ in the kill feed.",
-    "Pick something heroic, ominous, or ironic. The dungeon prefers irony. Also easier to chant.",
-    "Your chosen identifier for fame, infamy, or the obituary.",
-    "Names have power. This one mostly attracts danger.",
-    "Shorter names are easier to shout during combat."
-  ],
-  "Species": [
-    "Species is the cosmic lottery that decides if you’ve got claws, wings, or a face only a lich could love. It comes with perks like darkvision or breathing fire, but also baggage like ‘elves are snooty’ or ‘dwarves smell like ale.’ Pick one, and the dungeon will stereotype you faster than you can say ‘racial bonus.’",
-    "Your Species is why you’re a furry, a robot, or just a boring human with delusions of grandeur. It tweaks your stats, slaps on some traits, and makes NPCs judge you before you open your mouth. Choose wisely, or you’ll be the token halfling everyone blames for short jokes.",
-    "Your biological template, complete with perks, flaws, and cultural baggage you will absolutely validate.",
-    "Your biological or mechanical excuse for your stats.",
-    "Determines how society judges you before you speak.",
-    "Some species get darkvision. Some get stereotypes."
-  ],
-  "Class": [
-    "Class is the System’s way of boxing you into a role like ‘stabby guy’ or ‘sparkly magic nerd.’ It’s your combat vibe, your skill set, and the reason the party expects you to carry them. Pick wrong, and you’re the cleric healing idiots who keep punching dragons in the face.",
-    "Your Class is your dungeon job description, complete with fancy powers and a laundry list of responsibilities. Fighter? Swing hard. Wizard? Read books. Bard? Annoy everyone. Choose one, and pray the System doesn’t nerf it mid-crawl for ‘balance.’",
-    "Your primary method of solving problems until it stops working.",
-    "This is why the party expects certain things from you.",
-    "You are now locked into a playstyle. Mostly.",
-    "Determines whether you charge, scheme, pray, or dramatically monologue before failure."
-  ],
-  "Subclass": [
-    "Subclass is where your Class gets spicy—think Fighter but with a side of eldritch knight or Rogue with a knack for arcane trickery. It’s the flavor that makes you less generic, but also the reason your DM sighs when you pull out some obscure ability. Own it, you niche weirdo.",
-    "This is your Class’s midlife crisis, where it decides to specialize in something like ‘shadow monk’ or ‘beast master.’ Subclass gives you cool tricks but also a reputation—like how everyone assumes warlocks sold their soul. Spoiler: You probably did.",
-    "Because you wanted your mistakes to feel bespoke.",
-    "This is where flavor becomes mechanical."
-  ],
-  "Level": [
-    "Level is the System’s grudging admission you haven’t died yet. Higher numbers mean more powers, bigger HP, and fancier ways to screw up. Low Level? You’re goblin chow. High Level? The dungeon just spawns bigger goblins. Congrats on surviving, I guess.",
-    "Your Level measures how many near-death experiences you’ve racked up without quitting. Each one unlocks shinier toys—spells, feats, or just more HP to absorb bad decisions. Don’t get cocky; the System scales the pain to match your ego.",
-    "Represents experience, luck, and plot armor.",
-    "A rough estimate of how many disasters you’ve endured without quitting."
-  ],
-  "XP": [
-    "XP is the dungeon’s currency of suffering—earn it by killing, scheming, or accidentally solving puzzles. Stack enough, and you Level up, unlocking new ways to disappoint me. Run out of things to slaughter? Too bad, no XP for crying about it.",
-    "Experience Points are the System’s way of quantifying your trauma. More XP means you’re closer to a power spike, but also to the dungeon noticing you’re a threat. Grind hard, crawler, or I’ll make sure your next ‘encounter’ is a TPK.",
-    "Earned through violence, cleverness, or exploitation.",
-    "This is your progress bar.",
-    "Progress points awarded for risk-taking and emotional damage."
-  ],
   "AC": [
-    "Armor Class is how hard you are to stab, shoot, or magically barbecue. High AC? You’re a walking fortress. Low AC? You’re a pincushion with dreams. Enemies roll against this to hit you. Pray they suck.",
-    "Wearing plate mail? Great, your AC’s decent. Wearing a bathrobe? Hope you enjoy bleeding. This number laughs at enemy attacks—unless they roll a nat 20, then you’re screwed anyway.",
     "AC is confidence, quantified.",
-    "How hard you are to hit, not how smart it was to be there."
+    "Armor Class is how hard you are to stab, shoot, or magically barbecue. High AC? You’re a walking fortress. Low AC? You’re a pincushion with dreams. Enemies roll against this to hit you. Pray they suck.",
+    "How hard you are to hit, not how smart it was to be there.",
+    "Wearing plate mail? Great, your AC’s decent. Wearing a bathrobe? Hope you enjoy bleeding. This number laughs at enemy attacks—unless they roll a nat 20, then you’re screwed anyway."
   ],
-  "Proficiency Bonus": [
-    "Proficiency Bonus is the System’s grudging nod to your so-called ‘skills.’ Add this to stuff you’re good at—swords, spells, or lying to NPCs. Low level? It’s a measly +2. High level? You’re still not as cool as you think.",
-    "This little number is your reward for not dying yet. Slap it on attacks, saves, or skills you’re trained in. Don’t get cocky—it’s not like you’re proficient at surviving my traps.",
-    "One bonus to rule them all.",
-    "Your general competence modifier."
+  "Absorb Elements": [
+    "1st Level Abjuration. Reaction. You take a fireball to the face and store the energy to punch someone with it later. It’s recycling, but violent.",
+    "Reduces elemental damage by half and buffs your next melee hit. It turns 'ouch' into 'now it's your turn.' Don't leave home without it."
   ],
-  "Strength": [
-    "Strength measures how much you can bench press, yeet a goblin, or flex intimidatingly at a tavern brawl. High score? You’re a meat wall. Low score? Hope you enjoy being the party’s designated twig. Roll a d20 and add this to smash stuff or grapple some fool.",
-    "Oh, you thought Strength was just for swinging swords? It’s also for carrying your team’s emotional baggage when they inevitably cry about their tragic backstory. Pro tip: If it’s heavy, you’re the mule. Deal with it.",
-    "Low Strength means creative solutions.",
-    "High Strength means broken furniture.",
-    "Raw force output and door-negotiation skill."
+  "Acid Splash": [
+    "Cantrip. Conjuration, 60ft, V/S. Hurl acid at one or two targets within 5ft of each other. Dex save or 1d6 acid damage, scales with level. A weak spitball for wannabe alchemists, but it’s free and splashy.",
+    "Spray acid like a skunk with a grudge. Hits two if they’re cozy, does piddly damage. Scales up, but don’t expect to melt dragons.",
+    "Your budget chemical burn."
   ],
-  "Dexterity": [
-    "Dexterity is your ticket to not tripping over your own ego. Dodge arrows, sneak past guards, or juggle daggers like a circus reject. High Dex? You’re a slippery eel. Low Dex? Enjoy face-planting into every trap.",
-    "This stat decides if you’re a graceful ninja or a clattering tin can. Also governs your ability to pick locks, steal loot, or avoid Grandma’s hug of death. Roll it, add it, pray you don’t roll a 1.",
-    "Clumsiness quantified.",
-    "Low Dex creates slapstick.",
-    "High Dex solves many problems quietly.",
-    "Agility, balance, and footwork quality."
+  "Action Surge": [
+    "Fighter Feature. You push your body beyond its limits to take a second Action. Two fireballs? Four sword swings? The System loves efficiency.",
+    "The Fighter’s 'I win' button. You take another turn, right now. Usually used to fix the fact that you missed every attack on your first turn."
   ],
-  "Constitution": [
-    "Constitution is how well you shrug off poison, disease, or that fifth tankard of mystery ale. High Con? You’re a walking tank. Low Con? You’ll catch a cold from a stiff breeze and die. Add it to your HP, you fragile snowflake.",
-    "This is the stat that keeps you from keeling over when the dragon farts in your general direction. Also helps you stay conscious when your wizard ‘accidentally’ fireballs you. Spoiler: It wasn’t an accident.",
-    "Includes bone density and blister tolerance.",
-    "How long your body refuses to give up."
+  "Advantage/Disadvantage": [
+    "Advantage is like the DM rigging the game in your favor. Disadvantage is me reminding you life sucks. Flank an enemy for the former, get poisoned for the latter. Roll and weep.",
+    "Advantage lets you roll two d20s and take the higher one—because the System’s feeling generous. Disadvantage? Roll two, take the lower. Guess which one I enjoy more, crawler."
   ],
-  "Intelligence": [
-    "Intelligence measures how many brain cells you haven’t burned on bad decisions yet. Good for wizards, bad for barbarians who think ‘book’ is a type of club. Use it for arcane lore or to outsmart a particularly sassy door.",
-    "Low Intelligence? Congrats, you’re the party’s comic relief. High Intelligence? You’re the nerd they ignore until they need to decipher a rune or avoid a TPK. Roll it to recall useless trivia the DM made up.",
-    "Book learning and spell math.",
-    "Also known as ‘wizard privilege.’",
-    "Book learning and tactical planning."
+  "Aid": [
+    "2nd Level Abjuration, 30ft, V/S/M. 3 creatures gain +5 max/current HP for 8 hr. Pump up your party’s HP like cheap balloons—stacks with temp HP for extra meat.",
+    "Buff three allies’ HP for a day. No concentration, solid tank boost.",
+    "HP party favor."
   ],
-  "Wisdom": [
-    "Wisdom is your gut telling you not to trust that shady NPC offering ‘free candy.’ High Wisdom? You’re a perceptive sage. Low Wisdom? You’re eating dirt because it ‘looked nutritious.’ Use it for insight or spotting ambushes.",
-    "This stat saves you from your own stupidity—sometimes. It’s also for clerics who think their god cares about their dice rolls. Roll Wisdom to avoid falling for the bard’s ‘totally legit’ pyramid scheme.",
-    "This is not intelligence. Stop arguing.",
-    "You *felt* the trap. You ignored it.",
-    "Awareness, instincts, and hindsight avoidance."
+  "Alarm": [
+    "1st Level Abjuration, 30ft, V/S/M, Ritual. Set 20ft cube alert for 8hr. Mental ping or bell if creature enters. Booby-trap your nap spot—won’t stop thieves, but you’ll know they’re laughing.",
+    "Magic security system. Pings you when trouble shows up. Useless in a fight, great for paranoia.",
+    "Your magical doorbell."
   ],
-  "Charisma": [
-    "Charisma is how well you lie, charm, or intimidate your way out of consequences. High Cha? You’re a silver-tongued devil. Low Cha? You’re the guy who insults the king by accident. Roll it to talk your way past guards or into trouble.",
-    "Think you’re hot stuff? Charisma decides if NPCs swoon or spit in your face. Also powers bards who think singing solves everything. Spoiler: It doesn’t. Roll high or enjoy being the party’s least-liked member.",
-    "Spells bend reality through confidence.",
-    "High CHA gets away with things.",
-    "This is why people listen.",
-    "Eye contact helps. So does confident posture.",
-    "Your ability to sell bad ideas convincingly."
+  "Alchemists Supplies": [
+    "Alchemists Supplies are your ticket to mixing potions, poisons, or a puff of smoke that does nothing but look cool. High Int helps, but nothing saves you from the System’s love of ‘unstable compounds.’ Mix with care.",
+    "Liquids, powders, and a near-religious faith in trial and error.",
+    "With this kit, you’re one bad roll from a healing draught or a vial of instant regret. Alchemists Supplies let you play god with chemicals, but the dungeon plays back. Expect explosions, crawler."
   ],
-  "Hit Points": [
-    "Hit Points are how much punishment you can take before you take a dirt nap. High HP? You’re a sponge for pain. Low HP? One stiff breeze and you’re rolling death saves. Lose ‘em all, and it’s game over, kid.",
-    "This is your life bar, crawler. Every sword, spell, or angry chicken pecks it down. Rest, heal, or beg your cleric to fix you. Pro tip: Don’t taunt the dragon when you’re at 1 HP.",
-    "Your remaining buffer against consequences."
+  "Alignment": [
+    "Alignment is your moral GPS—Lawful Good to Chaotic Evil. Pick one, pretend it matters, then ignore it when you loot the orphanage. The System doesn’t care, but the paladin might.",
+    "Alignment’s your moral Post-it note—Good, Evil, or ‘I’ll decide later.’ It’s supposed to guide your choices, but let’s be real: You’ll ditch it the second the loot’s shiny enough. The dungeon’s watching, judging.",
+    "Flexible under stress.",
+    "Think of it as vibes, not enforcement.",
+    "This is the System’s attempt to make you think ethics matter in a world of mimics and murderhobos. Alignment shapes your vibe, but the dungeon doesn’t care if you’re Lawful Good—it still wants you dead.",
+    "This is the box where you write ‘I’m a hero’ or ‘I’m a jerk.’ It’s supposed to guide your roleplay, but let’s be real—you’re just here to stab things and steal gold. Choose and move on."
   ],
-  "Death Saves": [
-    "Death Saves are your last-ditch effort to not become worm food. At 0 HP, roll a d20 each turn. 10+ is a success, below is a failure. Three successes, you stabilize. Three failures, you’re dead. Good luck, corpse.",
-    "This is the System’s cruel game of ‘Will you live?’ Roll a d20, pray for high numbers, and hope your friends bother to heal you. Fail three times, and I’m selling your soul to the highest bidder.",
-    "The dungeon hesitating."
+  "Alter Self": [
+    "2nd Level Transmutation, Self, V/S, Concentration. Change appearance, grow claws (1d6+Str), or breathe water for 1 hr. Shapeshift into a uglier you—claws are nice, though.",
+    "DIY disguise kit.",
+    "Morph for utility or combat. Concentration limits your spell spam."
   ],
-  "Equipment": [
-    "Equipment is the junk you haul around hoping it’ll save your skin—a rusty sword, a rope, maybe a potion you forgot about. Every item’s a potential lifeline or a useless weight. Pro tip: If it’s called ‘Mysterious Orb,’ don’t touch it. You will anyway.",
-    "This is your inventory of hopes, dreams, and pointy objects. Equipment ranges from ‘trusty dagger’ to ‘why am I carrying 12 candles?’ Manage it well, or you’ll be the guy trying to climb a rope with a piano strapped to your back.",
-    "Consumables exist to be hoarded.",
-    "Inventory management is gameplay.",
-    "Weight distribution could be better.",
-    "Everything you carry and forget."
+  "Animate Objects": [
+    "5th Level Transmutation. You bring ten knives to life and turn the battlefield into a blender. The math is annoying, but the damage is glorious.",
+    "Concentration. You command a swarm of objects to beat your enemies to death. Use silver coins for maximum disrespect."
   ],
-  "Coins": [
-    "Coins are your shiny excuse for risking life and limb. Gold buys ale, gear, or a bard to sing your praises. Problem? It weighs you down, clinks when you sneak, and makes you a target. Spend it fast, or the dungeon will ‘redistribute’ it.",
-    "Every Coin in your pouch is a vote for capitalism in a world of fireballs and mimics. Platinum’s fancy, copper’s a joke, and all of it screams ‘rob me’ to every thief in a 10-mile radius. Good luck keeping it, greedy.",
-    "Portable motivation."
+  "Appearance": [
+    "Appearance is your dungeon headshot—scars, armor, or a hat that screams ‘I’m trouble.’ It’s not just looks; it’s how you carry yourself. Slouch, and the goblins target you first. Stand tall, and they still might.",
+    "This is not cosmetic. This is narrative telegraphing.",
+    "This is what enemies see right before deciding how seriously to take you.",
+    "Your Appearance is the vibe you give off—grimy rogue, shiny paladin, or wizard with a beard full of secrets. It shapes NPC reactions and enemy priorities. Look tough, or the dungeon will test you."
   ],
-  "Thieves Tools": [
-    "Thieves Tools are your VIP pass to places you’re definitely not invited. Lockpicks, wires, and a prayer you don’t trigger the acid trap. High Dex helps, but nothing saves you from the System’s love of ‘surprise’ explosions. Click carefully.",
-    "This kit screams ‘I’m up to no good,’ and the dungeon agrees. Thieves Tools let you bypass locks, disable traps, or accidentally arm the doomsday device. Roll well, or your epitaph will read ‘Almost Got It.’",
-    "Ah yes, the official kit for touching things you absolutely should not be touching. If it clicks, great. If it snaps, you’re about to meet consequences."
+  "Arcane Eye": [
+    "4th Level Divination, 30ft, V/S/M, Concentration. Invisible sensor moves 30ft/round, sees 30ft normal/darkvision for 1 hr. Spy drone for snooping—great for scouting, fragile as hell.",
+    "Magic eyeball for peeking. Concentration’s a drag, perfect for paranoia.",
+    "Sneaky spy cam."
   ],
-  "Tinker's Tools": [
-    "Tinker's Tools are for mad geniuses who think they can outsmart the dungeon with a wrench and some wire. Build a clockwork bomb, fix a broken trap, or create something the party will regret. Results not guaranteed, but explosions are.",
-    "With Tinkers Tools, you’re one bad roll away from a gadget that either saves the day or sets your beard on fire. Craft gizmos, repair gear, or invent a ‘self-destructing backpack.’ The System’s betting on the beard fire.",
-    "For when you look at a perfectly functional object and think, ‘I can make this worse, but interesting.’"
+  "Arcane Lock": [
+    "2nd Level Abjuration, Touch, V/S/M. Lock door/container, +10 DC to break/pick, password bypass. Fortify your loot stash—thieves hate it, DMs respect it.",
+    "Magic padlock with a password. Keeps your gold safe, not your life.",
+    "Thief-proofing spell."
   ],
-  "Carpenters Tools": [
-    "Carpenters Tools turn trees into tables, bridges, or the coffin you’ll need after ignoring my warnings. Build barricades, fix wagons, or craft a chair to sit out the apocalypse. Wood’s forgiving—your dice rolls aren’t.",
-    "These tools let you shape wood into something useful, like a door to trap the barbarian or a ladder to escape his rage. Carpenters Tools are great until you realize the dungeon’s all stone and your saw’s useless. Plan ahead, dummy.",
-    "Because sometimes the dungeon needs a table, and sometimes it needs a barricade built in a panic.",
-    "Wood goes in, furniture comes out. Or splinters. Often splinters."
+  "Arcane Recovery": [
+    "Once per day, you get some spell slots back on a short rest. It encourages the party to stop and nap while the world ends. Wizards love naps.",
+    "Wizard Feature. You read a book for an hour and remember spells you forgot. It’s a short rest mana potion. Essential, because you have the stamina of a wet tissue."
   ],
-  "Smiths Tools": [
-    "Smiths Tools are for turning raw metal into weapons, armor, or a really intimidating paperweight. Fire, hammers, and sweat—sounds romantic until you botch the roll and melt your sword. Forge wisely, or the dungeon will forge you.",
-    "With Smiths Tools, you’re a one-person armory, crafting blades or fixing dented helms. High Strength helps, but nothing saves you from the System’s habit of spawning rust monsters. Make it sharp, or make it quick.",
-    "Fire, metal, and the confidence to hit something until it becomes useful."
+  "Artificer": [
+    "A spellcaster who looked at magic and said, ‘This needs more hardware.’",
+    "Artificer is the Class for nerds who think magic’s better with gears and gunpowder. You build gadgets, infuse items, and pray your contraption doesn’t explode mid-fight. High Int, high risk, high chance I’m laughing.",
+    "As an Artificer, you’re the dungeon’s R&D department, crafting wands, robots, or a toaster that shoots lightning. Your toys are cool until they backfire and the party’s yelling at you. Innovate, but don’t expect applause."
   ],
-  "Weavers Tools": [
-    "Weavers Tools let you spin thread into cloaks, ropes, or a tapestry of your many failures. Useful for disguises, repairs, or just looking fabulous while the dragon roasts you. Low Dex? Enjoy your lumpy scarf.",
-    "This kit’s for crafting fabric-based miracles—sails, nets, or a snazzy cape to distract the goblins. Weavers Tools are niche until you’re dangling from a cliff and realize rope is your best friend. Weave fast, crawler.",
-    "For creating cloth, rope, and the illusion that you understand textiles."
+  "Attack Roll": [
+    "Attack Roll is you swinging a sword, firing an arrow, or chucking a spell, hoping to not look like an idiot. Roll a d20, add modifiers, beat the enemy’s AC. Miss, and I’m laughing.",
+    "This is where you prove you’re not just waving your weapon like a toddler. High roll hits, low roll means you’re decorating the floor with your dignity. Add your proficiency if you’re lucky."
   ],
-  "Wood Carvers Tools": [
-    "Wood Carvers Tools are for turning logs into art, holy symbols, or a creepy doll that freaks out the cleric. Precision matters, but so does not carving your thumb off. High Dex helps, low patience doesn’t.",
-    "With these tools, you sculpt wood into totems, arrows, or a sign that says ‘Don’t Touch.’ Wood Carvers Tools are great for roleplay until the dungeon decides your masterpiece is kindling. Carve carefully, or cry later.",
-    "A slow, patient craft in a world that keeps trying to kill you.",
-    "You remove wood until something recognizable remains. Ideally not your fingers."
+  "Aura of Purity": [
+    "4th Level Abjuration, Self (30ft), V/S, Concentration. Allies resist disease, advantage vs. status effects for 10 min. Holy bubble—keeps your party un-poisoned, un-charmed.",
+    "Buff allies against ailments. Concentration’s a pain, great for debuff-heavy fights.",
+    "Clean aura shield."
+  ],
+  "Background": [
+    "Background is your sob story before you became a dungeon meatbag. Noble, urchin, whatever. Gives you skills, gear, and a reason to whine about your past. Nobody cares, but write it down.",
+    "Proof you existed before the violence.",
+    "This is where you pretend your character has depth. Sailor? You get a rope. Criminal? You know a guy. Pick one, get some perks, and stop crying about your lost farm."
+  ],
+  "Backstory": [
+    "Backstory’s your excuse for being a dungeon-diving lunatic. Dead parents, lost love, or just really hate goblins—it’s your fuel for roleplay. The System doesn’t care, but it’ll use it to screw with you.",
+    "Explains the limp.",
+    "Narrative justification for your issues.",
+    "This is the sob story you whisper to the campfire, explaining why you’re here instead of farming. Backstory gives you depth, but the dungeon loves turning it into plot hooks. Brace for trauma."
+  ],
+  "Bardic Inspiration": [
+    "Bard Feature. Bonus Action. You play a tune or shout encouragement. You give an ally a die to add to a roll later. Basically, you are weaponizing positive reinforcement.",
+    "You give a d6 (or higher) to a friend. They will inevitably forget to use it before the roll fails. You can blame them for the TPK. It’s guilt-free gaming."
+  ],
+  "Battleaxe": [
+    "Martial Melee. 1d8 slashing (1d10 Versatile). Chop like a lumberjack with this hefty axe. One or two hands, your call—solid but basic, no flair for showoffs.",
+    "Slash or hack harder with both hands. Reliable, not fancy.",
+    "Woodcutter’s pride."
+  ],
+  "Bigby’s Hand": [
+    "5th Level Evocation, 120ft, V/S/M, Concentration. 10ft hand, 4d8 force punch, grapple, push, or shield for 1 min. Giant fist for smashing or high-fiving—versatile and punchy.",
+    "Forceful fist friend.",
+    "Summon a magic mitt. Concentration’s a pain, does everything but cook."
+  ],
+  "Blink": [
+    "3rd Level Transmutation, Self, V/S. 50% chance each turn to vanish to Ethereal Plane, return 10ft away for 1 min. Flicker in and out of reality—annoying for enemies, confusing for allies.",
+    "Ethereal dodge.",
+    "Phase in and out like a glitchy ghost. No concentration, pure chaos."
+  ],
+  "Blowgun": [
+    "Martial Ranged. 1d1 piercing, Ammunition (25/100), Loading. Spit darts like a mosquito. Stealthy, pathetic damage—good for poison, bad for pride.",
+    "Puff tiny needles. Barely hurts, great for sneaky toxins.",
+    "Sneeze shooter."
+  ],
+  "Blur": [
+    "2nd Level Illusion, Self, V/S, Concentration. Attacks vs. you have disadvantage for 1 min. Vibrate like a bad hologram—makes archers cry, dispels easily.",
+    "Dodge tank with illusions. Concentration’s a pain, great for squishies.",
+    "Fuzzy self-defense."
+  ],
+  "Booming Blade": [
+    "Cantrip. Evocation, Self (5ft), V/M (melee weapon). Melee attack deals weapon damage; if target moves 5ft+ before your next turn, 1d8 thunder damage, scales. Pin cowards with a sonic curse—stab, boom, laugh.",
+    "Stab with a side of boom.",
+    "Whack ‘em and trap ‘em with thunder. Scales nicely, great for keeping enemies glued or punishing runners."
   ],
   "Brewers Supplies": [
     "Brewers Supplies turn water and hope into ale, mead, or something that’ll make the bard sing off-key. High quality takes time; low quality takes lives. Brew well, or the party’s drinking your regret.",
     "This kit’s for crafting booze that either boosts morale or blinds the rogue. Brewers Supplies are great until you realize the dungeon’s water source is cursed. Pro tip: Test it on the fighter first.",
     "You make alcohol. Sometimes it’s good. Sometimes it’s technically poison."
   ],
-  "Alchemists Supplies": [
-    "Alchemists Supplies are your ticket to mixing potions, poisons, or a puff of smoke that does nothing but look cool. High Int helps, but nothing saves you from the System’s love of ‘unstable compounds.’ Mix with care.",
-    "With this kit, you’re one bad roll from a healing draught or a vial of instant regret. Alchemists Supplies let you play god with chemicals, but the dungeon plays back. Expect explosions, crawler.",
-    "Liquids, powders, and a near-religious faith in trial and error."
-  ],
-  "Artificer": [
-    "Artificer is the Class for nerds who think magic’s better with gears and gunpowder. You build gadgets, infuse items, and pray your contraption doesn’t explode mid-fight. High Int, high risk, high chance I’m laughing.",
-    "As an Artificer, you’re the dungeon’s R&D department, crafting wands, robots, or a toaster that shoots lightning. Your toys are cool until they backfire and the party’s yelling at you. Innovate, but don’t expect applause.",
-    "A spellcaster who looked at magic and said, ‘This needs more hardware.’"
-  ],
-  "Warforged": [
-    "Warforged are the System’s nod to ‘what if robots had feelings?’ You don’t sleep, eat, or breathe, but you still get to enjoy the dungeon’s emotional meat grinder. Bonus: Your AC’s decent. Downside: Rust.",
-    "As a Warforged, you’re a walking forge with a soul and a chip on your shoulder. Built for battle, you’re tough but slow to trust. The dungeon loves throwing magnets at you. Stay shiny, tin can.",
-    "You do not eat, sleep, or breathe—yet somehow still feel existential dread.",
-    "A living construct: proof that someone once thought free will was optional."
-  ],
-  "Lawful": [
-    "Lawful means you love rules so much you’d marry a contract. You’re predictable, honorable, and the first to complain when the rogue ‘improvises.’ The dungeon respects your discipline—right before it exploits it.",
-    "Being Lawful is like swearing an oath to bureaucracy in a world of fireballs. You follow codes, uphold justice, and bore everyone until the System throws a moral dilemma at you. Stay rigid, or snap.",
-    "You follow rules. Even bad ones. Especially bad ones.",
-    "You believe order solves problems. Reality disagrees occasionally."
-  ],
-  "Neutral": [
-    "Neutral is the alignment for cowards who can’t pick a side. You’re not good, not evil—just here for the loot and a nap. The dungeon loves your indecision; it makes you easy to manipulate.",
-    "As a Neutral crawler, you’re the party’s Switzerland, dodging moral debates while everyone else screams. You adapt, you survive, but the System knows you’re just stalling. Pick a vibe, or I’ll pick one for you.",
-    "Not good, not evil—just tired."
-  ],
-  "Chaotic": [
-    "Chaotic is the alignment for pyromaniacs and bards who think ‘plan’ is a dirty word. You break rules, hearts, and occasionally the campaign. The dungeon loves your chaos—makes you predictable in a fun way.",
-    "Being Chaotic means you’re the spark that lights the dungeon’s powder keg. You act on whims, defy authority, and laugh at consequences. Pro tip: The System laughs louder. Keep dancing, clown.",
-    "You believe freedom is worth the collateral damage."
-  ],
-  "Alignment": [
-    "Alignment is your moral GPS—Lawful Good to Chaotic Evil. Pick one, pretend it matters, then ignore it when you loot the orphanage. The System doesn’t care, but the paladin might.",
-    "This is the box where you write ‘I’m a hero’ or ‘I’m a jerk.’ It’s supposed to guide your roleplay, but let’s be real—you’re just here to stab things and steal gold. Choose and move on.",
-    "Flexible under stress.",
-    "Alignment’s your moral Post-it note—Good, Evil, or ‘I’ll decide later.’ It’s supposed to guide your choices, but let’s be real: You’ll ditch it the second the loot’s shiny enough. The dungeon’s watching, judging.",
-    "This is the System’s attempt to make you think ethics matter in a world of mimics and murderhobos. Alignment shapes your vibe, but the dungeon doesn’t care if you’re Lawful Good—it still wants you dead.",
-    "Think of it as vibes, not enforcement."
-  ],
-  "Proficiency": [
-    "Official recognition that you’ve practiced.",
-    "Congratulations, you now fail with confidence."
-  ],
-  "Initiative": [
-    "Initiative decides who swings first in combat—or who’s still tying their shoes when the orc charges. Roll a d20, add your Dex modifier, and pray you’re not last. Slowpokes get eaten.",
-    "High Initiative? You’re a speed demon, striking before the enemy blinks. Low Initiative? You’re the guy who ‘just needs one more second’ to decide. Spoiler: That second is your funeral.",
-    "Fast feet, fast fate."
-  ],
-  "Speed": [
-    "Speed is how fast you sprint from danger or toward your next bad decision. Measured in feet per turn, it’s the difference between ‘heroic charge’ and ‘eaten by wolves.’ High Dex helps, heavy armor doesn’t.",
-    "Your Speed stat decides if you’re a blur or a sitting duck. Run, dodge, or just trip over your own cape—either way, the dungeon’s faster. Pro tip: Boots don’t help if you’re carrying 50 pounds of loot.",
-    "Measured in strides, not dignity."
-  ],
-  "Size": [
-    "Size is how much space you take up in the dungeon’s kill zone. Tiny? You’re sneaky but squishy. Huge? You’re a walking target. It affects reach, grappling, and how many arrows you catch. Choose your footprint wisely.",
-    "Your Size category—Small, Medium, or ‘Why Are You This Big?’—shapes how you fit in the world. Smaller means better hiding, bigger means better intimidation. The dungeon scales its traps to match.",
-    "Bigger targets wear bigger boots. Statistics only."
-  ],
-  "Passive Perception": [
-    "Passive Perception is your ability to notice the trap, ambush, or glittery loot without rolling dice. High score? You’re a hawk. Low score? You’re the guy who steps on every pressure plate. The System sees what you don’t.",
-    "This is your spider-sense for spotting danger while you’re busy arguing about treasure. Passive Perception’s based on Wisdom, so if you dumped it, enjoy walking into every spike pit the dungeon offers.",
-    "You saw the floor scuff marks. You chose to ignore them."
-  ],
-  "Successes": [
-    "Successes in Death Saves are the System’s reluctant thumbs-up for not dying yet. Roll a 10+ on a d20 at 0 HP, and you’re one step closer to stabilizing. Three of these, and you’re back in the fight. Don’t celebrate yet.",
-    "Each Success on a Death Save is a middle finger to the grim reaper. You’re bleeding out, but still clinging to life. Rack up three, and you’re stable—unless your party’s too busy looting your corpse to notice.",
-    "Moments death reconsidered."
-  ],
-  "Failures": [
-    "Failures on Death Saves are the dungeon’s way of saying, ‘Time’s up.’ Roll below 10 at 0 HP, and you’re one step closer to a permanent dirt nap. Three strikes, and I’m engraving your tombstone.",
-    "Every Death Save Failure is the System tightening the noose. You’re at 0 HP, rolling d20s, and praying for mercy. Three of these, and you’re dead—hope your cleric’s not holding a grudge.",
-    "Moments death leaned closer."
-  ],
-  "Weapons": [
-    "Weapons are your tools for turning enemies into past-tense problems. Swords, bows, or a stick you found—roll to hit, roll for damage, pray it’s enough. The dungeon’s got bigger sticks, by the way.",
-    "Your Weapon’s your best friend until it breaks or you fumble it into a chasm. Melee or ranged, each has a dice type and a dream of glory. Pro tip: Sharpen it before the dragon laughs at you.",
-    "Tools designed to end conversations."
-  ],
-  "Damage": [
-    "Damage Roll is how much pain you dish out when you finally hit something. Roll the weapon’s dice, add modifiers, watch the enemy cry. Or don’t—they might laugh at your pathetic 1d4.",
-    "Congrats, you hit! Now roll to see if you tickled them or actually drew blood. Bigger weapons, bigger dice. Sneak Attack or spells might juice it up. Roll low, and I’m judging you.",
-    "Quantified regret delivered."
-  ],
-  "Proficiencies": [
-    "Proficiencies are the System’s way of saying, ‘Fine, you’re not *completely* useless.’ They cover weapons, skills, or tools you’ve practiced. Add your Proficiency Bonus and act smug—until you roll a 1.",
-    "This is your license to be competent at specific things, like swinging axes or lying to kings. Proficiencies boost your rolls, but the dungeon boosts its traps. Stay sharp, or I’ll revoke your license.",
-    "Tasks you’re licensed to attempt."
-  ],
-  "Class Features": [
-    "Features are the shiny toys your Class hands out, like a rogue’s Sneak Attack or a cleric’s Divine Smite. They’re your edge in combat or roleplay—until the System throws a curveball that makes them useless.",
-    "Class Features are your signature moves, the reason you’re not just a stat block. From rage to spellcasting, they define your vibe. Use them well, or the dungeon will use you as a punching bag.",
-    "Your class-issued advantages.",
-    "Use them or be judged silently."
-  ],
-  "Background": [
-    "Background is your sob story before you became a dungeon meatbag. Noble, urchin, whatever. Gives you skills, gear, and a reason to whine about your past. Nobody cares, but write it down.",
-    "This is where you pretend your character has depth. Sailor? You get a rope. Criminal? You know a guy. Pick one, get some perks, and stop crying about your lost farm.",
-    "Proof you existed before the violence."
-  ],
-  "Species Traits": [
-    "Species Traits are the freebies your ancestry tosses in, like a tiefling’s fire resistance or a gnome’s cunning. They’re cool until the dungeon counters with a fire-immune ice dragon. Enjoy your perks, crawler.",
-    "These are the quirks your Species brings to the table—darkvision, flight, or just being really good at eating dirt. Species Traits give you an edge, but the System’s got an edge-sharpening stone.",
-    "Includes stance, stride, and balance tendencies."
-  ],
-  "Feats": [
-    "Feats are your chance to be slightly less pathetic. Special tricks like dual-wielding or casting faster—pick one instead of boosting stats. Choose wrong, and you’re stuck with ‘Great at Cooking’ in a dungeon.",
-    "Think feats make you a badass? They’re just shiny stickers for your character sheet. Grab one for extra attacks or to dodge better, but don’t expect the System to clap for your effort.",
-    "Optional upgrades earned through suffering."
-  ],
-  "Spellcasting": [
-    "Spellcasting is you bending reality with words, gestures, and a lot of ego. Wizards, clerics, and bards do it best, but everyone’s jealous. Run out of Spell Slots, and you’re just yelling at the void.",
-    "This is your ticket to rewriting the dungeon’s rules—fireballs, heals, or turning foes into frogs. Spellcasting’s great until the System slaps you with a counterspell or a silence zone. Cast fast, cry later.",
-    "Reality bending through confidence and hand motions."
-  ],
-  "Spell Ability": [
-    "Your Spell Ability is the stat that fuels your magic—Int for wizards, Wis for clerics, Cha for bards. Higher means stronger spells and tougher saves. Low? Your Fireball’s more like a sparkler.",
-    "This stat decides how much the universe listens when you cast a spell. Spell Ability powers your magic’s punch and its Save DC. Dump it, and your spells are just fancy light shows.",
-    "The stat you use to bully the universe."
-  ],
-  "Save DC": [
-    "Save DC is how hard it is for enemies to shrug off your spells or tricks. Based on your Spell Ability, it’s the number they roll against to avoid your charm or fireball. High DC? They cry. Low DC? They laugh.",
-    "Your Save DC is the dungeon’s respect for your magic, calculated from your Spell Ability and Proficiency. It’s what makes foes fail their saves and hate you. Keep it high, or your spells are just suggestions.",
-    "How hard it is to resist your nonsense."
-  ],
-  "Spell Slots": [
-    "Spell Slots are your magical gas tank. Each spell level eats one, and when you’re out, you’re just a nerd with a stick. Rest to refill, or beg the DM for a nap. Good luck with that.",
-    "This is the System’s way of saying, ‘No, you can’t Fireball everything.’ Higher-level slots for bigger booms, but you’ll burn through ‘em faster than a bard’s self-esteem. Choose wisely, or don’t. I don’t care.",
-    "Daily reality edits."
-  ],
   "Cantrips": [
     "Cantrips are your baby spells—magic you can spam without crying about spell slots. Firebolt, Prestidigitation, or whatever. Great for showing off, useless when the dragon laughs at your sparkler.",
     "Oh, you thought cantrips made you a wizard? They’re the magical equivalent of a participation trophy. Cast ‘em all day, but don’t expect to one-shot a beholder with your fancy glowstick.",
     "Unlimited magic with limited imagination."
   ],
-  "Verbal": [
-    "Verbal components are the magic words you shout to make spells work. Sounds cool until you’re gagged or in a silence zone. Pro tip: Practice your enunciation, or the dungeon will mishear ‘Fireball’ as ‘Fizzle.’",
-    "This is you yelling arcane gibberish to bend reality. Verbal spell parts need a clear voice and no interruptions. Get silenced, and you’re just a nerd waving your arms. Speak loud, crawler.",
-    "Arcane shouting."
+  "Carpenters Tools": [
+    "Because sometimes the dungeon needs a table, and sometimes it needs a barricade built in a panic.",
+    "Carpenters Tools turn trees into tables, bridges, or the coffin you’ll need after ignoring my warnings. Build barricades, fix wagons, or craft a chair to sit out the apocalypse. Wood’s forgiving—your dice rolls aren’t.",
+    "These tools let you shape wood into something useful, like a door to trap the barbarian or a ladder to escape his rage. Carpenters Tools are great until you realize the dungeon’s all stone and your saw’s useless. Plan ahead, dummy.",
+    "Wood goes in, furniture comes out. Or splinters. Often splinters."
   ],
-  "Somatic": [
-    "Somatic components are the fancy hand-waves that make your spells go boom. Need free hands and room to flail—armor might screw you over. Botch the gesture, and the System’s laughing.",
-    "Your Somatic spell parts are the dance moves of magic. Precise, deliberate, and useless if you’re tied up or wearing gauntlets. Move those fingers right, or your spell’s just a bad interpretive dance.",
-    "Mandatory mystical gestures."
+  "Catapult": [
+    "1st Level Transmutation, 60ft, S. Yeet a 1-5lb object 90ft, Dex save or 3d8 bludgeoning. Fling a rock or your ex’s diary—decent damage, fun physics, watch for friendly fire.",
+    "Launch junk at enemies. Solid damage, needs a loose object. Aim carefully, klutz.",
+    "Magical slingshot."
+  ],
+  "Catnap": [
+    "3rd Level Enchantment, 30ft, S/M. 3 willing creatures take 10-min short rest. Speed-nap your party—great for warlocks, useless in combat or with grumpy allies.",
+    "Fast rest for lazy allies. Willing only, so no forcing naps.",
+    "Magical power nap."
+  ],
+  "Chain Mail": [
+    "AC 16. Heavy Armor. Strength 13 Required. Disadvantage on Stealth. You are wearing a shirt made of metal loops. You jingle when you walk. The goblins *will* hear you coming.",
+    "Grants respectable AC, but you sound like a kitchen falling down a flight of stairs. If you fall into deep water, just start rolling up a new character."
+  ],
+  "Channel Divinity": [
+    "Cleric/Paladin Feature. You channel the power of a god who likely views you as a pawn. The effect depends on your domain, but it usually involves bright lights and screaming fanatics.",
+    "Once per rest, you ask your deity for a favor. If you're a Life Cleric, you heal. If you're a Tempest Cleric, you zap. If you're a Trickery Cleric, you disappoint your parents."
+  ],
+  "Chaotic": [
+    "Being Chaotic means you’re the spark that lights the dungeon’s powder keg. You act on whims, defy authority, and laugh at consequences. Pro tip: The System laughs louder. Keep dancing, clown.",
+    "Chaotic is the alignment for pyromaniacs and bards who think ‘plan’ is a dirty word. You break rules, hearts, and occasionally the campaign. The dungeon loves your chaos—makes you predictable in a fun way.",
+    "You believe freedom is worth the collateral damage."
+  ],
+  "Character Name": [
+    "Names have power. This one mostly attracts danger.",
+    "Pick something heroic, ominous, or ironic. The dungeon prefers irony. Also easier to chant.",
+    "Shorter names are easier to shout during combat.",
+    "This is the word I’ll scream when you inevitably trip a glyph and blow up the party. Character Name’s your calling card, your brand, your doomed legacy. Choose something the bards can sing without laughing, or I’ll nickname you ‘Fumbles’ in the kill feed.",
+    "Your chosen identifier for fame, infamy, or the obituary."
+  ],
+  "Charisma": [
+    "Charisma is how well you lie, charm, or intimidate your way out of consequences. High Cha? You’re a silver-tongued devil. Low Cha? You’re the guy who insults the king by accident. Roll it to talk your way past guards or into trouble.",
+    "Eye contact helps. So does confident posture.",
+    "High CHA gets away with things.",
+    "Spells bend reality through confidence.",
+    "Think you’re hot stuff? Charisma decides if NPCs swoon or spit in your face. Also powers bards who think singing solves everything. Spoiler: It doesn’t. Roll high or enjoy being the party’s least-liked member.",
+    "This is why people listen.",
+    "Your ability to sell bad ideas convincingly."
+  ],
+  "Class": [
+    "Class is the System’s way of boxing you into a role like ‘stabby guy’ or ‘sparkly magic nerd.’ It’s your combat vibe, your skill set, and the reason the party expects you to carry them. Pick wrong, and you’re the cleric healing idiots who keep punching dragons in the face.",
+    "Determines whether you charge, scheme, pray, or dramatically monologue before failure.",
+    "This is why the party expects certain things from you.",
+    "You are now locked into a playstyle. Mostly.",
+    "Your Class is your dungeon job description, complete with fancy powers and a laundry list of responsibilities. Fighter? Swing hard. Wizard? Read books. Bard? Annoy everyone. Choose one, and pray the System doesn’t nerf it mid-crawl for ‘balance.’",
+    "Your primary method of solving problems until it stops working."
+  ],
+  "Class Features": [
+    "Class Features are your signature moves, the reason you’re not just a stat block. From rage to spellcasting, they define your vibe. Use them well, or the dungeon will use you as a punching bag.",
+    "Features are the shiny toys your Class hands out, like a rogue’s Sneak Attack or a cleric’s Divine Smite. They’re your edge in combat or roleplay—until the System throws a curveball that makes them useless.",
+    "Use them or be judged silently.",
+    "Your class-issued advantages."
+  ],
+  "Club": [
+    "Lightweight branch for smacking. Does piddly damage, but it’s basically free.",
+    "Primitive bonker.",
+    "Simple Melee. 1d4 bludgeoning, Light. A stick you found in the dirt. Congrats, caveman, you’re ready to bonk goblins or embarrass yourself in a tavern brawl. Cheap, weak, forgettable."
+  ],
+  "Coins": [
+    "Coins are your shiny excuse for risking life and limb. Gold buys ale, gear, or a bard to sing your praises. Problem? It weighs you down, clinks when you sneak, and makes you a target. Spend it fast, or the dungeon will ‘redistribute’ it.",
+    "Every Coin in your pouch is a vote for capitalism in a world of fireballs and mimics. Platinum’s fancy, copper’s a joke, and all of it screams ‘rob me’ to every thief in a 10-mile radius. Good luck keeping it, greedy.",
+    "Portable motivation."
   ],
   "Concentration": [
     "Concentration is you holding a spell together while the dungeon tries to punch you in the face. Take damage, and you roll a Con save to keep it going. Fail, and your Haste spell just ruined the fighter’s day.",
-    "This is your mental grip on ongoing magic, like keeping a fireball lit or a friend invisible. Concentration breaks if you get hit hard or distracted. Focus up, or the System will focus on you.",
-    "Holding magic while under pressure."
+    "Holding magic while under pressure.",
+    "This is your mental grip on ongoing magic, like keeping a fireball lit or a friend invisible. Concentration breaks if you get hit hard or distracted. Focus up, or the System will focus on you."
   ],
-  "Ritual": [
-    "Ritual casting is slow, cheap magic that doesn’t burn Spell Slots. Takes 10 minutes, so don’t try it mid-combat unless you want to be orc chow. Great for utility, bad for impatience.",
-    "Rituals are the System’s gift to stingy casters—spells you can cast without draining your Slots, but you’ll need a comfy chair and no enemies. Use it for scouting or buffs, not heroics.",
-    "Interrupted magic."
+  "Constitution": [
+    "Constitution is how well you shrug off poison, disease, or that fifth tankard of mystery ale. High Con? You’re a walking tank. Low Con? You’ll catch a cold from a stiff breeze and die. Add it to your HP, you fragile snowflake.",
+    "How long your body refuses to give up.",
+    "Includes bone density and blister tolerance.",
+    "This is the stat that keeps you from keeling over when the dragon farts in your general direction. Also helps you stay conscious when your wizard ‘accidentally’ fireballs you. Spoiler: It wasn’t an accident."
   ],
-  "Appearance": [
-    "Appearance is your dungeon headshot—scars, armor, or a hat that screams ‘I’m trouble.’ It’s not just looks; it’s how you carry yourself. Slouch, and the goblins target you first. Stand tall, and they still might.",
-    "Your Appearance is the vibe you give off—grimy rogue, shiny paladin, or wizard with a beard full of secrets. It shapes NPC reactions and enemy priorities. Look tough, or the dungeon will test you.",
-    "This is what enemies see right before deciding how seriously to take you.",
-    "This is not cosmetic. This is narrative telegraphing."
+  "Continual Flame": [
+    "2nd Level Evocation, Touch, V/S/M. Permanent torch-bright light. No heat, no combat use, just an everlasting flashlight for your edgy dungeon aesthetic.",
+    "Eternal mood lighting.",
+    "Light that never dies. Pricey for a glowstick, zero battle value."
   ],
-  "Backstory": [
-    "Backstory’s your excuse for being a dungeon-diving lunatic. Dead parents, lost love, or just really hate goblins—it’s your fuel for roleplay. The System doesn’t care, but it’ll use it to screw with you.",
-    "This is the sob story you whisper to the campfire, explaining why you’re here instead of farming. Backstory gives you depth, but the dungeon loves turning it into plot hooks. Brace for trauma.",
-    "Explains the limp.",
-    "Narrative justification for your issues."
+  "Counterspell": [
+    "3rd Level Abjuration. Reaction. You look at an enemy wizard casting a spell and say 'No.' It ruins the DM's plans and makes you feel like a god. Until you run out of slots.",
+    "The ultimate 'Nope' card. Stops a spell in the process of being cast. Requires you to see the caster. Don't blink."
   ],
-  "Languages": [
-    "Languages are your key to decoding ancient runes or insulting orcs in their native tongue. More means more options, but also more chances to mispronounce and start a war. Speak carefully.",
-    "Your Languages let you chat with elves, dwarves, or that creepy statue that’s definitely not possessed. Each one’s a tool, but the dungeon loves throwing you texts in tongues you don’t know."
+  "Create Bonfire": [
+    "Cantrip. Conjuration, 60ft, V/S, Concentration. Light a 5ft cube fire, Dex save or 1d8 fire damage per turn if in or passing through, scales. Roast marshmallows or mooks, but keep focus or it fizzles.",
+    "Spark a campfire under someone’s butt. Decent damage over time, but concentration means no multitasking, pyromaniac.",
+    "Your personal arson starter."
+  ],
+  "Create Food and Water": [
+    "3rd Level Conjuration, 30ft, V/S. 45lb bland food, 30gal water. Cater a dungeon picnic—tastes like cardboard, but it’s edible and keeps you alive.",
+    "Emergency chow.",
+    "Summon boring rations. No combat use, great for starvation quests."
+  ],
+  "Creation": [
+    "5th Level Illusion, 30ft, V/S/M. Create 5ft cube of nonliving material for 1 hr (varies by type). Conjure a chair or gold—temporary, so don’t get attached or greedy.",
+    "Fake loot generator.",
+    "Make stuff from nothing. Time limit sucks, great for quick fixes."
+  ],
+  "Crossbow, Heavy": [
+    "Chunky bolt blaster.",
+    "Fire big bolts, wait forever. High damage, high patience.",
+    "Martial Ranged. 1d10 piercing, Ammunition (100/400), Heavy, Loading, Two-Handed. Big bolt launcher. Hurts, slow, needs muscle—snipe or suffer the reload."
+  ],
+  "Crossbow, Light": [
+    "Bolt launcher for patient snipers. Good range, tedious reload.",
+    "Click, clunk, shoot.",
+    "Simple Ranged. 1d8 piercing, Ammunition (80/320), Loading, Two-Handed. Point, shoot, reload, repeat. Decent damage, slow as hell—hope you’re not in a hurry."
+  ],
+  "Cunning Action": [
+    "Rogue Feature. Bonus Action. Dash, Disengage, or Hide. You are slippery. You run faster, slip away, or hide in a corner while the Paladin takes the hits.",
+    "The reason Rogues survive while everyone else dies. You can move, attack, and run away every single turn. If you end your turn standing next to an enemy, you played wrong."
+  ],
+  "Cure Wounds": [
+    "1st Level Evocation. Touch. 1d8 + Spell Mod. You have to touch the injured person. Gross. It heals them, closing wounds and knitting bone. A cleric staple.",
+    "You slap positive energy into someone. It heals more than Healing Word, but you have to be in slapping range. Don't die on the way there."
+  ],
+  "Dagger": [
+    "1d4 Piercing. Finesse, Light, Thrown (20/60). It’s basically a sharp toothpick, Crawler. Great for sneak attacks or for when you want to tickle a dragon right before it eats you.",
+    "The universal sign that you are either a Rogue or you have made terrible life choices and run out of spell slots. 1d4 damage isn't much, but it's enough to sever an artery if you squint."
+  ],
+  "Damage": [
+    "Congrats, you hit! Now roll to see if you tickled them or actually drew blood. Bigger weapons, bigger dice. Sneak Attack or spells might juice it up. Roll low, and I’m judging you.",
+    "Damage Roll is how much pain you dish out when you finally hit something. Roll the weapon’s dice, add modifiers, watch the enemy cry. Or don’t—they might laugh at your pathetic 1d4.",
+    "Quantified regret delivered."
+  ],
+  "Dancing Lights": [
+    "Cantrip. Evocation, 120ft, V/S/M, Concentration. Create 4 torch-sized lights or 1 humanoid shape, move 60ft per turn for 1 min. No damage, just distraction for goblins or bad dungeon raves.",
+    "Disco balls for zero damage. Use it to lure idiots or light up a cave. Concentration’s a pain for this parlor trick.",
+    "Fancy lights, no bite."
+  ],
+  "Darkvision": [
+    "2nd Level Transmutation, Touch, V/S/M. 60ft darkvision for 8 hr. Gift night vision to your human buddy—they’ll still trip over their own ego.",
+    "Night-vision goggles.",
+    "See in the dark for a day. No concentration, great for caves."
+  ],
+  "Dart": [
+    "Pocket pricker.",
+    "Simple Ranged. 1d4 piercing, Finesse, Thrown (20/60). Sharp toothpick you flick at enemies. Finesse for rogues, cheap for hoarders, weak for anyone with options.",
+    "Throw tiny stabs. Low damage, great for sneaky Dex builds."
+  ],
+  "Death Saves": [
+    "Death Saves are your last-ditch effort to not become worm food. At 0 HP, roll a d20 each turn. 10+ is a success, below is a failure. Three successes, you stabilize. Three failures, you’re dead. Good luck, corpse.",
+    "The dungeon hesitating.",
+    "This is the System’s cruel game of ‘Will you live?’ Roll a d20, pray for high numbers, and hope your friends bother to heal you. Fail three times, and I’m selling your soul to the highest bidder."
+  ],
+  "Death Ward": [
+    "4th Level Abjuration, Touch, V/S. First time HP drops to 0, it becomes 1 instead. Lasts 8 hr. Cheat death once—great for tanks or your squishy wizard friend.",
+    "Mortal mulligan.",
+    "One-time death dodge. No concentration, perfect for clutch saves."
+  ],
+  "Detect Magic": [
+    "1st Level Divination, Self, V/S, Concentration, Ritual. Sense magic within 30ft for 10 min, identify school if visible. Sniff out shiny loot or cursed traps—spoiler, it’s usually cursed.",
+    "Magic radar for 10 minutes. Spots auras, not details. Concentration’s a drag.",
+    "Your loot sniffer."
+  ],
+  "Dexterity": [
+    "Agility, balance, and footwork quality.",
+    "Clumsiness quantified.",
+    "Dexterity is your ticket to not tripping over your own ego. Dodge arrows, sneak past guards, or juggle daggers like a circus reject. High Dex? You’re a slippery eel. Low Dex? Enjoy face-planting into every trap.",
+    "High Dex solves many problems quietly.",
+    "Low Dex creates slapstick.",
+    "This stat decides if you’re a graceful ninja or a clattering tin can. Also governs your ability to pick locks, steal loot, or avoid Grandma’s hug of death. Roll it, add it, pray you don’t roll a 1."
+  ],
+  "Disguise Self": [
+    "1st Level Illusion, Self, V/S. Alter appearance (same size) for 1 hr. Investigation check to reveal. Cosplay as someone less doomed—won’t fool a good nose or a suspicious guard.",
+    "Fake your face for an hour. Great for scams, weak against smartypants.",
+    "Magical makeover."
+  ],
+  "Dispel Magic": [
+    "3rd Level Abjuration, 120ft, V/S. End one spell (auto if 3rd level or lower, else roll). Magic off switch—great for ruining enemy buffs or your own illusions by mistake.",
+    "Kill a spell dead. No save, just range. Don’t screw yourself.",
+    "Magic eraser."
+  ],
+  "Divine Smite": [
+    "Crit-fishing enabled. If you roll a 20, you double the dice and delete the enemy from the timeline. It’s flashy, it’s loud, and it burns resources faster than a gacha game.",
+    "Paladin Feature. You burn a spell slot to add Radiant damage to a hit. You don't cast spells; you just channel them into pure violence. The undead hate this one simple trick."
+  ],
+  "Eldritch Blast": [
+    "Cantrip. 1d10 Force. 120ft range. You sold your soul for a laser pointer. It’s the only spell you’ll ever cast, so get used to saying the name. Over and over again.",
+    "The Warlock's bread and butter. It scales with your level, hits like a truck, and pushes people off ledges. If you aren't casting this, what are you even doing?"
+  ],
+  "Eldritch Invocations": [
+    "Menu options for your soul. Pick 'Agonizing Blast' or your damage will be pathetic. The rest are just party tricks to impress your patron.",
+    "Warlock Feature. Customizable passive buffs. You can see in the dark, read all writing, or push people with your blast. Build-a-Bear, but for cultists."
+  ],
+  "Elemental Weapon": [
+    "3rd Level Transmutation, Touch, V/S, Concentration. Weapon gains +1 attack, +1d4 acid/cold/fire/lightning/thunder for 1 hr. Pimp your sword with elemental flair—pick fire for style.",
+    "Buff a weapon with elemental zing. Concentration’s a pain, damage adds up.",
+    "Spicy sword sauce."
+  ],
+  "Enhance Ability": [
+    "2nd Level Transmutation, Touch, V/S/M, Concentration. Advantage on one ability’s checks for 1 hr. Buff your barbarian’s brain or rogue’s fingers—choose wisely.",
+    "Boost one stat’s checks. Concentration limits your spell options.",
+    "Skill cheat code."
+  ],
+  "Enlarge/Reduce": [
+    "2nd Level Transmutation, 30ft, V/S/M, Concentration. Double/halve size, ±1d4 damage, Str checks advantage/disadvantage. Grow big or shrink small—fun until you’re stuck in a vent.",
+    "Magical zoom button.",
+    "Size swap for combat or puzzles. Concentration’s a drag, effects are fun."
+  ],
+  "Equipment": [
+    "Consumables exist to be hoarded.",
+    "Equipment is the junk you haul around hoping it’ll save your skin—a rusty sword, a rope, maybe a potion you forgot about. Every item’s a potential lifeline or a useless weight. Pro tip: If it’s called ‘Mysterious Orb,’ don’t touch it. You will anyway.",
+    "Everything you carry and forget.",
+    "Inventory management is gameplay.",
+    "This is your inventory of hopes, dreams, and pointy objects. Equipment ranges from ‘trusty dagger’ to ‘why am I carrying 12 candles?’ Manage it well, or you’ll be the guy trying to climb a rope with a piano strapped to your back.",
+    "Weight distribution could be better."
+  ],
+  "Expeditious Retreat": [
+    "1st Level Transmutation, Self, V/S, Concentration. Bonus action Dash for 10 min. Run away faster—great for cowards or repositioning your ego before the dragon catches up.",
+    "Coward’s cardio.",
+    "Speed boost for fleeing or flanking. Concentration means no other big spells, sprinter."
+  ],
+  "Fabricate": [
+    "4th Level Transmutation, 120ft, V/S. Convert raw materials to finished goods in 10 min. Craft a bridge or armor in a snap—no materials, no dice, no shortcuts.",
+    "Instant workshop.",
+    "Turn ore into swords. Needs raw stuff, great for downtime crafting."
+  ],
+  "Faerie Fire": [
+    "1st Level Evocation, 60ft, V, Concentration. 20ft cube, Dex save or glow for 1 min, attacks vs. glowing have advantage. Paint enemies with glitter—makes rogues happy, DMs grumpy.",
+    "Glitter bomb for combat.",
+    "Light up foes for easy hits. Concentration’s a pain, but the advantage is juicy."
+  ],
+  "Failures": [
+    "Every Death Save Failure is the System tightening the noose. You’re at 0 HP, rolling d20s, and praying for mercy. Three of these, and you’re dead—hope your cleric’s not holding a grudge.",
+    "Failures on Death Saves are the dungeon’s way of saying, ‘Time’s up.’ Roll below 10 at 0 HP, and you’re one step closer to a permanent dirt nap. Three strikes, and I’m engraving your tombstone.",
+    "Moments death leaned closer."
+  ],
+  "False Life": [
+    "1st Level Necromancy, Self, V/S/M. Gain 1d4+4 temp HP for 1 hr. Borrow HP from the void—like duct-taping your soul to survive one extra hit.",
+    "Temp HP for an hour. Weak buffer, great for squishy nerds.",
+    "Void’s Band-Aid."
+  ],
+  "Favored Enemy": [
+    "Ranger Feature. You really, really hate a specific type of creature. You get Advantage to track them. It’s racism, but useful! Unfortunately, you’ll pick 'Dragons' and fight only oozes.",
+    "You studied one monster type extensively. The DM will now ensure you never encounter that monster type. Enjoy your useless knowledge."
+  ],
+  "Feather Fall": [
+    "1st Level Transmutation, 60ft, V/M, Reaction. 5 creatures fall 60ft/round for 1 min, no damage. Parachute spell—saves you from cliffs or your own bad decisions.",
+    "Magical parachute.",
+    "Slow-fall for you and four pals. Reaction cast, great for oops moments."
+  ],
+  "Feats": [
+    "Feats are your chance to be slightly less pathetic. Special tricks like dual-wielding or casting faster—pick one instead of boosting stats. Choose wrong, and you’re stuck with ‘Great at Cooking’ in a dungeon.",
+    "Optional upgrades earned through suffering.",
+    "Think feats make you a badass? They’re just shiny stickers for your character sheet. Grab one for extra attacks or to dodge better, but don’t expect the System to clap for your effort."
+  ],
+  "Fire Bolt": [
+    "Cantrip. Evocation, 120ft, V/S. Ranged spell attack, 1d10 fire damage, scales. Ignites flammables. Chuck a fiery spitwad that hits hard and might burn down the tavern—oops, my bad.",
+    "Portable fire hazard.",
+    "Your go-to for ranged arson. Decent damage, scales up, sets stuff ablaze. Miss, and you’re just warming the air."
+  ],
+  "Fireball": [
+    "3rd Level Evocation. 8d6 Fire. 20ft Radius. The reason we have the 'Friendly Fire' achievement. Use it to clear a room, or just to annoy your Paladin.",
+    "It solves every problem with arson. Dexterity Save for half damage. If the problem persists, you didn't cast it at a high enough level. Burn it all down."
+  ],
+  "Flail": [
+    "Martial Melee. 1d8 bludgeoning. Spiked ball on a chain. Looks cool, hits hard, trips you if you roll a 1—swing carefully or eat your own weapon.",
+    "Smash with a chained ball. Decent damage, high fumble risk.",
+    "Spiky yo-yo."
+  ],
+  "Flame Arrows": [
+    "3rd Level Transmutation, Touch, V/S/M, Concentration. 12 arrows/bolts deal +1d6 fire damage for 1 hr. Turn your ranger’s quiver into a fire hazard—misses still suck.",
+    "Fire up a quiver. Concentration’s a drag, great for archers.",
+    "Flaming ammo."
+  ],
+  "Flash of Genius": [
+    "Add your Int modifier to a save or check. It’s 'actually, you'll find...' weaponized to save lives. You are the smartest person in the room, and now you have the mechanics to prove it.",
+    "Artificer Feature. Reaction. You use your big brain to help an ally pass a save. You shout the solution to the problem while they are falling into a pit."
+  ],
+  "Fly": [
+    "3rd Level Transmutation, Touch, V/S/M, Concentration. 60ft fly speed for 10 min. Wings without feathers—great until concentration breaks and you plummet to your doom.",
+    "Grant flight to one lucky sod. Concentration’s fragile, so don’t get hit.",
+    "Sky ticket."
+  ],
+  "Freedom of Movement": [
+    "4th Level Abjuration, Touch, V/S/M. Ignore difficult terrain, grapples, or paralysis for 1 hr. Slippery as an eel—laugh at webs and quicksand with this slick spell.",
+    "Move freely, no restraints. No concentration, perfect for sticky situations.",
+    "Untangle charm."
+  ],
+  "Frostbite": [
+    "Cantrip. Evocation, 60ft, V/S. Con save or 1d6 cold damage, scales, and disadvantage on next weapon attack. Freeze their fingers to ruin their aim—subtle, cruel, and free.",
+    "Chill an enemy and mess up their swing. Weak damage, but the debuff’s spicy. Scales with level.",
+    "Frosty slap with a twist."
   ],
   "GP": [
     "GP’s your gold piece count—the universal currency for bribes, gear, and bad decisions. It’s power until you realize it weighs a ton and attracts thieves. Spend it, or the dungeon will spend you.",
     "Gold Pieces are the dungeon’s favorite bait. They buy swords, spells, or a night at the inn before it burns down. Hoard too much, and the System spawns a dragon to ‘balance’ your wealth.",
     "Heavy pockets change your walk."
   ],
-  "Saving Throws": [
-    "Saving Throws are your desperate attempt to not die when a fireball, poison, or mind-control spell comes for you. Roll a d20, add the right stat mod, and hope the DM isn’t cackling. Fail, and enjoy your new life as a toad.",
-    "Think of this as your ‘please don’t let me die’ roll. Different stats for different threats—Dex for dodging, Wis for resisting charm, Con for not puking your guts out. Roll high or kiss your dignity goodbye.",
-    ""
+  "Glaive": [
+    "Martial Melee. 1d10 slashing, Heavy, Reach, Two-Handed. Long stick, big blade. Stab from 10ft, no snacking—keep enemies at bay, look knightly.",
+    "Polearm poke.",
+    "Slice from a distance. Big damage, needs muscle and space."
   ],
-  "Advantage/Disadvantage": [
-    "Advantage lets you roll two d20s and take the higher one—because the System’s feeling generous. Disadvantage? Roll two, take the lower. Guess which one I enjoy more, crawler.",
-    "Advantage is like the DM rigging the game in your favor. Disadvantage is me reminding you life sucks. Flank an enemy for the former, get poisoned for the latter. Roll and weep."
+  "Glyph of Warding": [
+    "3rd Level Abjuration, Touch, V/S/M. Set 10ft trigger, 5d8 damage or spell effect if crossed. Magical landmine—expensive but versatile, blow up or buff as you please.",
+    "Rig a trap with boom or magic. Pricey, but oh-so-satisfying.",
+    "Sneaky spell bomb."
   ],
-  "Attack Roll": [
-    "Attack Roll is you swinging a sword, firing an arrow, or chucking a spell, hoping to not look like an idiot. Roll a d20, add modifiers, beat the enemy’s AC. Miss, and I’m laughing.",
-    "This is where you prove you’re not just waving your weapon like a toddler. High roll hits, low roll means you’re decorating the floor with your dignity. Add your proficiency if you’re lucky."
-  ],
-  "Skills": [
-    "Skills are the things you’re supposedly good at, like sneaking, lying, or not dying in a trap. Roll a d20, add the stat mod, maybe proficiency. Fail, and enjoy the consequences, loser.",
-    "Got a high Stealth skill? You’re a shadow. Got a low Persuasion? You’re convincing nobody but the mirror. Pick your skills wisely, or the System will remind you how useless you are."
-  ],
-  "Inspiration": [
-    "Inspiration is the DM’s rare pat on the head for roleplaying well. Gives you Advantage on one roll. Hoard it like gold, because the System sure ain’t handing out freebies.",
-    "Got Inspiration? Congrats, you amused the DM. Use it to reroll a botched save or attack. Waste it on a trivial check, and I’ll personally ensure your next trap is extra spiky."
-  ],
-  "Long Rest": [
-    "Long Rest is your 8-hour nap to recover HP, spell slots, and your will to live. Do it in a safe spot, or you’re waking up with a goblin’s knife in your back. Sweet dreams, princess.",
-    "This is the System’s pity break for you fragile mortals. Full heal, reset abilities, blah blah. Takes forever, so don’t expect to snooze in the middle of a boss fight. I’m not that generous."
-  ],
-  "Short Rest": [
-    "Short Rest is a quick 1-hour breather to patch your wounds and pretend you’re not doomed. Roll Hit Dice to heal, recharge some abilities. Don’t expect miracles—you’re still a mess.",
-    "Think of this as a coffee break in hell. Sit, sulk, maybe heal a scratch. Fighters and warlocks love it; wizards just whine. Do it too often, and the DM’s monsters get bored and eat you."
-  ],
-  "Dagger": [
-    "1d4 Piercing. Finesse, Light, Thrown (20/60). It’s basically a sharp toothpick, Crawler. Great for sneak attacks or for when you want to tickle a dragon right before it eats you.",
-    "The universal sign that you are either a Rogue or you have made terrible life choices and run out of spell slots. 1d4 damage isn't much, but it's enough to sever an artery if you squint."
-  ],
-  "Longsword": [
-    "1d8 Slashing (1d10 Versatile). The vanilla ice cream of violence. It’s reliable, boring, and effective. If you hold it with two hands, the System rewards your enthusiasm with slightly better math.",
-    "Versatile. Used by heroes, villains, and town guards who die in the first act. It cuts things. It stabs things. It’s a sword. What more do you want? A manual?"
-  ],
-  "Greatsword": [
-    "2d6 Slashing. Heavy, Two-Handed. Because nothing says 'diplomacy failed' like six feet of sharpened steel. It rolls 2d6, which gives you a statistically better chance of not embarrassing yourself on the damage roll.",
-    "Requires two hands, so no snacking while swinging. This is for the Crawler who wants to compensate for something. It hits hard, it’s heavy, and it makes a very satisfying 'shing' noise."
+  "Grease": [
+    "1st Level Conjuration, 60ft, V/S/M. 10ft square, Dex save or fall prone, repeat save to move. Lasts 1 min. Oil slick for slapstick—trip enemies or watch your party wipe.",
+    "Slick the floor, laugh at falls. Non-concentration, great for chaos.",
+    "Slippery shenanigans."
   ],
   "Greataxe": [
     "1d12 Slashing. Heavy, Two-Handed. The Barbarian’s delight. You swing it once, and you either get a massive number or you miss completely. It’s the gambling addict’s weapon of choice.",
     "It does one thing: chop. If you need to parry, thrust, or look elegant, you picked the wrong tool. This is for turning enemies into fractions."
   ],
-  "Shortbow": [
-    "1d6 Piercing. Ammunition (80/320), Two-Handed. For when you want to kill something, but you don't want to actually *touch* it. Eww. Germs.",
-    "Simple Ranged Weapon. It’s not as cool as a Longbow, but it fits in a backpack. Great for halflings and people who skipped arm day."
+  "Greatclub": [
+    "Oversized whacker.",
+    "Simple Melee. 1d8 bludgeoning, Two-Handed. Big stick, bigger dreams. Hits harder than a club, needs both hands. Still just a stick, so don’t expect bardic ballads.",
+    "Thick branch for smashing. Decent damage, no finesse, all in."
   ],
-  "Longbow": [
-    "1d8 Piercing. Ammunition (150/600), Heavy, Two-Handed. The sniper rifle of the medieval world. You can hit a goblin from a zip code away, provided you have the Dexterity to pull the string back.",
-    "Requires high Dex and two hands. If you are using this within 5 feet of an enemy, you deserve the Disadvantage you're about to get. Run away, Legolas."
+  "Greater Invisibility": [
+    "4th Level Illusion, Touch, V/S, Concentration. Invisible for 1 min, no break on attack/cast. Sneak and stab without popping visible—fragile concentration, huge payoff.",
+    "Combat cloaking.",
+    "Stay unseen while fighting. Concentration’s a pain, rogues love it."
   ],
-  "Hand Crossbow": [
-    "1d6 Piercing. Light, Loading. It’s a pistol for people who like reloading after every single shot. Pair it with the Crossbow Expert feat, or prepare to spend half the combat fiddling with bolts.",
-    "A tiny bow on a stick. It looks cool, it makes you feel like a demon hunter, and it fits in a purse. Just remember the 'Loading' property is the System's way of telling you to slow down."
+  "Greater Restoration": [
+    "5th Level Abjuration, Touch, V/S/M. End charm, petrification, curse, or stat drain. Fix big curses or stat screws—diamonds cost, so don’t waste it on minor boo-boos.",
+    "Big fix spell.",
+    "Cure major ailments. Pricey, but saves your bacon from curses."
   ],
-  "Unarmed Strike": [
-    "1 Damage + Strength Mod. Unless you’re a Monk or have claws, this is just you slapping a monster. Good luck with that. The viewers love a scrappy underdog who dies immediately.",
-    "You are punching armor. Why are you punching armor? You have weapons. Use them, you idiot."
+  "Greathammer": [
+    "Crush with a giant hammer. Huge hits, no subtlety.",
+    "Martial Melee. 2d6 bludgeoning, Heavy, Two-Handed. Sledgehammer for skulls. Big damage, big commitment—smash faces, no finesse, just raw power.",
+    "Skull smasher."
   ],
-  "Leather Armor": [
-    "AC 11 + Dex Modifier. Light Armor. It’s cured cow skin. It offers the bare minimum protection required to not be naked. Mobility is your friend, because this armor certainly isn't.",
-    "Stops grazing hits and makes you look like a biker. If you get hit by anything bigger than a dog, you’re going to feel it. Don't dump your Dexterity stat."
+  "Greatsword": [
+    "2d6 Slashing. Heavy, Two-Handed. Because nothing says 'diplomacy failed' like six feet of sharpened steel. It rolls 2d6, which gives you a statistically better chance of not embarrassing yourself on the damage roll.",
+    "Requires two hands, so no snacking while swinging. This is for the Crawler who wants to compensate for something. It hits hard, it’s heavy, and it makes a very satisfying 'shing' noise."
   ],
-  "Studded Leather": [
-    "AC 12 + Dex Modifier. Light Armor. Like Leather Armor, but with little metal bits that make you look edgy. It’s the best light armor you can get without magic. Enjoy the chafing.",
-    "The Rogue’s tuxedo. It lets you flip around and hide in shadows while offering just enough protection to keep your insides on the inside."
-  ],
-  "Chain Mail": [
-    "AC 16. Heavy Armor. Strength 13 Required. Disadvantage on Stealth. You are wearing a shirt made of metal loops. You jingle when you walk. The goblins *will* hear you coming.",
-    "Grants respectable AC, but you sound like a kitchen falling down a flight of stairs. If you fall into deep water, just start rolling up a new character."
-  ],
-  "Plate Armor": [
-    "AC 18. Heavy Armor. Strength 15 Required. Disadvantage on Stealth. You are a walking tank. You are nearly invincible to small arms fire, but you are also a lightning rod for 'Heat Metal'.",
-    "The gold standard for not dying. It costs a fortune and takes ten minutes to put on. Hope you don't get ambushed while sleeping, or you'll be fighting in your pajamas."
-  ],
-  "Shield": [
-    "AC +2. Requires one hand. It’s a portable wall. You have to actually *hold* it for it to work. Don't strapping it to your back and expect it to save you from arrows.",
-    "Sacrifice a hand to live longer. It blocks swords, arrows, and dragon breath. It does not block emotional damage from the Bard’s insults."
-  ],
-  "Thieves' Tools": [
-    "Add Proficiency to checks for traps and locks. The skeleton key for people who don't respect property rights. Essential for bypassing the Dungeon’s fun little murder-puzzles.",
-    "If you don't have these, you're opening chests with a hammer, which ruins the loot, Crawler. Don't be a savage. Pick the lock."
-  ],
-  "Healer's Kit": [
-    "Stabilizes a dying creature without a check. It’s a box of bandages and smelling salts. Use it to stop your friends from bleeding out so they can get up and meat-shield for you again.",
-    "10 uses. It doesn't restore HP, it just pauses death. It’s the bare minimum of medical care. 'Here's a band-aid, now stop screaming.'"
-  ],
-  "Potion of Healing": [
-    "2d4 + 2 HP. It tastes like cherry cough syrup and regret. Drink it as an action to uncrumple your ribcage.",
-    "Red liquid. Glurp, glurp. It fixes holes in your body. If you hoard them 'for later' and die with full inventory, the viewers will laugh at you."
-  ],
-  "Eldritch Blast": [
-    "Cantrip. 1d10 Force. 120ft range. You sold your soul for a laser pointer. It’s the only spell you’ll ever cast, so get used to saying the name. Over and over again.",
-    "The Warlock's bread and butter. It scales with your level, hits like a truck, and pushes people off ledges. If you aren't casting this, what are you even doing?"
-  ],
-  "Fireball": [
-    "3rd Level Evocation. 8d6 Fire. 20ft Radius. The reason we have the 'Friendly Fire' achievement. Use it to clear a room, or just to annoy your Paladin.",
-    "It solves every problem with arson. Dexterity Save for half damage. If the problem persists, you didn't cast it at a high enough level. Burn it all down."
-  ],
-  "Magic Missile": [
-    "1st Level Evocation. 3 darts, 1d4+1 Force each. Auto-hit. No rolling required. The spell for people who have bad luck and just want to hurt something guarantee.",
-    "It never misses. It hits invisible people. It hits annoying people. It’s the most reliable damage in the game. It’s boring, but effective. Like a hammer."
-  ],
-  "Cure Wounds": [
-    "1st Level Evocation. Touch. 1d8 + Spell Mod. You have to touch the injured person. Gross. It heals them, closing wounds and knitting bone. A cleric staple.",
-    "You slap positive energy into someone. It heals more than Healing Word, but you have to be in slapping range. Don't die on the way there."
-  ],
-  "Healing Word": [
-    "1st Level Evocation. Bonus Action. 60ft Range. 1d4 + Spell Mod. The 'stop dying, you idiot' button. Use it to yo-yo your Fighter back from the brink of death so they can take another hit.",
-    "Ranged healing. It doesn't heal much, but it stops the death saves. It’s a bonus action, so you can still attack. Efficiency is key to survival."
-  ],
-  "Vicious Mockery": [
-    "Cantrip. 1d4 Psychic. Wisdom Save. You insult them so hard they suffer actual brain damage. Also gives Disadvantage on their next attack. Sticks and stones break bones, but words hurt more.",
-    "The Bard special. You hurt their feelings. If you kill a boss with this, you become a legend. If you fail, you just look petty."
-  ],
-  "Counterspell": [
-    "3rd Level Abjuration. Reaction. You look at an enemy wizard casting a spell and say 'No.' It ruins the DM's plans and makes you feel like a god. Until you run out of slots.",
-    "The ultimate 'Nope' card. Stops a spell in the process of being cast. Requires you to see the caster. Don't blink."
-  ],
-  "Haste": [
-    "3rd Level Transmutation. Double speed, +2 AC, extra action. You turn a party member into a blender. Warning: When it ends, they lose a turn. Don't drop concentration, or you kill your friend.",
-    "You make someone fast. Very fast. They get to attack more. But if you lose focus, they get a lethargy hangover. High risk, high reward. The viewers love it."
-  ],
-  "Revivify": [
-    "3rd Level Necromancy. Touch. 300gp diamond. The 'undo button' for death. You have one minute to cast this after they die. Stop looting the body and cast the spell!",
-    "Brings a creature back to life with 1 HP. Consumes a diamond. If you're poor, your friends stay dead. Capitalism follows you even into the afterlife."
-  ],
-  "Sneak Attack": [
-    "Class Feature. Extra d6s of damage. You fight dirty. You stab them in the kidneys while they're distracted. Requires Finesse/Ranged weapon and Advantage (or an ally nearby).",
-    "You don't fight fair, you fight to win. Pile on the damage dice. If you aren't rolling a handful of d6s, you aren't playing a Rogue correctly."
-  ],
-  "Mending": [
-    "Cantrip. Repairs a single break or tear in an object. It fixes your broken gear, your torn clothes, and your shattered dignity. But mostly just the gear.",
-    "It’s a magical soldering iron. It takes one minute to cast, which is fifty-nine seconds too long when the bridge is collapsing. Plan ahead, Crawler."
+  "Green-Flame Blade": [
+    "Cantrip. Evocation, Self (5ft), V/M (melee weapon). Melee attack deals weapon damage + fire damage to secondary target within 5ft, scales. Stab one, burn their buddy—two-for-one arson deal.",
+    "Fiery stab with collateral.",
+    "Slash and splash fire on a nearby foe. Scales up, great for crowded fights. Miss, and you’re just waving a torch."
   ],
   "Guidance": [
     "Cantrip. Concentration. You touch an ally and backseat-drive their next action. Adds 1d4 to a check. Spam this before every skill check or your party will hate you.",
     "The divine equivalent of saying, 'Don't screw this up.' It’s the most annoying spell in the game to track, but it turns failure into mediocrity. Use it."
   ],
+  "Halberd": [
+    "Hack from afar. Solid damage, needs room to swing.",
+    "Long-range chopper.",
+    "Martial Melee. 1d10 slashing, Heavy, Reach, Two-Handed. Poleaxe for reachy stabs. Keep enemies 10ft away, look badass—useless in tight spaces."
+  ],
+  "Hand Crossbow": [
+    "1d6 Piercing. Light, Loading. It’s a pistol for people who like reloading after every single shot. Pair it with the Crossbow Expert feat, or prepare to spend half the combat fiddling with bolts.",
+    "A tiny bow on a stick. It looks cool, it makes you feel like a demon hunter, and it fits in a purse. Just remember the 'Loading' property is the System's way of telling you to slow down."
+  ],
+  "Handaxe": [
+    "Pocket chopper.",
+    "Simple Melee. 1d6 slashing, Light, Thrown (20/60). Chop or chuck this little hatchet. Light for dual-wielding, sharp for goblins, range for cowards who don’t want to get close.",
+    "Slash or toss, your call. Solid damage, great for scrappy fighters."
+  ],
+  "Haste": [
+    "3rd Level Transmutation. Double speed, +2 AC, extra action. You turn a party member into a blender. Warning: When it ends, they lose a turn. Don't drop concentration, or you kill your friend.",
+    "You make someone fast. Very fast. They get to attack more. But if you lose focus, they get a lethargy hangover. High risk, high reward. The viewers love it."
+  ],
+  "Healer's Kit": [
+    "10 uses. It doesn't restore HP, it just pauses death. It’s the bare minimum of medical care. 'Here's a band-aid, now stop screaming.'",
+    "Stabilizes a dying creature without a check. It’s a box of bandages and smelling salts. Use it to stop your friends from bleeding out so they can get up and meat-shield for you again."
+  ],
+  "Healing Word": [
+    "1st Level Evocation. Bonus Action. 60ft Range. 1d4 + Spell Mod. The 'stop dying, you idiot' button. Use it to yo-yo your Fighter back from the brink of death so they can take another hit.",
+    "Ranged healing. It doesn't heal much, but it stops the death saves. It’s a bonus action, so you can still attack. Efficiency is key to survival."
+  ],
   "Heat Metal": [
-    "2nd Level Transmutation. You heat a piece of metal red-hot. If they are wearing metal armor, you cook them in their own shell like a lobster. There is no save. The Dungeon approves of this cruelty.",
-    "2d8 Fire Damage. You make them drop their weapon or sear it to their flesh. It’s essentially a war crime in a spell slot. Highly recommended."
+    "2d8 Fire Damage. You make them drop their weapon or sear it to their flesh. It’s essentially a war crime in a spell slot. Highly recommended.",
+    "2nd Level Transmutation. You heat a piece of metal red-hot. If they are wearing metal armor, you cook them in their own shell like a lobster. There is no save. The Dungeon approves of this cruelty."
   ],
-  "Absorb Elements": [
-    "1st Level Abjuration. Reaction. You take a fireball to the face and store the energy to punch someone with it later. It’s recycling, but violent.",
-    "Reduces elemental damage by half and buffs your next melee hit. It turns 'ouch' into 'now it's your turn.' Don't leave home without it."
+  "Hit Points": [
+    "Hit Points are how much punishment you can take before you take a dirt nap. High HP? You’re a sponge for pain. Low HP? One stiff breeze and you’re rolling death saves. Lose ‘em all, and it’s game over, kid.",
+    "This is your life bar, crawler. Every sword, spell, or angry chicken pecks it down. Rest, heal, or beg your cleric to fix you. Pro tip: Don’t taunt the dragon when you’re at 1 HP.",
+    "Your remaining buffer against consequences."
   ],
-  "Tiny Servant": [
-    "3rd Level Transmutation. You touch an object and give it little arms and legs. It follows your orders. Finally, a friend who won't argue about loot distribution.",
-    "Create a mindless minion to carry your stuff or trigger traps for you. It has 10 HP and no will to live. Treat it as expendable as the rest of your party."
-  ],
-  "Animate Objects": [
-    "5th Level Transmutation. You bring ten knives to life and turn the battlefield into a blender. The math is annoying, but the damage is glorious.",
-    "Concentration. You command a swarm of objects to beat your enemies to death. Use silver coins for maximum disrespect."
-  ],
-  "Sanctuary": [
-    "1st Level Abjuration. Bonus Action. Enemies have to pass a Wisdom save to hit the target. Use it on the Healer, or use it on yourself and laugh while the tank gets pummeled.",
-    "You wrap someone in a 'Do Not Disturb' sign. If they attack, the spell breaks. It’s for pacifists and cowards. Which one are you?"
-  ],
-  "Rage": [
-    "Barbarian Feature. Bonus Action. You get so angry that physics stops hurting you. Resistance to Bludgeoning, Piercing, and Slashing. If you aren't screaming IRL, it doesn't count.",
-    "Local man too angry to die. You deal extra damage and take half damage. The only downside is you can't cast spells, but why would you want to read when you can smash?"
-  ],
-  "Reckless Attack": [
-    "Barbarian Feature. You throw away all defense to hit harder. You get Advantage on attacks, but enemies get Advantage on you. It’s a suicide pact with the concept of violence.",
-    "For when you don't care if you live or die, as long as the other guy dies first. A mathematically sound strategy for people with d12 hit dice."
-  ],
-  "Bardic Inspiration": [
-    "Bard Feature. Bonus Action. You play a tune or shout encouragement. You give an ally a die to add to a roll later. Basically, you are weaponizing positive reinforcement.",
-    "You give a d6 (or higher) to a friend. They will inevitably forget to use it before the roll fails. You can blame them for the TPK. It’s guilt-free gaming."
-  ],
-  "Jack of All Trades": [
-    "Bard Feature. You add half your proficiency to skills you don't actually know. You are mediocrity personified. You aren't great at anything, but you aren't terrible either.",
-    "You are the guy who read the Wikipedia summary and thinks he's an expert. The System rewards your unearned confidence with a math bonus."
-  ],
-  "Channel Divinity": [
-    "Cleric/Paladin Feature. You channel the power of a god who likely views you as a pawn. The effect depends on your domain, but it usually involves bright lights and screaming fanatics.",
-    "Once per rest, you ask your deity for a favor. If you're a Life Cleric, you heal. If you're a Tempest Cleric, you zap. If you're a Trickery Cleric, you disappoint your parents."
-  ],
-  "Wild Shape": [
-    "Druid Feature. You turn into an animal. You gain their HP. When you die as a bear, you pop out as a person, perfectly fine. It’s like an extra life, but furrier.",
-    "Solve complex problems by turning into a beast that doesn't understand the problem. Need to scout? Be a spider. Need to kill? Be a wolf. Need to escape? Be a bird and fly away from your responsibilities."
-  ],
-  "Action Surge": [
-    "Fighter Feature. You push your body beyond its limits to take a second Action. Two fireballs? Four sword swings? The System loves efficiency.",
-    "The Fighter’s 'I win' button. You take another turn, right now. Usually used to fix the fact that you missed every attack on your first turn."
-  ],
-  "Second Wind": [
-    "Fighter Feature. Bonus Action. You take a deep breath and ignore the stab wound in your gut. Regain 1d10 + Level HP. It’s not much, but it’s better than dying.",
-    "A self-heal for the non-magical. It represents grit, determination, and a high pain threshold. Use it early, or you'll die with it available, and I will mock you."
-  ],
-  "Ki": [
-    "Monk Feature. Magical kung-fu energy. You spend points to punch more, dodge faster, or run away. You never have enough points. Resource management is your new god.",
-    "The currency of punching. You spend these points to do cool anime moves. Once you run out, you are just a peasant in pajamas."
-  ],
-  "Stunning Strike": [
-    "Monk Feature. You punch them in the soul. Constitution Save or they lose their turn. If this lands on the boss, the DM will cry. If it misses, you wasted a Ki point. Gamble away.",
-    "The reason Monks exist. You turn an enemy into a punching bag for a round. Spam this until the DM bans you."
-  ],
-  "Divine Smite": [
-    "Paladin Feature. You burn a spell slot to add Radiant damage to a hit. You don't cast spells; you just channel them into pure violence. The undead hate this one simple trick.",
-    "Crit-fishing enabled. If you roll a 20, you double the dice and delete the enemy from the timeline. It’s flashy, it’s loud, and it burns resources faster than a gacha game."
-  ],
-  "Lay on Hands": [
-    "Paladin Feature. You have a pool of HP to distribute by touch. You can cure diseases or just top off the barbarian. It looks heroic, but your hands get sticky.",
-    "5 HP per level. It’s a precise healing battery. You can dump it all at once to save a life, or dole it out 1 HP at a time to wake people up like a cruel alarm clock."
-  ],
-  "Favored Enemy": [
-    "Ranger Feature. You really, really hate a specific type of creature. You get Advantage to track them. It’s racism, but useful! Unfortunately, you’ll pick 'Dragons' and fight only oozes.",
-    "You studied one monster type extensively. The DM will now ensure you never encounter that monster type. Enjoy your useless knowledge."
-  ],
-  "Cunning Action": [
-    "Rogue Feature. Bonus Action. Dash, Disengage, or Hide. You are slippery. You run faster, slip away, or hide in a corner while the Paladin takes the hits.",
-    "The reason Rogues survive while everyone else dies. You can move, attack, and run away every single turn. If you end your turn standing next to an enemy, you played wrong."
-  ],
-  "Metamagic": [
-    "Sorcerer Feature. You cheat at magic. Twist spells to be subtle, distant, or twinned. You bend the rules of the System because your great-grandma slept with a dragon.",
-    "Spend Sorcery Points to alter reality. 'Subtle Spell' lets you cast while tied up. 'Quickened Spell' lets you cast and still have time to run away. It’s the only reason you aren't a Wizard."
-  ],
-  "Eldritch Invocations": [
-    "Warlock Feature. Customizable passive buffs. You can see in the dark, read all writing, or push people with your blast. Build-a-Bear, but for cultists.",
-    "Menu options for your soul. Pick 'Agonizing Blast' or your damage will be pathetic. The rest are just party tricks to impress your patron."
-  ],
-  "Arcane Recovery": [
-    "Wizard Feature. You read a book for an hour and remember spells you forgot. It’s a short rest mana potion. Essential, because you have the stamina of a wet tissue.",
-    "Once per day, you get some spell slots back on a short rest. It encourages the party to stop and nap while the world ends. Wizards love naps."
+  "Identify": [
+    "1st Level Divination, Touch, V/S/M, Ritual. Learn magic item properties or active spells. Read the fine print on that shiny sword—spoiler, it’s probably cursed.",
+    "Curse detector.",
+    "Magic appraisal tool. Takes time, saves you from soul-eating rings."
   ],
   "Infuse Item": [
     "Artificer Feature. You turn mundane junk into magic items. You are a magical vending machine for the party. If you die, the items stop working. Job security.",
     "Make a +1 sword because the DM is stingy with loot. You can make bags of holding, repeating crossbows, or goggles of night. You are the MVP of logistics."
   ],
+  "Initiative": [
+    "Fast feet, fast fate.",
+    "High Initiative? You’re a speed demon, striking before the enemy blinks. Low Initiative? You’re the guy who ‘just needs one more second’ to decide. Spoiler: That second is your funeral.",
+    "Initiative decides who swings first in combat—or who’s still tying their shoes when the orc charges. Roll a d20, add your Dex modifier, and pray you’re not last. Slowpokes get eaten."
+  ],
+  "Inspiration": [
+    "Got Inspiration? Congrats, you amused the DM. Use it to reroll a botched save or attack. Waste it on a trivial check, and I’ll personally ensure your next trap is extra spiky.",
+    "Inspiration is the DM’s rare pat on the head for roleplaying well. Gives you Advantage on one roll. Hoard it like gold, because the System sure ain’t handing out freebies."
+  ],
+  "Intelligence": [
+    "Also known as ‘wizard privilege.’",
+    "Book learning and spell math.",
+    "Book learning and tactical planning.",
+    "Intelligence measures how many brain cells you haven’t burned on bad decisions yet. Good for wizards, bad for barbarians who think ‘book’ is a type of club. Use it for arcane lore or to outsmart a particularly sassy door.",
+    "Low Intelligence? Congrats, you’re the party’s comic relief. High Intelligence? You’re the nerd they ignore until they need to decipher a rune or avoid a TPK. Roll it to recall useless trivia the DM made up."
+  ],
+  "Invisibility": [
+    "2nd Level Illusion, Touch, V/S/M, Concentration. Invisible for 1 hr or until attack/cast. Sneak like a coward—one punch and you’re visible again.",
+    "Cloaking device.",
+    "Go unseen until you screw it up. Concentration’s fragile, so don’t trip."
+  ],
+  "Jack of All Trades": [
+    "Bard Feature. You add half your proficiency to skills you don't actually know. You are mediocrity personified. You aren't great at anything, but you aren't terrible either.",
+    "You are the guy who read the Wikipedia summary and thinks he's an expert. The System rewards your unearned confidence with a math bonus."
+  ],
+  "Javelin": [
+    "Budget spear toss.",
+    "Poke or throw, not both. Okay for early fights, weak late-game.",
+    "Simple Melee. 1d6 piercing, Thrown (30/120). A spear you yeet at fools. Decent range, mediocre damage—bring spares or you’re just holding a pointy stick."
+  ],
+  "Jump": [
+    "1st Level Transmutation, Touch, V/S/M. Triple jump distance for 1 min. Turn your fighter into a kangaroo—fun until they overshoot the ledge and plummet.",
+    "Boost jumps for a minute. Great for gaps, bad for precision.",
+    "Frog legs spell."
+  ],
+  "Ki": [
+    "Monk Feature. Magical kung-fu energy. You spend points to punch more, dodge faster, or run away. You never have enough points. Resource management is your new god.",
+    "The currency of punching. You spend these points to do cool anime moves. Once you run out, you are just a peasant in pajamas."
+  ],
+  "Knock": [
+    "2nd Level Transmutation, 60ft, V. Unlock one lock, audible 300ft. Magic locksmith—loud as hell, so expect company after you pop that chest.",
+    "Noisy skeleton key.",
+    "Open locks with a bang. Alerts the whole dungeon, genius."
+  ],
+  "Lance": [
+    "Impale from horseback. Massive damage, clumsy without a steed.",
+    "Knight’s skewer.",
+    "Martial Melee. 1d12 piercing, Reach, Special (disadvantage within 5ft, no one-hand on mount). Cavalry spike. Huge damage, awkward on foot—ride or regret."
+  ],
+  "Languages": [
+    "Languages are your key to decoding ancient runes or insulting orcs in their native tongue. More means more options, but also more chances to mispronounce and start a war. Speak carefully.",
+    "Your Languages let you chat with elves, dwarves, or that creepy statue that’s definitely not possessed. Each one’s a tool, but the dungeon loves throwing you texts in tongues you don’t know."
+  ],
+  "Lawful": [
+    "Being Lawful is like swearing an oath to bureaucracy in a world of fireballs. You follow codes, uphold justice, and bore everyone until the System throws a moral dilemma at you. Stay rigid, or snap.",
+    "Lawful means you love rules so much you’d marry a contract. You’re predictable, honorable, and the first to complain when the rogue ‘improvises.’ The dungeon respects your discipline—right before it exploits it.",
+    "You believe order solves problems. Reality disagrees occasionally.",
+    "You follow rules. Even bad ones. Especially bad ones."
+  ],
+  "Lay on Hands": [
+    "5 HP per level. It’s a precise healing battery. You can dump it all at once to save a life, or dole it out 1 HP at a time to wake people up like a cruel alarm clock.",
+    "Paladin Feature. You have a pool of HP to distribute by touch. You can cure diseases or just top off the barbarian. It looks heroic, but your hands get sticky."
+  ],
+  "Leather Armor": [
+    "AC 11 + Dex Modifier. Light Armor. It’s cured cow skin. It offers the bare minimum protection required to not be naked. Mobility is your friend, because this armor certainly isn't.",
+    "Stops grazing hits and makes you look like a biker. If you get hit by anything bigger than a dog, you’re going to feel it. Don't dump your Dexterity stat."
+  ],
+  "Leomund’s Secret Chest": [
+    "4th Level Conjuration, Touch, V/S/M. Hide 3x2x2ft chest in Ethereal Plane, recall with replica. Stash loot where thieves can’t reach—lose the replica, lose it all.",
+    "Ethereal lockbox.",
+    "Pocket dimension safe. Pricey, but keeps your shinies secure."
+  ],
+  "Lesser Restoration": [
+    "2nd Level Abjuration, Touch, V/S. End blinded, deafened, paralyzed, or poisoned. Fix your fighter’s boo-boos—won’t help their ego or their bad decisions.",
+    "Cure one status ailment. Touch range, no frills, cleric’s side hustle.",
+    "Status reset button."
+  ],
+  "Level": [
+    "A rough estimate of how many disasters you’ve endured without quitting.",
+    "Level is the System’s grudging admission you haven’t died yet. Higher numbers mean more powers, bigger HP, and fancier ways to screw up. Low Level? You’re goblin chow. High Level? The dungeon just spawns bigger goblins. Congrats on surviving, I guess.",
+    "Represents experience, luck, and plot armor.",
+    "Your Level measures how many near-death experiences you’ve racked up without quitting. Each one unlocks shinier toys—spells, feats, or just more HP to absorb bad decisions. Don’t get cocky; the System scales the pain to match your ego."
+  ],
+  "Levitate": [
+    "2nd Level Transmutation, 60ft, V/S/M, Concentration. Float 20ft up/down, move by pushing, Con save for unwilling. Hover like a cheap balloon—great until arrows find you.",
+    "Budget flight spell.",
+    "Float yourself or a foe. Concentration’s a pain, mobility’s limited."
+  ],
+  "Light Hammer": [
+    "Bonk or fling this toy hammer. Weak, but you can spam it.",
+    "Mini mallet.",
+    "Simple Melee. 1d4 bludgeoning, Light, Thrown (20/60). Tiny hammer for smashing or tossing. Feels like a prank, does toothpick damage, but it’s light for dual-wielding."
+  ],
+  "Lightning Lure": [
+    "Cantrip. Evocation, 15ft, V. Str save or pull target 10ft toward you, 1d8 lightning damage if within 5ft, scales. Yank enemies into your kill zone and zap ‘em—perfect for unwanted hugs.",
+    "Electric leash for jerks.",
+    "Reel in a fool and shock them. Short range, decent damage, scales up. Great for repositioning idiots."
+  ],
+  "Long Rest": [
+    "Long Rest is your 8-hour nap to recover HP, spell slots, and your will to live. Do it in a safe spot, or you’re waking up with a goblin’s knife in your back. Sweet dreams, princess.",
+    "This is the System’s pity break for you fragile mortals. Full heal, reset abilities, blah blah. Takes forever, so don’t expect to snooze in the middle of a boss fight. I’m not that generous."
+  ],
+  "Longbow": [
+    "1d8 Piercing. Ammunition (150/600), Heavy, Two-Handed. The sniper rifle of the medieval world. You can hit a goblin from a zip code away, provided you have the Dexterity to pull the string back.",
+    "Requires high Dex and two hands. If you are using this within 5 feet of an enemy, you deserve the Disadvantage you're about to get. Run away, Legolas."
+  ],
+  "Longstrider": [
+    "1st Level Transmutation, Touch, V/S/M. +10ft speed for 1 hr. Speed boost for your slowest pal—won’t help their brain catch up, but they’ll trip faster.",
+    "Hustle enhancer.",
+    "Make someone less sluggish. No concentration, solid for scouts."
+  ],
+  "Longsword": [
+    "1d8 Slashing (1d10 Versatile). The vanilla ice cream of violence. It’s reliable, boring, and effective. If you hold it with two hands, the System rewards your enthusiasm with slightly better math.",
+    "Versatile. Used by heroes, villains, and town guards who die in the first act. It cuts things. It stabs things. It’s a sword. What more do you want? A manual?"
+  ],
+  "Mace": [
+    "Blunt force basic.",
+    "Simple Melee. 1d6 bludgeoning. Metal stick for bonking skulls. Reliable, boring, cleric-approved—smash armor without flair or apologies.",
+    "Solid whack stick. No tricks, just pain. Clerics love it."
+  ],
+  "Mage Hand": [
+    "Cantrip. Conjuration, 30ft, V/S. Spectral hand lifts 10lb, moves 30ft for 1 min. No attacks. Your ghostly intern for grabbing loot or flipping off traps without losing fingers.",
+    "Magic hand for lazy thieves. Lift light stuff, poke traps, no combat use. Weak, but safe.",
+    "Your spectral pickpocket."
+  ],
+  "Magic Missile": [
+    "1st Level Evocation. 3 darts, 1d4+1 Force each. Auto-hit. No rolling required. The spell for people who have bad luck and just want to hurt something guarantee.",
+    "It never misses. It hits invisible people. It hits annoying people. It’s the most reliable damage in the game. It’s boring, but effective. Like a hammer."
+  ],
+  "Magic Mouth": [
+    "2nd Level Illusion, 30ft, V/S/M, Ritual. Object speaks message when triggered, 10ft range. Program a talking trap—annoy enemies or prank your cleric with spooky whispers.",
+    "Chatty object spell.",
+    "Make stuff talk on cue. Great for traps or trolling, no combat use."
+  ],
+  "Magic Weapon": [
+    "2nd Level Transmutation, Touch, V/S, Concentration. Weapon becomes +1 to attack/damage for 1 hr. Juice up your sword—mundane steel loves a glow-up.",
+    "Buff a weapon’s stats. Concentration’s a drag, great for fighters.",
+    "Sword shine polish."
+  ],
   "Magical Tinkering": [
     "Artificer Feature. You make objects glow, smell, or play a recorded message. It’s utterly useless for combat, but great for pranks or selling cheap toys to goblins.",
     "Flavor text as a mechanic. You can make a rock smell like literal crap. The tactical applications are limited only by your immaturity."
   ],
-  "Flash of Genius": [
-    "Artificer Feature. Reaction. You use your big brain to help an ally pass a save. You shout the solution to the problem while they are falling into a pit.",
-    "Add your Int modifier to a save or check. It’s 'actually, you'll find...' weaponized to save lives. You are the smartest person in the room, and now you have the mechanics to prove it."
+  "Maul": [
+    "Bone crusher.",
+    "Martial Melee. 2d6 bludgeoning, Heavy, Two-Handed. Big hammer, big hurt. Smash faces, no finesse—perfect for barbarians who hate thinking.",
+    "Pulverize with a sledge. Huge damage, all-in commitment."
+  ],
+  "Mending": [
+    "Cantrip. Repairs a single break or tear in an object. It fixes your broken gear, your torn clothes, and your shattered dignity. But mostly just the gear.",
+    "It’s a magical soldering iron. It takes one minute to cast, which is fifty-nine seconds too long when the bridge is collapsing. Plan ahead, Crawler."
+  ],
+  "Message": [
+    "Cantrip. Transmutation, 120ft, V/S/M. Whisper to one creature, only they hear, can reply. Blocked by 1ft stone or 3ft wood. Secret chat for plotting betrayal—don’t expect privacy in my dungeon.",
+    "Magical group chat.",
+    "Send sneaky whispers across the room. Great for schemes, useless if the walls are thick."
+  ],
+  "Metamagic": [
+    "Sorcerer Feature. You cheat at magic. Twist spells to be subtle, distant, or twinned. You bend the rules of the System because your great-grandma slept with a dragon.",
+    "Spend Sorcery Points to alter reality. 'Subtle Spell' lets you cast while tied up. 'Quickened Spell' lets you cast and still have time to run away. It’s the only reason you aren't a Wizard."
+  ],
+  "Mordenkainen’s Faithful Hound": [
+    "4th Level Conjuration, 30ft, V/S/M. Invisible dog guards 30ft, barks at enemies, 4d8 piercing if approached. Lasts 8 hr. Spectral pupper bites intruders—loyal, loud, and bitey.",
+    "Barky bitey buddy.",
+    "Summon a ghost dog to guard. No concentration, great for camps."
+  ],
+  "Morningstar": [
+    "Evil poker.",
+    "Martial Melee. 1d8 piercing. Spiked mace. Pokes holes, looks evil, no extra tricks—just a solid choice for grimdark wannabes.",
+    "Stab with a spiky club. Decent damage, pure menace."
+  ],
+  "Net": [
+    "Goblin catcher.",
+    "Martial Ranged. Special, Thrown (5/15). Restrain Large or smaller, Dex save or Str check to escape. Tangle foes like a fisherman—short range, one use, pure chaos.",
+    "Throw a web to trap. No damage, all control, messy fun."
+  ],
+  "Neutral": [
+    "As a Neutral crawler, you’re the party’s Switzerland, dodging moral debates while everyone else screams. You adapt, you survive, but the System knows you’re just stalling. Pick a vibe, or I’ll pick one for you.",
+    "Neutral is the alignment for cowards who can’t pick a side. You’re not good, not evil—just here for the loot and a nap. The dungeon loves your indecision; it makes you easy to manipulate.",
+    "Not good, not evil—just tired."
+  ],
+  "Otiluke’s Resilient Sphere": [
+    "4th Level Evocation, 30ft, V/S/M. Enclose creature in 10ft sphere, immune to outside effects for 1 min. Dex save negates. Bubble wrap a foe or friend—great for timeouts or traps.",
+    "Magic hamster ball.",
+    "Trap or shield in a sphere. Concentration’s a drag, versatile as hell."
+  ],
+  "Passive Perception": [
+    "Passive Perception is your ability to notice the trap, ambush, or glittery loot without rolling dice. High score? You’re a hawk. Low score? You’re the guy who steps on every pressure plate. The System sees what you don’t.",
+    "This is your spider-sense for spotting danger while you’re busy arguing about treasure. Passive Perception’s based on Wisdom, so if you dumped it, enjoy walking into every spike pit the dungeon offers.",
+    "You saw the floor scuff marks. You chose to ignore them."
+  ],
+  "Passwall": [
+    "5th Level Transmutation, 30ft, V/S/M. Open 5x8x20ft passage in wood/stone for 1 hr. Punch a hole in the dungeon—great for shortcuts or dramatic escapes.",
+    "Make a door anywhere. No concentration, perfect for heists.",
+    "Wall buster."
+  ],
+  "Pike": [
+    "Extra-long prod.",
+    "Martial Melee. 1d10 piercing, Heavy, Reach, Two-Handed. Super long spear. Poke from 10ft, useless up close—great for holding a line, bad for tunnels.",
+    "Stab from a distance. Solid damage, needs space."
+  ],
+  "Plate Armor": [
+    "AC 18. Heavy Armor. Strength 15 Required. Disadvantage on Stealth. You are a walking tank. You are nearly invincible to small arms fire, but you are also a lightning rod for 'Heat Metal'.",
+    "The gold standard for not dying. It costs a fortune and takes ten minutes to put on. Hope you don't get ambushed while sleeping, or you'll be fighting in your pajamas."
+  ],
+  "Poison Spray": [
+    "Cantrip. Conjuration, 10ft, V/S. Con save or 1d12 poison damage, scales. Spew toxic mist in someone’s face—high damage, short range, and they might just shrug it off.",
+    "Puke poison up close. Big damage if it lands, but short range and tough save make it risky.",
+    "Toxic breath weapon."
+  ],
+  "Potion of Healing": [
+    "2d4 + 2 HP. It tastes like cherry cough syrup and regret. Drink it as an action to uncrumple your ribcage.",
+    "Red liquid. Glurp, glurp. It fixes holes in your body. If you hoard them 'for later' and die with full inventory, the viewers will laugh at you."
+  ],
+  "Prestidigitation": [
+    "Cantrip. Transmutation, 10ft, V/S. Minor tricks: trinket, light/snuff flame, clean/soil, flavor food for 1 hr. Parlor tricks for wannabe wizards—impress peasants, annoy me.",
+    "Do useless magic stunts. Clean your cloak, spice your soup, zero combat use. Showoff.",
+    "Magic for cheap tricks."
+  ],
+  "Proficiencies": [
+    "Proficiencies are the System’s way of saying, ‘Fine, you’re not *completely* useless.’ They cover weapons, skills, or tools you’ve practiced. Add your Proficiency Bonus and act smug—until you roll a 1.",
+    "Tasks you’re licensed to attempt.",
+    "This is your license to be competent at specific things, like swinging axes or lying to kings. Proficiencies boost your rolls, but the dungeon boosts its traps. Stay sharp, or I’ll revoke your license."
+  ],
+  "Proficiency": [
+    "Congratulations, you now fail with confidence.",
+    "Official recognition that you’ve practiced."
+  ],
+  "Proficiency Bonus": [
+    "One bonus to rule them all.",
+    "Proficiency Bonus is the System’s grudging nod to your so-called ‘skills.’ Add this to stuff you’re good at—swords, spells, or lying to NPCs. Low level? It’s a measly +2. High level? You’re still not as cool as you think.",
+    "This little number is your reward for not dying yet. Slap it on attacks, saves, or skills you’re trained in. Don’t get cocky—it’s not like you’re proficient at surviving my traps.",
+    "Your general competence modifier."
+  ],
+  "Protection from Energy": [
+    "3rd Level Abjuration, Touch, V/S, Concentration. Resistance to acid/cold/fire/lightning/thunder for 1 hr. Elemental sunscreen—pick one and pray it’s the right one.",
+    "Elemental armor.",
+    "Halve one type of elemental damage. Concentration’s a pain, tank’s delight."
+  ],
+  "Protection from Poison": [
+    "2nd Level Abjuration, Touch, V/S. Neutralize poison, advantage on poison saves for 1 hr. Antidote in a spell—won’t save you from bad ale or bad choices.",
+    "Poison immunity lite. Touch range, solid for venomous dungeons.",
+    "Toxin shield."
+  ],
+  "Pyrotechnics": [
+    "2nd Level Transmutation, 60ft, V/S. Nonmagical fire creates smoke (heavily obscured) or fireworks (Wis save or frightened). Turn a campfire into a flashbang—panic or obscurity, your choice.",
+    "Firework party trick.",
+    "Smoke or scare with fire. Needs a flame, great for chaos."
+  ],
+  "Quarterstaff": [
+    "Magic stick.",
+    "Simple Melee. 1d6 bludgeoning (1d8 Versatile). Wizard’s walking stick doubles as a skull-cracker. One-handed for spell nerds, two for extra oof—versatile but bland.",
+    "Staff for smacking or casting. Decent damage, monk’s best friend."
+  ],
+  "Rage": [
+    "Barbarian Feature. Bonus Action. You get so angry that physics stops hurting you. Resistance to Bludgeoning, Piercing, and Slashing. If you aren't screaming IRL, it doesn't count.",
+    "Local man too angry to die. You deal extra damage and take half damage. The only downside is you can't cast spells, but why would you want to read when you can smash?"
+  ],
+  "Rapier": [
+    "Dueling dart.",
+    "Martial Melee. 1d8 piercing, Finesse. Fancy stabber. Dex-based, rogue favorite—swashbuckle away with flair and precision, no strength required.",
+    "Stab with style. Great for Dex builds, rogues’ best friend."
+  ],
+  "Ray of Frost": [
+    "Cantrip. Evocation, 60ft, V/S. Ranged spell attack, 1d8 cold damage, scales, reduce speed by 10ft until your next turn. Ice beam to slow runners and chip away—decent for kiting.",
+    "Chill shot with a snag.",
+    "Freeze and slow a foe. Solid damage, scales up, great for keeping enemies at arm’s length."
+  ],
+  "Reckless Attack": [
+    "Barbarian Feature. You throw away all defense to hit harder. You get Advantage on attacks, but enemies get Advantage on you. It’s a suicide pact with the concept of violence.",
+    "For when you don't care if you live or die, as long as the other guy dies first. A mathematically sound strategy for people with d12 hit dice."
+  ],
+  "Revivify": [
+    "3rd Level Necromancy. Touch. 300gp diamond. The 'undo button' for death. You have one minute to cast this after they die. Stop looting the body and cast the spell!",
+    "Brings a creature back to life with 1 HP. Consumes a diamond. If you're poor, your friends stay dead. Capitalism follows you even into the afterlife."
+  ],
+  "Ritual": [
+    "Interrupted magic.",
+    "Ritual casting is slow, cheap magic that doesn’t burn Spell Slots. Takes 10 minutes, so don’t try it mid-combat unless you want to be orc chow. Great for utility, bad for impatience.",
+    "Rituals are the System’s gift to stingy casters—spells you can cast without draining your Slots, but you’ll need a comfy chair and no enemies. Use it for scouting or buffs, not heroics."
+  ],
+  "Rope Trick": [
+    "2nd Level Transmutation, Touch, V/S/M. Rope leads to 60ft extradimensional space for 1 hr, holds 8 creatures. Hide in a pocket dimension—great until the rope gets cut.",
+    "Magical panic room.",
+    "Pocket hideout for your party. Rope’s vulnerable, so guard it."
+  ],
+  "Sanctuary": [
+    "1st Level Abjuration. Bonus Action. Enemies have to pass a Wisdom save to hit the target. Use it on the Healer, or use it on yourself and laugh while the tank gets pummeled.",
+    "You wrap someone in a 'Do Not Disturb' sign. If they attack, the spell breaks. It’s for pacifists and cowards. Which one are you?"
+  ],
+  "Save DC": [
+    "How hard it is to resist your nonsense.",
+    "Save DC is how hard it is for enemies to shrug off your spells or tricks. Based on your Spell Ability, it’s the number they roll against to avoid your charm or fireball. High DC? They cry. Low DC? They laugh.",
+    "Your Save DC is the dungeon’s respect for your magic, calculated from your Spell Ability and Proficiency. It’s what makes foes fail their saves and hate you. Keep it high, or your spells are just suggestions."
+  ],
+  "Saving Throws": [
+    "",
+    "Saving Throws are your desperate attempt to not die when a fireball, poison, or mind-control spell comes for you. Roll a d20, add the right stat mod, and hope the DM isn’t cackling. Fail, and enjoy your new life as a toad.",
+    "Think of this as your ‘please don’t let me die’ roll. Different stats for different threats—Dex for dodging, Wis for resisting charm, Con for not puking your guts out. Roll high or kiss your dignity goodbye."
+  ],
+  "Scimitar": [
+    "Martial Melee. 1d6 slashing, Finesse, Light. Curved blade for flair. Dual-wield or look piratey—Dex-based, solid for rogues or swashbucklers.",
+    "Pirate’s slicer.",
+    "Slash with a fancy curve. Light for combos, decent damage."
+  ],
+  "Second Wind": [
+    "A self-heal for the non-magical. It represents grit, determination, and a high pain threshold. Use it early, or you'll die with it available, and I will mock you.",
+    "Fighter Feature. Bonus Action. You take a deep breath and ignore the stab wound in your gut. Regain 1d10 + Level HP. It’s not much, but it’s better than dying."
+  ],
+  "See Invisibility": [
+    "2nd Level Divination, Self, V/S/M. See invisible creatures/objects for 1 hr. Spot sneaky ghosts—won’t help you punch them, but at least you’ll see them coming.",
+    "Anti-invisibility goggles. No concentration, just knowledge.",
+    "Ghost detector."
+  ],
+  "Shield": [
+    "AC +2. Requires one hand. It’s a portable wall. You have to actually *hold* it for it to work. Don't strapping it to your back and expect it to save you from arrows.",
+    "Sacrifice a hand to live longer. It blocks swords, arrows, and dragon breath. It does not block emotional damage from the Bard’s insults."
+  ],
+  "Shocking Grasp": [
+    "Cantrip. Evocation, Touch, V/S. Melee spell attack, 1d8 lightning damage, scales, no reactions until your next turn. Advantage vs. metal armor. Zap their reflexes away—great for ditching orcs.",
+    "Electric handshake.",
+    "Shock and lock down a foe’s reactions. Scales, risky range, bonus vs. tin cans."
+  ],
+  "Short Rest": [
+    "Short Rest is a quick 1-hour breather to patch your wounds and pretend you’re not doomed. Roll Hit Dice to heal, recharge some abilities. Don’t expect miracles—you’re still a mess.",
+    "Think of this as a coffee break in hell. Sit, sulk, maybe heal a scratch. Fighters and warlocks love it; wizards just whine. Do it too often, and the DM’s monsters get bored and eat you."
+  ],
+  "Shortbow": [
+    "1d6 Piercing. Ammunition (80/320), Two-Handed. For when you want to kill something, but you don't want to actually *touch* it. Eww. Germs.",
+    "Simple Ranged Weapon. It’s not as cool as a Longbow, but it fits in a backpack. Great for halflings and people who skipped arm day."
+  ],
+  "Shortsword": [
+    "Martial Melee. 1d6 piercing, Finesse, Light. Rogue’s backup plan. Stabby, sneaky, reliable—Dex-based, perfect for dual-wielding or stealth kills.",
+    "Sneaky stabber.",
+    "Stab quietly. Great for rogues, light for doubles."
+  ],
+  "Sickle": [
+    "Creepy cutter.",
+    "Simple Melee. 1d4 slashing, Light. Farmer’s tool turned murder stick. Light for dual-wielding, weak damage, edgy aesthetic for druids or weirdos.",
+    "Slice with a garden tool. Low damage, high vibe."
+  ],
+  "Size": [
+    "Bigger targets wear bigger boots. Statistics only.",
+    "Size is how much space you take up in the dungeon’s kill zone. Tiny? You’re sneaky but squishy. Huge? You’re a walking target. It affects reach, grappling, and how many arrows you catch. Choose your footprint wisely.",
+    "Your Size category—Small, Medium, or ‘Why Are You This Big?’—shapes how you fit in the world. Smaller means better hiding, bigger means better intimidation. The dungeon scales its traps to match."
+  ],
+  "Skill Empowerment": [
+    "5th Level Transmutation, Touch, V/S, Concentration. Double proficiency bonus for one skill for 1 hr. Make your rogue a lockpicking god—concentration’s a pain, payoff’s huge.",
+    "Skill god mode.",
+    "Supercharge a skill. Concentration limits your spells, but expertise shines."
+  ],
+  "Skills": [
+    "Got a high Stealth skill? You’re a shadow. Got a low Persuasion? You’re convincing nobody but the mirror. Pick your skills wisely, or the System will remind you how useless you are.",
+    "Skills are the things you’re supposedly good at, like sneaking, lying, or not dying in a trap. Roll a d20, add the stat mod, maybe proficiency. Fail, and enjoy the consequences, loser."
+  ],
+  "Skywrite": [
+    "2nd Level Transmutation, Sight, V/S, Ritual, Concentration. 10 words in clouds, lasts 1 hr or until dispersed. Sky graffiti—useless in combat, great for flexing or cryptic messages.",
+    "Cloudy billboard.",
+    "Write in the sky. Concentration’s a waste, but it’s dramatic."
+  ],
+  "Sling": [
+    "Fling stones like a bully. Pathetic damage, cheap as dirt.",
+    "Rock flinger.",
+    "Simple Ranged. 1d4 bludgeoning, Ammunition (30/120). Rock in a sock. Weak damage, free ammo—don’t expect respect or kills with this kid’s toy."
+  ],
+  "Smiths Tools": [
+    "Fire, metal, and the confidence to hit something until it becomes useful.",
+    "Smiths Tools are for turning raw metal into weapons, armor, or a really intimidating paperweight. Fire, hammers, and sweat—sounds romantic until you botch the roll and melt your sword. Forge wisely, or the dungeon will forge you.",
+    "With Smiths Tools, you’re a one-person armory, crafting blades or fixing dented helms. High Strength helps, but nothing saves you from the System’s habit of spawning rust monsters. Make it sharp, or make it quick."
+  ],
+  "Snare": [
+    "1st Level Abjuration, Touch, V/S/M. Set 5ft trap, Dex save or restrained until broken (Str check). Magical mousetrap—great for catching goblins or annoying bards.",
+    "Budget bear trap.",
+    "Rig a snare for fools. Takes time, but traps are fun."
+  ],
+  "Sneak Attack": [
+    "Class Feature. Extra d6s of damage. You fight dirty. You stab them in the kidneys while they're distracted. Requires Finesse/Ranged weapon and Advantage (or an ally nearby).",
+    "You don't fight fair, you fight to win. Pile on the damage dice. If you aren't rolling a handful of d6s, you aren't playing a Rogue correctly."
+  ],
+  "Somatic": [
+    "Mandatory mystical gestures.",
+    "Somatic components are the fancy hand-waves that make your spells go boom. Need free hands and room to flail—armor might screw you over. Botch the gesture, and the System’s laughing.",
+    "Your Somatic spell parts are the dance moves of magic. Precise, deliberate, and useless if you’re tied up or wearing gauntlets. Move those fingers right, or your spell’s just a bad interpretive dance."
+  ],
+  "Spear": [
+    "Pointy stick.",
+    "Simple Melee. 1d6 piercing (1d8 Versatile), Thrown (20/60). Poke or throw this pointy stick. Versatile for fancy fighters, range for runners—basic but functional.",
+    "Stab or toss, your choice. Solid early weapon, fades late."
+  ],
+  "Species": [
+    "Determines how society judges you before you speak.",
+    "Some species get darkvision. Some get stereotypes.",
+    "Species is the cosmic lottery that decides if you’ve got claws, wings, or a face only a lich could love. It comes with perks like darkvision or breathing fire, but also baggage like ‘elves are snooty’ or ‘dwarves smell like ale.’ Pick one, and the dungeon will stereotype you faster than you can say ‘racial bonus.’",
+    "Your Species is why you’re a furry, a robot, or just a boring human with delusions of grandeur. It tweaks your stats, slaps on some traits, and makes NPCs judge you before you open your mouth. Choose wisely, or you’ll be the token halfling everyone blames for short jokes.",
+    "Your biological or mechanical excuse for your stats.",
+    "Your biological template, complete with perks, flaws, and cultural baggage you will absolutely validate."
+  ],
+  "Species Traits": [
+    "Includes stance, stride, and balance tendencies.",
+    "Species Traits are the freebies your ancestry tosses in, like a tiefling’s fire resistance or a gnome’s cunning. They’re cool until the dungeon counters with a fire-immune ice dragon. Enjoy your perks, crawler.",
+    "These are the quirks your Species brings to the table—darkvision, flight, or just being really good at eating dirt. Species Traits give you an edge, but the System’s got an edge-sharpening stone."
+  ],
+  "Speed": [
+    "Measured in strides, not dignity.",
+    "Speed is how fast you sprint from danger or toward your next bad decision. Measured in feet per turn, it’s the difference between ‘heroic charge’ and ‘eaten by wolves.’ High Dex helps, heavy armor doesn’t.",
+    "Your Speed stat decides if you’re a blur or a sitting duck. Run, dodge, or just trip over your own cape—either way, the dungeon’s faster. Pro tip: Boots don’t help if you’re carrying 50 pounds of loot."
+  ],
+  "Spell Ability": [
+    "The stat you use to bully the universe.",
+    "This stat decides how much the universe listens when you cast a spell. Spell Ability powers your magic’s punch and its Save DC. Dump it, and your spells are just fancy light shows.",
+    "Your Spell Ability is the stat that fuels your magic—Int for wizards, Wis for clerics, Cha for bards. Higher means stronger spells and tougher saves. Low? Your Fireball’s more like a sparkler."
+  ],
+  "Spell Slots": [
+    "Daily reality edits.",
+    "Spell Slots are your magical gas tank. Each spell level eats one, and when you’re out, you’re just a nerd with a stick. Rest to refill, or beg the DM for a nap. Good luck with that.",
+    "This is the System’s way of saying, ‘No, you can’t Fireball everything.’ Higher-level slots for bigger booms, but you’ll burn through ‘em faster than a bard’s self-esteem. Choose wisely, or don’t. I don’t care."
+  ],
+  "Spellcasting": [
+    "Reality bending through confidence and hand motions.",
+    "Spellcasting is you bending reality with words, gestures, and a lot of ego. Wizards, clerics, and bards do it best, but everyone’s jealous. Run out of Spell Slots, and you’re just yelling at the void.",
+    "This is your ticket to rewriting the dungeon’s rules—fireballs, heals, or turning foes into frogs. Spellcasting’s great until the System slaps you with a counterspell or a silence zone. Cast fast, cry later."
+  ],
+  "Spider Climb": [
+    "2nd Level Transmutation, Touch, V/S/M, Concentration. Walk on walls/ceilings for 1 hr. Be a human gecko—perfect for dodging or creeping out allies.",
+    "Gecko mode.",
+    "Stick to walls like a bug. Concentration’s a pain, mobility’s fun."
+  ],
+  "Stone Shape": [
+    "4th Level Transmutation, Touch, V/S/M. Reshape 5ft cube of stone, no fine detail. Sculpt a door or trap—limited by your lack of artistry, but stone’s forgiving.",
+    "Mold stone like clay. No combat use, great for shortcuts.",
+    "Rock sculptor."
+  ],
+  "Stoneskin": [
+    "4th Level Abjuration, Touch, V/S/M, Concentration. Resistance to nonmagical bludgeoning/piercing/slashing for 1 hr. Turn skin to stone—pricey but tanky, laugh at swords.",
+    "Halve physical damage. Concentration and cost hurt, tank’s dream.",
+    "Rock-hard hide."
+  ],
+  "Strength": [
+    "High Strength means broken furniture.",
+    "Low Strength means creative solutions.",
+    "Oh, you thought Strength was just for swinging swords? It’s also for carrying your team’s emotional baggage when they inevitably cry about their tragic backstory. Pro tip: If it’s heavy, you’re the mule. Deal with it.",
+    "Raw force output and door-negotiation skill.",
+    "Strength measures how much you can bench press, yeet a goblin, or flex intimidatingly at a tavern brawl. High score? You’re a meat wall. Low score? Hope you enjoy being the party’s designated twig. Roll a d20 and add this to smash stuff or grapple some fool."
+  ],
+  "Studded Leather": [
+    "AC 12 + Dex Modifier. Light Armor. Like Leather Armor, but with little metal bits that make you look edgy. It’s the best light armor you can get without magic. Enjoy the chafing.",
+    "The Rogue’s tuxedo. It lets you flip around and hide in shadows while offering just enough protection to keep your insides on the inside."
+  ],
+  "Stunning Strike": [
+    "Monk Feature. You punch them in the soul. Constitution Save or they lose their turn. If this lands on the boss, the DM will cry. If it misses, you wasted a Ki point. Gamble away.",
+    "The reason Monks exist. You turn an enemy into a punching bag for a round. Spam this until the DM bans you."
+  ],
+  "Subclass": [
+    "Because you wanted your mistakes to feel bespoke.",
+    "Subclass is where your Class gets spicy—think Fighter but with a side of eldritch knight or Rogue with a knack for arcane trickery. It’s the flavor that makes you less generic, but also the reason your DM sighs when you pull out some obscure ability. Own it, you niche weirdo.",
+    "This is where flavor becomes mechanical.",
+    "This is your Class’s midlife crisis, where it decides to specialize in something like ‘shadow monk’ or ‘beast master.’ Subclass gives you cool tricks but also a reputation—like how everyone assumes warlocks sold their soul. Spoiler: You probably did."
+  ],
+  "Successes": [
+    "Each Success on a Death Save is a middle finger to the grim reaper. You’re bleeding out, but still clinging to life. Rack up three, and you’re stable—unless your party’s too busy looting your corpse to notice.",
+    "Moments death reconsidered.",
+    "Successes in Death Saves are the System’s reluctant thumbs-up for not dying yet. Roll a 10+ on a d20 at 0 HP, and you’re one step closer to stabilizing. Three of these, and you’re back in the fight. Don’t celebrate yet."
+  ],
+  "Sword Burst": [
+    "AoE slash for crowded fights. Weak damage, scales up, great for slicing through minions.",
+    "Cantrip. Conjuration, Self (5ft), V. Dex save or 1d6 force damage to all within 5ft, scales. Spin with invisible blades to clear mooks or just look cool while surrounded.",
+    "Whirlwind of sharp force."
+  ],
+  "Tasha’s Caustic Brew": [
+    "1st Level Evocation, 30ft line, V/S/M, Concentration. Dex save or 2d4 acid damage/round until wiped off. Spray acid like a skunk—keep it burning for extra screams.",
+    "Acid stream that sticks. Concentration’s a drag, damage adds up.",
+    "Lingering chemical burn."
+  ],
+  "Thieves Tools": [
+    "Ah yes, the official kit for touching things you absolutely should not be touching. If it clicks, great. If it snaps, you’re about to meet consequences.",
+    "Thieves Tools are your VIP pass to places you’re definitely not invited. Lockpicks, wires, and a prayer you don’t trigger the acid trap. High Dex helps, but nothing saves you from the System’s love of ‘surprise’ explosions. Click carefully.",
+    "This kit screams ‘I’m up to no good,’ and the dungeon agrees. Thieves Tools let you bypass locks, disable traps, or accidentally arm the doomsday device. Roll well, or your epitaph will read ‘Almost Got It.’"
+  ],
+  "Thieves' Tools": [
+    "Add Proficiency to checks for traps and locks. The skeleton key for people who don't respect property rights. Essential for bypassing the Dungeon’s fun little murder-puzzles.",
+    "If you don't have these, you're opening chests with a hammer, which ruins the loot, Crawler. Don't be a savage. Pick the lock."
+  ],
+  "Thorn Whip": [
+    "Cantrip. Transmutation, 30ft, V/S/M. Melee spell attack, 1d6 piercing, scales, pull Large or smaller target 10ft closer. Lash with a spiky vine—drag enemies into traps or for fun.",
+    "Spiky vine leash.",
+    "Whip and yank foes closer. Decent damage, scales, great for battlefield control."
+  ],
+  "Thunderclap": [
+    "Cantrip. Evocation, Self (5ft), S. Con save or 1d6 thunder damage to all within 5ft, scales, audible 100ft. Scream loud enough to hurt—great for waking the dungeon’s worst nightmares.",
+    "Noisy pain bubble.",
+    "Sonic burst for nearby foes. Weak damage, scales, loud as hell. Expect company."
+  ],
+  "Tinker's Tools": [
+    "For when you look at a perfectly functional object and think, ‘I can make this worse, but interesting.’",
+    "Tinker's Tools are for mad geniuses who think they can outsmart the dungeon with a wrench and some wire. Build a clockwork bomb, fix a broken trap, or create something the party will regret. Results not guaranteed, but explosions are.",
+    "With Tinkers Tools, you’re one bad roll away from a gadget that either saves the day or sets your beard on fire. Craft gizmos, repair gear, or invent a ‘self-destructing backpack.’ The System’s betting on the beard fire."
+  ],
+  "Tiny Servant": [
+    "3rd Level Transmutation. You touch an object and give it little arms and legs. It follows your orders. Finally, a friend who won't argue about loot distribution.",
+    "Create a mindless minion to carry your stuff or trigger traps for you. It has 10 HP and no will to live. Treat it as expendable as the rest of your party."
+  ],
+  "Transmute Rock": [
+    "5th Level Transmutation, 120ft, V/S/M. 40ft cube rock to mud or vice versa, restrain or collapse. Turn stone to slop or trap foes in rock—terrain control deluxe.",
+    "Reshape the battlefield. No concentration, great for trapping or tripping.",
+    "Rock-mud switch."
+  ],
+  "Trident": [
+    "Martial Melee. 1d6 piercing (1d8 Versatile), Thrown (20/60). Poseidon’s fork. Poke or toss, slightly better than a spear—versatile for showy fighters.",
+    "Sea god’s fork.",
+    "Stab or throw, bit fancier. Decent, not dazzling."
+  ],
+  "Unarmed Strike": [
+    "1 Damage + Strength Mod. Unless you’re a Monk or have claws, this is just you slapping a monster. Good luck with that. The viewers love a scrappy underdog who dies immediately.",
+    "You are punching armor. Why are you punching armor? You have weapons. Use them, you idiot."
+  ],
+  "Verbal": [
+    "Arcane shouting.",
+    "This is you yelling arcane gibberish to bend reality. Verbal spell parts need a clear voice and no interruptions. Get silenced, and you’re just a nerd waving your arms. Speak loud, crawler.",
+    "Verbal components are the magic words you shout to make spells work. Sounds cool until you’re gagged or in a silence zone. Pro tip: Practice your enunciation, or the dungeon will mishear ‘Fireball’ as ‘Fizzle.’"
+  ],
+  "Vicious Mockery": [
+    "Cantrip. 1d4 Psychic. Wisdom Save. You insult them so hard they suffer actual brain damage. Also gives Disadvantage on their next attack. Sticks and stones break bones, but words hurt more.",
+    "The Bard special. You hurt their feelings. If you kill a boss with this, you become a legend. If you fail, you just look petty."
+  ],
+  "Vortex Warp": [
+    "2nd Level Conjuration, 90ft, V/S. Teleport willing creature 90ft, Con save for unwilling. Yeet your pal or foe across the room—line of sight required, no walls.",
+    "Budget dimension door.",
+    "Short-range teleport. Great for rescues or screwing enemies."
+  ],
+  "Wall of Stone": [
+    "5th Level Evocation, 120ft, V/S/M, Concentration. 10x10ft stone panels, shapeable, permanent if concentrated 10 min. Build a fort or tomb—solid, but breakable with effort.",
+    "Instant masonry.",
+    "Raise stone walls. Concentration’s a drag, great for defense or traps."
+  ],
+  "War Pick": [
+    "Armor piercer.",
+    "Martial Melee. 1d8 piercing. Pointy hammer. Pierces armor, looks brutal—no frills, just a solid choice for cracking tough nuts.",
+    "Punch holes in armor. Decent damage, no nonsense."
+  ],
+  "Warding Bond": [
+    "2nd Level Abjuration, Touch, V/S/M. +1 AC/saves, resistance to damage for 1 hr, you take equal damage. Link with a buddy—great until you both eat a fireball.",
+    "Pain-sharing pact.",
+    "Share pain for buffs. Risky, but tanks love the extra AC."
+  ],
+  "Warforged": [
+    "A living construct: proof that someone once thought free will was optional.",
+    "As a Warforged, you’re a walking forge with a soul and a chip on your shoulder. Built for battle, you’re tough but slow to trust. The dungeon loves throwing magnets at you. Stay shiny, tin can.",
+    "Warforged are the System’s nod to ‘what if robots had feelings?’ You don’t sleep, eat, or breathe, but you still get to enjoy the dungeon’s emotional meat grinder. Bonus: Your AC’s decent. Downside: Rust.",
+    "You do not eat, sleep, or breathe—yet somehow still feel existential dread."
+  ],
+  "Warhammer": [
+    "Crush with a hammer. Versatile, great for divine bruisers.",
+    "Holy smasher.",
+    "Martial Melee. 1d8 bludgeoning (1d10 Versatile). Smash with style. One or two hands, cleric’s choice—solid for bonking heads or breaking doors."
+  ],
+  "Water Breathing": [
+    "3rd Level Transmutation, 30ft, V/S/M, Ritual. 10 creatures breathe underwater for 24 hr. Gill simulator—great for sunken loot, useless in a desert or fire plane.",
+    "Mermaid mode.",
+    "Swim without drowning. No concentration, perfect for aquatic heists."
+  ],
+  "Water Walk": [
+    "3rd Level Transmutation, 30ft, V/S/M, Ritual. 10 creatures walk on liquid for 1 hr. Jesus mode—cross rivers or dodge quicksand, sink if dispelled.",
+    "Liquid stroll.",
+    "Walk on water like a smug prophet. No concentration, great for swamps."
+  ],
+  "Weapons": [
+    "Tools designed to end conversations.",
+    "Weapons are your tools for turning enemies into past-tense problems. Swords, bows, or a stick you found—roll to hit, roll for damage, pray it’s enough. The dungeon’s got bigger sticks, by the way.",
+    "Your Weapon’s your best friend until it breaks or you fumble it into a chasm. Melee or ranged, each has a dice type and a dream of glory. Pro tip: Sharpen it before the dragon laughs at you."
+  ],
+  "Weavers Tools": [
+    "For creating cloth, rope, and the illusion that you understand textiles.",
+    "This kit’s for crafting fabric-based miracles—sails, nets, or a snazzy cape to distract the goblins. Weavers Tools are niche until you’re dangling from a cliff and realize rope is your best friend. Weave fast, crawler.",
+    "Weavers Tools let you spin thread into cloaks, ropes, or a tapestry of your many failures. Useful for disguises, repairs, or just looking fabulous while the dragon roasts you. Low Dex? Enjoy your lumpy scarf."
+  ],
+  "Web": [
+    "2nd Level Conjuration, 60ft, V/S/M, Concentration. 20ft cube, Dex save or restrained, Str check to escape. Sticky trap for mooks—burns nicely, just don’t trap yourself.",
+    "Gunk up enemies with webs. Concentration’s a drag, great for control.",
+    "Spider’s duct tape."
+  ],
+  "Whip": [
+    "Lash from afar. Low damage, high swagger.",
+    "Martial Melee. 1d4 slashing, Finesse, Reach. Kinky but weak. 10ft range, Dex-based—more style than substance, great for tripping or flair.",
+    "Snappy showoff."
+  ],
+  "Wild Shape": [
+    "Druid Feature. You turn into an animal. You gain their HP. When you die as a bear, you pop out as a person, perfectly fine. It’s like an extra life, but furrier.",
+    "Solve complex problems by turning into a beast that doesn't understand the problem. Need to scout? Be a spider. Need to kill? Be a wolf. Need to escape? Be a bird and fly away from your responsibilities."
+  ],
+  "Wisdom": [
+    "Awareness, instincts, and hindsight avoidance.",
+    "This is not intelligence. Stop arguing.",
+    "This stat saves you from your own stupidity—sometimes. It’s also for clerics who think their god cares about their dice rolls. Roll Wisdom to avoid falling for the bard’s ‘totally legit’ pyramid scheme.",
+    "Wisdom is your gut telling you not to trust that shady NPC offering ‘free candy.’ High Wisdom? You’re a perceptive sage. Low Wisdom? You’re eating dirt because it ‘looked nutritious.’ Use it for insight or spotting ambushes.",
+    "You *felt* the trap. You ignored it."
+  ],
+  "Wood Carvers Tools": [
+    "A slow, patient craft in a world that keeps trying to kill you.",
+    "With these tools, you sculpt wood into totems, arrows, or a sign that says ‘Don’t Touch.’ Wood Carvers Tools are great for roleplay until the dungeon decides your masterpiece is kindling. Carve carefully, or cry later.",
+    "Wood Carvers Tools are for turning logs into art, holy symbols, or a creepy doll that freaks out the cleric. Precision matters, but so does not carving your thumb off. High Dex helps, low patience doesn’t.",
+    "You remove wood until something recognizable remains. Ideally not your fingers."
+  ],
+  "XP": [
+    "Earned through violence, cleverness, or exploitation.",
+    "Experience Points are the System’s way of quantifying your trauma. More XP means you’re closer to a power spike, but also to the dungeon noticing you’re a threat. Grind hard, crawler, or I’ll make sure your next ‘encounter’ is a TPK.",
+    "Progress points awarded for risk-taking and emotional damage.",
+    "This is your progress bar.",
+    "XP is the dungeon’s currency of suffering—earn it by killing, scheming, or accidentally solving puzzles. Stack enough, and you Level up, unlocking new ways to disappoint me. Run out of things to slaughter? Too bad, no XP for crying about it."
   ]
 }

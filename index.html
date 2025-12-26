@@ -159,7 +159,7 @@
                 </select>
             </div>
         </div>
-        <button class="app-btn" id="toggle-tips" onclick="toggleTips()" style="background: #222;">Tips: OFF</button>
+        <button class="app-btn" id="toggle-tips" onclick="toggleTips()" style="background: #222;">Tips: ON</button>
         <button class="app-btn" onclick="shortRest()" style="background: #6b46c1;">Short Rest</button>
         <button class="app-btn" onclick="longRest()" style="background: #2d3748;">Long Rest</button>
         <button class="app-btn" onclick="resetSheet()" style="background: #800;">New</button>
@@ -337,7 +337,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         // --- CONFIG ---
-        let tipsEnabled = false;
+        let tipsEnabled = true;
         let AI_COMMENTS = {};
 
         const firebaseConfig = {
