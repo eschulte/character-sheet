@@ -556,9 +556,9 @@
                 if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','End','Home'].includes(e.key)) updateGhost();
             });
             input.addEventListener('mouseleave', () => {
-                if (lastTipKey !== "") { 
-                    lastTipKey = ""; 
-                    hideTip(); 
+                if (lastTipKey !== "") {
+                    lastTipKey = "";
+                    hideTip();
                 }
             });
 
@@ -617,17 +617,41 @@
 
         // --- SHARED UTILS ---
         async function loadSharedCharacter(sharedId) {
-            isLoading = true; document.getElementById('status').innerText = "Loading Shared...";
+            isLoading = true;
+            document.getElementById('status').innerText = "Loading...";
             try {
+                let targetData = null;
+                let finalId = null;
                 const docRef = doc(db, "characters", sharedId);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    currentCharacterId = sharedId; localStorage.setItem('dnd_char_id', currentCharacterId);
-                    const data = docSnap.data(); populateData(data.sheetData);
-                    lastLoadedRemoteTimestamp = new Date(data.lastUpdated).getTime();
-                    if (currentUser && data.ownerId === currentUser.uid) setupRealtimeListener();
-                    else { isCloudOwner = false; document.getElementById('status').innerText = "Read Only Mode"; }
-                } else alert("Character not found.");
+                    const q = query(
+                        collection(db, "characters"),
+                        where("__name__", ">=", sharedId),
+                        where("__name__", "<", sharedId + '\uf8ff'),
+                        limit(1)
+                    );
+                    const querySnap = await getDocs(q);
+                    if (!querySnap.empty) {
+                        targetData = querySnap.docs[0].data();
+                        finalId = querySnap.docs[0].id; // Get the actual full ID
+                    }
+                }
+                if (targetData && finalId) {
+                    currentCharacterId = finalId;
+                    localStorage.setItem('dnd_char_id', currentCharacterId);
+                    populateData(targetData.sheetData);
+                    lastLoadedRemoteTimestamp = new Date(targetData.lastUpdated).getTime();
+
+                    if (currentUser && targetData.ownerId === currentUser.uid) {
+                        setupRealtimeListener();
+                    } else {
+                        isCloudOwner = false;
+                        document.getElementById('status').innerText = "Read Only Mode";
+                    }
+                } else {
+                    alert("Character not found.");
+                }
             } catch (e) { console.error(e); } finally { isLoading = false; updateModifiers(); }
         }
 
@@ -745,7 +769,7 @@
         window.shareSheet = async function() {
             if (!currentUser) { alert("Login required."); return; }
             await window.saveVersion(false);
-            const shareUrl = `${window.location.origin}${window.location.pathname}?charId=${currentCharacterId}`;
+            const shareUrl = `${window.location.origin}${window.location.pathname}?charId=${currentCharacterId.substring(0, 8)}`;
             try { await navigator.clipboard.writeText(shareUrl); alert("Link copied!"); } catch (err) { prompt("Copy:", shareUrl); }
         }
 
