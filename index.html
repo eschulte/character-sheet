@@ -47,7 +47,7 @@
         .prof-bubble { width: 12px; height: 12px; border: 1px solid black; border-radius: 50%; appearance: none; cursor: pointer; flex-shrink: 0; }
         .prof-bubble:checked { background: black; }
         .save-val-input { width: 25px !important; text-align: center; font-size: 0.8rem; margin-right: 5px; border-bottom: 1px solid #999 !important; }
-        .combat-row-1 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .combat-row-1 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .combat-row-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 20px; }
         .shield-box { border: 2px double var(--border-color); padding: 5px; text-align: center; border-radius: 5px 5px 50% 50%; display: flex; flex-direction: column; justify-content: center; }
         .rect-box { border: 2px double var(--border-color); padding: 5px; border-radius: 5px; display: flex; flex-direction: column; }
@@ -188,7 +188,12 @@
                 <input type="text" id="xp"><span class="label-sm" data-tip="XP" tabindex="0">XP</span>
             </div>
             <div class="header-section">
-                <div class="shield-box"><span class="box-title" data-tip="AC" tabindex="0">Armor Class</span><input type="number" id="ac" style="font-size: 1.5rem; text-align: center; border: none;"></div>
+                <div id="portrait-container" style="width: 100px; height: 100px; border: 2px solid var(--border-color); border-radius: 5px; position: relative; cursor: pointer; background: #eee; overflow: hidden;" onclick="document.getElementById('portrait-upload').click()">
+                    <img id="portrait-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                    <div id="portrait-placeholder" style="display: flex; align-items: center; justify-content: center; height: 100%; color: #888; font-size: 0.7rem; text-align: center; padding: 5px;">Click to Upload</div>
+                    <input type="file" id="portrait-upload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                    <input type="hidden" id="portraitUrl">
+                </div>
             </div>
         </div>
 
@@ -200,6 +205,7 @@
 
             <div class="main-col">
                 <div class="combat-row-1">
+                    <div class="shield-box"><span class="box-title" data-tip="AC" tabindex="0">AC</span><input type="number" id="ac" style="text-align: center; font-size: 1rem;"></div>
                     <div class="shield-box"><span class="box-title" data-tip="Initiative" tabindex="0">Initiative</span><input type="text" id="initiative" placeholder="d20 + dex mod" style="text-align: center; font-size: 1rem;"></div>
                     <div class="shield-box"><span class="box-title" data-tip="Speed" tabindex="0">Speed</span><input type="text" id="speed" style="text-align: center; font-size: 1rem;"></div>
                     <div class="shield-box"><span class="box-title" data-tip="Size" tabindex="0">Size</span><input type="text" id="size" style="text-align: center; font-size: 1rem;"></div>
@@ -328,7 +334,7 @@
 
         <div class="inner-section">
             <div class="bio-col">
-                
+
                 <div class="panel" style="flex-grow: 1;"><span class="box-title" data-tip="Equipment" tabindex="0">Equipment</span><textarea id="equipment" style="height: 480px; border:none;"></textarea></div>
                 <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; ">
                     <div></div>
@@ -352,6 +358,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, addDoc, query, where, orderBy, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         // --- CONFIG ---
         let tipsEnabled = true;
@@ -368,6 +375,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
@@ -504,6 +512,64 @@
                 }
             } catch(e) { console.error(e); } finally { isLoading = false; }
         }
+
+        // -- PORTRAIT & UPLOAD LOGIC --
+        window.handleImageUpload = async function(event) {
+            const file = event.target.files[0];
+            if (!file || !currentUser) return;
+            if (!isCloudOwner) { alert("Only owners can change portraits."); return; }
+
+            document.getElementById('portrait-placeholder').innerText = "Uploading...";
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = async () => {
+                    // 1. Create Canvas for Compression
+                    const canvas = document.createElement('canvas');
+                    const MAX_SIZE = 400; // Resize to max 400px
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                    } else {
+                        if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // 2. Convert to compressed DataURL (Quality 0.7)
+                    const dataUrl = canvas.toDataURL('image/webp', 0.7);
+
+                    // 3. Upload to Firebase Storage
+                    try {
+                        const storageRef = ref(storage, `portraits/${currentCharacterId}`);
+                        await uploadString(storageRef, dataUrl, 'data_url');
+                        const downloadUrl = await getDownloadURL(storageRef);
+
+                        // Update UI
+                        const portraitImg = document.getElementById('portrait-img');
+                        portraitImg.src = downloadUrl;
+                        portraitImg.style.display = 'block';
+                        document.getElementById('portrait-placeholder').style.display = 'none';
+                        document.getElementById('portraitUrl').value = downloadUrl;
+
+                        // Save character update to link the image URL
+                        window.saveVersion(false);
+                        document.getElementById('portrait-placeholder').innerText = "Click to Upload";
+                    } catch (err) {
+                        console.error(err);
+                        alert("Upload failed.");
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
 
         // --- GHOST INPUT LOGIC ---
 
@@ -743,6 +809,15 @@
                     const el = document.getElementById(slotId);
                     if(el) el.checked = checked;
                 }
+            }
+            if (data.portraitUrl) {
+                const img = document.getElementById('portrait-img');
+                img.src = data.portraitUrl;
+                img.style.display = 'block';
+                document.getElementById('portrait-placeholder').style.display = 'none';
+            } else {
+                document.getElementById('portrait-img').style.display = 'none';
+                document.getElementById('portrait-placeholder').style.display = 'flex';
             }
             // Trigger an input event on all ghost inputs to update mirrors
             document.querySelectorAll('.ghost-input').forEach(el => el.dispatchEvent(new Event('input')));
