@@ -790,7 +790,9 @@
 
         function collectData() {
             const data = { charName: document.getElementById('charName').value };
-            document.querySelectorAll('input[id], textarea[id], select[id]').forEach(el => { data[el.id] = (el.type === 'checkbox') ? el.checked : el.value; });
+            document.querySelectorAll('input[id]:not([type="file"]), textarea[id], select[id]').forEach(el => {
+                data[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
+            });
             data['weapons'] = [];
             document.querySelectorAll('#weapons-body tr').forEach(tr => {
                 const i = tr.querySelectorAll('input');
@@ -819,7 +821,7 @@
         function populateData(data) {
             if(!data) return;
             for (const [key, value] of Object.entries(data)) {
-                if(key === 'spellSlots' || key === 'weapons' || key === 'spells' || key === 'portrait-upload') continue;
+                if(key === 'spellSlots' || key === 'weapons' || key === 'spells') continue;
                 const el = document.getElementById(key);
                 if (el) { if(el.type === 'checkbox') el.checked = value; else el.value = value; }
             }
