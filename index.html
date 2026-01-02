@@ -59,6 +59,7 @@
         .weapons-table, .spells-list-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
         .weapons-table th, .spells-list-table th { text-align: left; border-bottom: 2px solid var(--border-color); font-size: 0.8rem; }
         .weapons-table td, .spells-list-table td { border-bottom: 1px solid var(--faint-line); padding: 5px 0; }
+        #magic-items-body input[type="checkbox"] { margin: 0 auto; display: block; cursor: pointer; }
         .equipment-table { width: 100%; border-collapse: collapse; }
         .equipment-table th { font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
         .equipment-table td { padding: 2px 0; border-bottom: 1px solid var(--faint-line); }
@@ -336,38 +337,54 @@
         </div>
 
         <div class="inner-section">
-            <div class="bio-col">
+            <div class="panel">
+                <span class="box-title" data-tip="Magic Item Plans">Magic Item Plans (Artificer)</span>
+                <table class="weapons-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 30px; text-align: center;">Made</th>
+                            <th>Item Name</th>
+                            <th style="width: 100px; text-align: center;">Attun.</th>
+                            <th>Notes</th>
+                            <th class="action-cell"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="magic-items-body"></tbody>
+                </table>
+                <button onclick="addMagicItemRow()" style="width: 100%;">+</button>
+            </div>
+        </div>
 
-                <div class="panel">
-                    <span class="box-title" data-tip="Equipment">Equipment</span>
-                    <table class="equipment-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 45%">Item</th>
-                                <th style="width: 15%">Qty</th>
-                                <th style="width: 15%">Lbs</th>
-                                <th style="width: 25%">Notes</th>
-                                <th style="width: 30px"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="equipment-body"></tbody>
-                    </table>
-                    <button onclick="addEquipmentRow()" style="width: 100%;">+</button>
-                    <div style="text-align: right; margin-top: 10px; font-weight: bold; border-top: 1px solid var(--border-color);">
-                        Total Weight: <span id="total-weight">0</span> lbs
-                    </div>
+        <div class="inner-section">
+            <div class="panel">
+                <span class="box-title" data-tip="Equipment">Equipment</span>
+                <table class="equipment-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 45%">Item</th>
+                            <th style="width: 15%">Qty</th>
+                            <th style="width: 15%">Lbs</th>
+                            <th style="width: 25%">Notes</th>
+                            <th style="width: 30px"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="equipment-body"></tbody>
+                </table>
+                <button onclick="addEquipmentRow()" style="width: 100%;">+</button>
+                <div style="text-align: right; margin-top: 10px; font-weight: bold; border-top: 1px solid var(--border-color);">
+                    Total Weight: <span id="total-weight">0</span> lbs
                 </div>
-                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; ">
-                    <div></div>
-                    <div class="coins-container">
-                        <span class="box-title" data-tip="Coins" tabindex="0">COINS</span>
-                        <div class="coins">
-                            <div class="coin-slot"><span class="label-sm" data-tip="CP" tabindex="0">CP</span><input type="number" id="cp"></div>
-                            <div class="coin-slot"><span class="label-sm" data-tip="SP" tabindex="0">SP</span><input type="number" id="sp"></div>
-                            <div class="coin-slot"><span class="label-sm" data-tip="EP" tabindex="0">EP</span><input type="number" id="ep"></div>
-                            <div class="coin-slot"><span class="label-sm" data-tip="GP" tabindex="0">GP</span><input type="number" id="gp"></div>
-                            <div class="coin-slot"><span class="label-sm" data-tip="PP" tabindex="0">PP</span><input type="number" id="pp"></div>
-                        </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; ">
+                <div></div>
+                <div class="coins-container">
+                    <span class="box-title" data-tip="Coins" tabindex="0">COINS</span>
+                    <div class="coins">
+                        <div class="coin-slot"><span class="label-sm" data-tip="CP" tabindex="0">CP</span><input type="number" id="cp"></div>
+                        <div class="coin-slot"><span class="label-sm" data-tip="SP" tabindex="0">SP</span><input type="number" id="sp"></div>
+                        <div class="coin-slot"><span class="label-sm" data-tip="EP" tabindex="0">EP</span><input type="number" id="ep"></div>
+                        <div class="coin-slot"><span class="label-sm" data-tip="GP" tabindex="0">GP</span><input type="number" id="gp"></div>
+                        <div class="coin-slot"><span class="label-sm" data-tip="PP" tabindex="0">PP</span><input type="number" id="pp"></div>
                     </div>
                 </div>
             </div>
@@ -798,6 +815,15 @@
                 const i = tr.querySelectorAll('input');
                 data['weapons'].push({name: i[0].value, atk: i[1].value, dmg: i[2].value, notes: i[3].value});
             });
+            data.magic_items = Array.from(document.querySelectorAll('#magic-items-body tr')).map(tr => {
+                const inputs = tr.querySelectorAll('input');
+                return {
+                    created: inputs[0].checked,    // First checkbox
+                    name: inputs[1].value,         // Text input
+                    attunement: inputs[2].checked, // Second checkbox
+                    notes: inputs[3].value         // Text input
+                };
+            });
             data['equipment_table'] = [];
             document.querySelectorAll('#equipment-body tr').forEach(tr => {
                 const inputs = tr.querySelectorAll('input');
@@ -821,7 +847,7 @@
         function populateData(data) {
             if(!data) return;
             for (const [key, value] of Object.entries(data)) {
-                if(key === 'spellSlots' || key === 'weapons' || key === 'spells') continue;
+                if(['spellSlots', 'weapons', 'spells', 'equipment', 'magic_items'].includes(key)) continue;
                 const el = document.getElementById(key);
                 if (el) { if(el.type === 'checkbox') el.checked = value; else el.value = value; }
             }
@@ -840,6 +866,10 @@
                 for(let i=0; i<Math.max(5, data.weapons.length); i++) window.addWeaponRow();
                 const rows = document.querySelectorAll('#weapons-body tr');
                 data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.name; inputs[1].value=r.atk; inputs[2].value=r.dmg; inputs[3].value=r.notes; }});
+            }
+            if (data.magic_items) {
+                document.getElementById('magic-items-body').innerHTML = '';
+                data.magic_items.forEach(item => window.addMagicItemRow(item));
             }
             if(data.spells) {
                 document.getElementById('spells-body').innerHTML = '';
@@ -905,7 +935,13 @@
         }
 
         function handleInput(e) {
-            if (e.target.id.endsWith('-score') || e.target.id === 'prof-bonus' || e.target.type === 'checkbox' || e.target.id === 'spell-ability') updateModifiers();
+            const targetId = e?.target?.id || "";
+            const targetType = e?.target?.type || "";
+
+            if (targetId.endsWith('-score') || targetId === 'prof-bonus' || targetType === 'checkbox' || targetId === 'spell-ability') {
+                updateModifiers();
+            }
+
             if (!isLoading) {
                 lastLocalChangeTimestamp = Date.now();
                 debounce(() => window.saveVersion(false), 2000)();
@@ -977,6 +1013,27 @@
             };
 
             attachGhost(inputs[1]); // Spell Name
+        };
+
+        window.addMagicItemRow = (item = null) => {
+            const tbody = document.getElementById('magic-items-body');
+            const tr = document.createElement('tr');
+
+            tr.innerHTML = `
+                <td style="text-align: center;">
+                    <input type="checkbox" ${item?.created ? 'checked' : ''} style="width: auto;">
+                </td>
+                <td><input type="text" value="${item ? item.name : ''}" placeholder="Item name..."></td>
+                <td style="text-align: center;">
+                    <input type="checkbox" ${item?.attunement ? 'checked' : ''} style="width: auto;">
+                </td>
+                <td><input type="text" value="${item ? item.notes : ''}" placeholder="Details..."></td>
+                <td class="action-cell"><button onclick="this.parentElement.parentElement.remove(); handleInput();" class="remove-btn">-</button></td>
+            `;
+
+            tbody.appendChild(tr);
+            // Ensure both text inputs and checkboxes trigger a save
+            tr.querySelectorAll('input').forEach(el => el.addEventListener('input', () => handleInput()));
         };
 
         window.addEquipmentRow = (item = null) => {
