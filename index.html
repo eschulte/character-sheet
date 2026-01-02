@@ -59,6 +59,9 @@
         .weapons-table, .spells-list-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
         .weapons-table th, .spells-list-table th { text-align: left; border-bottom: 2px solid var(--border-color); font-size: 0.8rem; }
         .weapons-table td, .spells-list-table td { border-bottom: 1px solid var(--faint-line); padding: 5px 0; }
+        .equipment-table { width: 100%; border-collapse: collapse; }
+        .equipment-table th { font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+        .equipment-table td { padding: 2px 0; border-bottom: 1px solid var(--faint-line); }
         .remove-btn {
             background: #a39081; /* Subtle brownish-grey */
             color: #fdf6e3;
@@ -335,7 +338,25 @@
         <div class="inner-section">
             <div class="bio-col">
 
-                <div class="panel" style="flex-grow: 1;"><span class="box-title" data-tip="Equipment" tabindex="0">Equipment</span><textarea id="equipment" style="height: 480px; border:none;"></textarea></div>
+                <div class="panel">
+                    <span class="box-title" data-tip="Equipment">Equipment</span>
+                    <table class="equipment-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 45%">Item</th>
+                                <th style="width: 15%">Qty</th>
+                                <th style="width: 15%">Lbs</th>
+                                <th style="width: 25%">Notes</th>
+                                <th style="width: 30px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipment-body"></tbody>
+                    </table>
+                    <button onclick="addEquipmentRow()" style="width: 100%;">+</button>
+                    <div style="text-align: right; margin-top: 10px; font-weight: bold; border-top: 1px solid var(--border-color);">
+                        Total Weight: <span id="total-weight">0</span> lbs
+                    </div>
+                </div>
                 <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; ">
                     <div></div>
                     <div class="coins-container">
@@ -775,6 +796,16 @@
                 const i = tr.querySelectorAll('input');
                 data['weapons'].push({name: i[0].value, atk: i[1].value, dmg: i[2].value, notes: i[3].value});
             });
+            data['equipment_table'] = [];
+            document.querySelectorAll('#equipment-body tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                data['equipment_table'].push({
+                    name: inputs[0].value,
+                    qty: inputs[1].value,
+                    lbs: inputs[2].value,
+                    notes: inputs[3].value
+                });
+            });
             data['spells'] = [];
             document.querySelectorAll('#spells-body tr').forEach(tr => {
                 const i = tr.querySelectorAll('input');
@@ -788,9 +819,19 @@
         function populateData(data) {
             if(!data) return;
             for (const [key, value] of Object.entries(data)) {
-                if(key === 'spellSlots' || key === 'weapons' || key === 'spells') continue;
+                if(key === 'spellSlots' || key === 'weapons' || key === 'spells' || key === 'portrait-upload') continue;
                 const el = document.getElementById(key);
                 if (el) { if(el.type === 'checkbox') el.checked = value; else el.value = value; }
+            }
+            if (data.equipment_table && Array.isArray(data.equipment_table)) {
+                const tbody = document.getElementById('equipment-body');
+                tbody.innerHTML = ''; // Clear existing
+                data.equipment_table.forEach(item => {
+                    window.addEquipmentRow(item); // Pass item data to the row creator
+                });
+            } else if (typeof data.equipment === 'string' && data.equipment.trim() !== "") {
+                // Migration: If they had old text equipment, put it in the first row of the table
+                window.addEquipmentRow({name: data.equipment, qty: 1, lbs: 0, notes: "Imported from text"});
             }
             if(data.weapons) {
                 document.getElementById('weapons-body').innerHTML = '';
@@ -821,7 +862,7 @@
             }
             // Trigger an input event on all ghost inputs to update mirrors
             document.querySelectorAll('.ghost-input').forEach(el => el.dispatchEvent(new Event('input')));
-            updateModifiers(); updatePageTitle();
+          updateModifiers(); updatePageTitle(); updateWeight();
         }
 
         function updateModifiers() {
@@ -935,6 +976,43 @@
 
             attachGhost(inputs[1]); // Spell Name
         };
+
+        window.addEquipmentRow = (item = null) => {
+            const tbody = document.getElementById('equipment-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" value="${item ? item.name : ''}"></td>
+                <td><input type="number" value="${item ? item.qty : 1}" style="text-align:center;"></td>
+                <td><input type="number" value="${item ? item.lbs : 0}" style="text-align:center;"></td>
+                <td><input type="text" value="${item ? item.notes : ''}"></td>
+                <td><button onclick="this.parentElement.parentElement.remove(); updateWeight();" class="remove-btn">-</button></td>
+            `;
+            tbody.appendChild(tr);
+            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', updateWeight));
+            updateWeight();
+        };
+
+        function updateWeight() {
+            let total = 0;
+            // Sum rows
+            document.querySelectorAll('#equipment-body tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                const qty = parseFloat(inputs[1].value) || 0;
+                const lbs = parseFloat(inputs[2].value) || 0;
+                total += (qty * lbs);
+            });
+            // Sum coins (50 coins = 1 lb)
+            const coinIds = ['cp','sp','ep','gp','pp'];
+            let coinCount = 0;
+            coinIds.forEach(id => {
+                coinCount += (parseInt(document.getElementById(id).value) || 0);
+            });
+            total += (coinCount / 50);
+
+            document.getElementById('total-weight').innerText = total.toFixed(1);
+            handleInput({ target: document.body }); // Trigger auto-save
+        }
+
         window.resetSheet = function() {
             if(confirm("Create new character? Unsaved changes will be lost.")) {
                 currentCharacterId = generateUUID(); localStorage.setItem('dnd_char_id', currentCharacterId);
@@ -1079,6 +1157,10 @@
 
             const allInputs = document.querySelectorAll('input, textarea, select');
             allInputs.forEach(input => { input.addEventListener('input', handleInput); });
+
+            document.querySelectorAll('.coin-slot input').forEach(coinInput => {
+                coinInput.addEventListener('input', updateWeight);
+            });
 
             const urlParams = new URLSearchParams(window.location.search);
             const sharedId = urlParams.get('charId');
