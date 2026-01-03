@@ -27,6 +27,12 @@
         .dropdown:hover .dropdown-content { display: flex; flex-direction: column; gap: 8px; }
         .menu-group-label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; margin-bottom: 2px; border-bottom: 1px solid #444; }
         button { padding: 5px 10px; cursor: pointer; background: #555; color: white; border: 1px solid #777; }
+        #portrait-container { width: 100%; height: 80px; /* Or your preferred height */ border: 2px solid var(--border-color); background: #eee; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; /* Clips the image if it's larger than the box */ cursor: pointer; }
+        #portrait-container:hover #char-portrait { filter: brightness(0.8); }
+        #portrait-url-container { display: none; margin-top: 8px; }
+        #portrait-container.editing + #portrait-url-container { display: block; }
+        #char-portrait { width: 100%; height: 100%; object-fit: cover; /* Resizes to fill box, cropping edges if necessary */ object-position: 33.33% center; /* Focuses on the top of the image (the face) */ transition: filter 0.2s; }
+        #portrait-placeholder { font-style: italic; color: #888; }
         @media print { #app-controls { display: none !important; } body { background: white; padding: 0; display: block; } .sheet-container { width: 100%; max-width: 100%; box-shadow: none; padding: 0; margin: 0; } textarea { border: 1px solid #ccc; } }
         .sheet-container { background-color: var(--bg-color); width: 100%; max-width: 950px; padding: 40px; box-shadow: 0 0 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 20px; margin-top: 40px; }
         input[type="text"], input[type="number"], textarea { background: transparent; border: none; border-bottom: 1px solid var(--border-color); width: 100%; font-family: inherit; font-size: 1rem; color: var(--text-color); }
@@ -192,11 +198,15 @@
                 <input type="text" id="xp"><span class="label-sm" data-tip="XP" tabindex="0">XP</span>
             </div>
             <div class="header-section">
-                <div id="portrait-container" style="width: 100px; height: 100px; border: 2px solid var(--border-color); border-radius: 5px; position: relative; cursor: pointer; background: #eee; overflow: hidden;" onclick="document.getElementById('portrait-upload').click()">
-                    <img id="portrait-img" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-                    <div id="portrait-placeholder" style="display: flex; align-items: center; justify-content: center; height: 100%; color: #888; font-size: 0.7rem; text-align: center; padding: 5px;">Click to Upload</div>
-                    <input type="file" id="portrait-upload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-                    <input type="hidden" id="portraitUrl">
+                <div id="portrait-container" onclick="this.classList.toggle('editing')">
+                    <div id="portrait-placeholder">Click to add Portrait URL</div>
+                    <img id="char-portrait" src="" alt="Portrait" style="display:none;">
+                </div>
+
+                <div id="portrait-url-container">
+                    <label style="font-size: 0.6rem; text-transform: uppercase; color: #666;">Image URL:</label>
+                    <input type="text" id="portrait-url" placeholder="Paste URL here..."
+                           style="width: 100%; font-size: 0.75rem; padding: 4px;">
                 </div>
             </div>
         </div>
@@ -396,7 +406,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, addDoc, query, where, orderBy, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         // --- CONFIG ---
         let tipsEnabled = true;
@@ -413,7 +422,6 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
@@ -552,62 +560,29 @@
         }
 
         // -- PORTRAIT & UPLOAD LOGIC --
-        window.handleImageUpload = async function(event) {
-            const file = event.target.files[0];
-            if (!file || !currentUser) return;
-            if (!isCloudOwner) { alert("Only owners can change portraits."); return; }
+        function updatePortraitFromURL(url) {
+            const img = document.getElementById('char-portrait');
+            const placeholder = document.getElementById('portrait-placeholder');
+            const container = document.getElementById('portrait-container');
 
-            document.getElementById('portrait-placeholder').innerText = "Uploading...";
+            if (url && url.trim() !== "") {
+                img.src = url;
+                img.style.display = 'block';
+                placeholder.style.display = 'none';
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = async () => {
-                    // 1. Create Canvas for Compression
-                    const canvas = document.createElement('canvas');
-                    const MAX_SIZE = 400; // Resize to max 400px
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
-                    } else {
-                        if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // 2. Convert to compressed DataURL (Quality 0.7)
-                    const dataUrl = canvas.toDataURL('image/webp', 0.7);
-
-                    // 3. Upload to Firebase Storage
-                    try {
-                        const storageRef = ref(storage, `portraits/${currentCharacterId}`);
-                        await uploadString(storageRef, dataUrl, 'data_url');
-                        const downloadUrl = await getDownloadURL(storageRef);
-
-                        // Update UI
-                        const portraitImg = document.getElementById('portrait-img');
-                        portraitImg.src = downloadUrl;
-                        portraitImg.style.display = 'block';
-                        document.getElementById('portrait-placeholder').style.display = 'none';
-                        document.getElementById('portraitUrl').value = downloadUrl;
-
-                        // Save character update to link the image URL
-                        window.saveVersion(false);
-                        document.getElementById('portrait-placeholder').innerText = "Click to Upload";
-                    } catch (err) {
-                        console.error(err);
-                        alert("Upload failed.");
-                    }
+                img.onerror = () => {
+                    img.style.display = 'none';
+                    placeholder.style.display = 'block';
+                    placeholder.innerText = "Error loading image";
+                    container.classList.add('editing'); // Re-show URL if it's broken
                 };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        };
+            } else {
+                img.style.display = 'none';
+                placeholder.style.display = 'block';
+                placeholder.innerText = "Click to add Portrait URL";
+                container.classList.add('editing'); // Show URL input if empty
+            }
+        }
 
         // --- GHOST INPUT LOGIC ---
 
@@ -847,7 +822,7 @@
         function populateData(data) {
             if(!data) return;
             for (const [key, value] of Object.entries(data)) {
-                if(['spellSlots', 'weapons', 'spells', 'equipment', 'magic_items'].includes(key)) continue;
+                if(['spellSlots', 'weapons', 'spells', 'equipment', 'magic_items', 'portrait-upload'].includes(key)) continue;
                 const el = document.getElementById(key);
                 if (el) { if(el.type === 'checkbox') el.checked = value; else el.value = value; }
             }
@@ -884,13 +859,7 @@
                 }
             }
             if (data.portraitUrl) {
-                const img = document.getElementById('portrait-img');
-                img.src = data.portraitUrl;
-                img.style.display = 'block';
-                document.getElementById('portrait-placeholder').style.display = 'none';
-            } else {
-                document.getElementById('portrait-img').style.display = 'none';
-                document.getElementById('portrait-placeholder').style.display = 'flex';
+                updatePortraitFromURL(data.portraitUrl);
             }
             // Trigger an input event on all ghost inputs to update mirrors
             document.querySelectorAll('.ghost-input').forEach(el => el.dispatchEvent(new Event('input')));
@@ -1220,6 +1189,22 @@
             document.querySelectorAll('.coin-slot input').forEach(coinInput => {
                 coinInput.addEventListener('input', updateWeight);
             });
+
+            // Portrait
+            const portraitInput = document.getElementById('portrait-url');
+            if (portraitInput) {
+                portraitInput.addEventListener('input', (e) => {
+                    updatePortraitFromURL(e.target.value);
+                    handleInput(e);
+                });
+
+                // Optional: Hide the input when it loses focus
+                portraitInput.addEventListener('blur', () => {
+                    if (portraitInput.value.trim() !== "") {
+                        document.getElementById('portrait-container').classList.remove('editing');
+                    }
+                });
+            }
 
             const urlParams = new URLSearchParams(window.location.search);
             const sharedId = urlParams.get('charId');
