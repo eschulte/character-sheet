@@ -492,27 +492,46 @@
 
         function setupRealtimeListener() {
             if (!currentUser || !currentCharacterId) return;
+
+            // Main character document listener
             onSnapshot(doc(db, "characters", currentCharacterId), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     isCloudOwner = (currentUser.uid === data.ownerId);
                     document.getElementById('status').innerText = isCloudOwner ? "Online (Owner)" : "Online (Read Only)";
-                    const cloudTime = new Date(data.lastUpdated).getTime() || 0;
+
+                    // Convert ISO string back to number for comparison logic
+                    const cloudTime = data.lastUpdated ? new Date(data.lastUpdated).getTime() : 0;
+
                     if (suggestLoadRemoteChanges && cloudTime > lastLoadedRemoteTimestamp) {
                         if (lastLocalChangeTimestamp > lastLoadedRemoteTimestamp) {
-                            if (confirm("New version available! Local edits detected. Overwrite local changes?")) loadHeadData(data, cloudTime);
+                            if (confirm("New version available! Overwrite local edits?")) loadHeadData(data, cloudTime);
                             else lastLoadedRemoteTimestamp = Date.now();
                         } else { loadHeadData(data, cloudTime); }
                     }
-                } else { isCloudOwner = true; document.getElementById('status').innerText = "Online (New)"; }
+                } else {
+                    isCloudOwner = true;
+                    document.getElementById('status').innerText = "Online (New)";
+                }
             });
-            const snapsQ = query(collection(db, "characters", currentCharacterId, "snapshots"), orderBy("createdAt", "desc"), limit(20));
+
+            // Snapshots sub-collection listener
+            const snapsQ = query(collection(db, "characters", currentCharacterId, "snapshots"), orderBy("createdAt", "desc"), limit(40));
             onSnapshot(snapsQ, (qSnap) => {
                 const select = document.getElementById('versionSelect');
                 select.innerHTML = '<option value="">Load Version...</option>';
-                qSnap.forEach(doc => {
-                    const d = doc.data();
-                    const opt = document.createElement('option'); opt.value = doc.id; opt.text = `${d.name || 'Auto'} (${new Date(d.createdAt).toLocaleTimeString()})`; select.appendChild(opt);
+
+                qSnap.forEach(docSnap => {
+                    const d = docSnap.data();
+                    // Javascript's new Date() handles both ISO strings and Integers automatically
+                    const dateObj = new Date(d.createdAt);
+                    const dateStr = dateObj.toLocaleDateString([], { month: 'numeric', day: 'numeric' });
+                    const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+                    const opt = document.createElement('option');
+                    opt.value = docSnap.id;
+                    opt.text = `[${dateStr} ${timeStr}] ${d.name || 'Auto'}`;
+                    select.appendChild(opt);
                 });
             });
         }
@@ -520,6 +539,9 @@
         function loadHeadData(data, timestamp) {
             isLoading = true; populateData(data.sheetData);
             lastLoadedRemoteTimestamp = typeof timestamp === 'number' ? timestamp : new Date(timestamp).getTime();
+            if (data.sheetData['portrait-url']) {
+                updatePortraitFromURL(data.sheetData['portrait-url']);
+            }
             isLoading = false;
         }
 
@@ -527,18 +549,33 @@
             if (!currentUser) return alert("Login required.");
             if (!isCloudOwner) return alert("You can only save characters you own.");
             const data = collectData();
-            const now = new Date(); const nowIso = now.getTime();
+            const now = new Date();
+            const nowIso = now.toISOString(); // Changed from .getTime()
+
             const charRef = doc(db, "characters", currentCharacterId);
             try {
-                await setDoc(charRef, { ownerId: currentUser.uid, lastUpdated: nowIso, sheetData: data }, { merge: true });
+                await setDoc(charRef, {
+                    ownerId: currentUser.uid,
+                    lastUpdated: nowIso, // Store as ISO String
+                    sheetData: data
+                }, { merge: true });
+
                 lastLoadedRemoteTimestamp = now.getTime();
+
+                // Use time math for the 5-minute auto-save throttle
                 if (isManualSnapshot || (now.getTime() - lastAutoSnapshotTime > 5 * 60 * 1000)) {
                     let name = "Auto-Save";
                     if (isManualSnapshot) {
-                        name = prompt("Snapshot Name:", `Snapshot-${nowIso}`);
+                        // Default prompt name to a readable date
+                        name = prompt("Snapshot Name:", `Snapshot-${now.toLocaleDateString()}`);
                         if (!name) return;
                     }
-                    await addDoc(collection(db, "characters", currentCharacterId, "snapshots"), { name: name, createdAt: nowIso, sheetData: data, createdBy: currentUser.uid });
+                    await addDoc(collection(db, "characters", currentCharacterId, "snapshots"), {
+                        name: name,
+                        createdAt: nowIso, // Store as ISO String
+                        sheetData: data,
+                        createdBy: currentUser.uid
+                    });
                     lastAutoSnapshotTime = now.getTime();
                 }
                 updateMyCharactersList();
@@ -569,12 +606,13 @@
                 img.src = url;
                 img.style.display = 'block';
                 placeholder.style.display = 'none';
+                container.classList.remove('editing');
 
                 img.onerror = () => {
                     img.style.display = 'none';
                     placeholder.style.display = 'block';
                     placeholder.innerText = "Error loading image";
-                    container.classList.add('editing'); // Re-show URL if it's broken
+                    container.classList.add('editing');
                 };
             } else {
                 img.style.display = 'none';
@@ -745,6 +783,7 @@
                     currentCharacterId = finalId;
                     localStorage.setItem('dnd_char_id', currentCharacterId);
                     populateData(targetData.sheetData);
+                    if(targetData.sheetData['portrait-url']) updatePortraitFromURL(targetData.sheetData['portrait-url']);
 
                     if (currentUser && targetData.ownerId === currentUser.uid) {
                         isCloudOwner = true;
