@@ -45,19 +45,89 @@
         .header-section { display: flex; flex-direction: column; justify-content: flex-end; }
         .main-grid { display: grid; grid-template-columns: 1fr 2.6fr; gap: 25px; }
         .stats-col { display: flex; flex-direction: column; gap: 15px; }
-        .ability-box { border: 2px solid var(--border-color); border-radius: 10px; padding: 10px 5px; text-align: center; background: rgba(255,255,255,0.3); margin-top: 0.5em; }
-        .ability-score { font-size: 1.5rem; font-weight: bold; width: 50px; margin: 0 auto; display: block; text-align: center; border: 1px solid #ccc; border-radius: 5px; }
-        .ability-mod { font-size: 2rem; font-weight: bold; border: none; text-align: center;}
-        .skills-list { font-size: 0.85rem; text-align: left; margin-top: 15px; padding-left: 5px; }
+        .save-val-input, .ability-mod { color: var(--text-color); }
+        .ability-box { 
+            border: none; 
+            background: transparent; 
+            margin-top: 10px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        
+        .ability-visual-container {
+            position: relative;
+            width: 90px;
+            height: 75px; /* Compressed height */
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Thorny Vine Filigree */
+        .ability-visual-container::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -10px;
+            right: -10px;
+            bottom: -5px;
+            /* SVG of intertwined thorny vines */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 100'%3E%3Cstyle%3E.v%7Bfill:none;stroke:%232d3d23;stroke-width:1.5;stroke-linecap:round;%7D.v2%7Bfill:none;stroke:%233a4d2f;stroke-width:0.8;stroke-opacity:0.6;%7D.t%7Bfill:%231a2614;%7D%3C/style%3E%3Cg%3E%3C!-- Left --%3E%3Cpath class='v' d='M15,90 C5,70 2,45 10,30 C15,20 8,10 22,2'/%3E%3Cpath class='v' d='M10,85 C-2,65 5,40 15,35'/%3E%3Cpath class='v2' d='M18,80 C10,60 12,45 20,40 M5,70 C0,50 8,30 18,25 M12,45 Q25,45 22,60'/%3E%3Cpath class='t' d='M8,55 L2,53 L8,48 Z M5,35 L0,32 L6,28 Z M10,15 L5,10 L12,12 Z M20,40 L25,43 L21,48 Z M3,75 L-1,72 L4,68 Z M18,20 L14,15 L20,16 Z'/%3E%3C/g%3E%3Cg%3E%3C!-- Right --%3E%3Cpath class='v' d='M125,90 C135,70 138,45 130,30 C125,20 132,10 118,2'/%3E%3Cpath class='v' d='M130,85 C142,65 135,40 125,35'/%3E%3Cpath class='v2' d='M122,80 C130,60 128,45 120,40 M135,70 C140,50 132,30 122,25 M128,45 Q115,45 118,60'/%3E%3Cpath class='t' d='M132,55 L138,53 L132,48 Z M135,35 L140,32 L134,28 Z M130,15 L135,10 L128,12 Z M120,40 L115,43 L119,48 Z M137,75 L141,72 L136,68 Z M122,20 L126,15 L120,16 Z'/%3E%3C/g%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: contain;
+            pointer-events: none;
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .ability-mod { 
+            font-size: 2rem; /* Slightly smaller for compression */
+            font-weight: bold; 
+            text-align: center;
+            width: 65px; /* Slightly smaller circle */
+            height: 65px;
+            border: 2.5px solid var(--border-color);
+            border-radius: 50%;
+            background: #fff;
+            position: absolute;
+            top: 0;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.15);
+        }
+
+        .ability-score { 
+            font-size: 0.95rem; 
+            font-weight: bold; 
+            width: 40px; 
+            height: 24px;
+            text-align: center; 
+            border: 2px solid var(--border-color); 
+            border-radius: 10px;
+            background: var(--bg-color) !important;
+            position: absolute;
+            bottom: 2px; /* Tucked closer to the circle */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .skills-list {
+            margin-top: 0px; /* Bring skills up closer to the score pill */
+        }
+        .save-val-input {  width: 30px !important; /* Slightly wider for "+2" */ text-align: center;  font-size: 0.9rem;  border-bottom: 1px solid #999 !important;  font-family: inherit; }
         .skill-row { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; border-bottom: 1px solid #eee; }
         .prof-bubble { width: 12px; height: 12px; border: 1px solid black; border-radius: 50%; appearance: none; cursor: pointer; flex-shrink: 0; }
         .prof-bubble:checked { background: black; }
-        .save-val-input { width: 25px !important; text-align: center; font-size: 0.8rem; margin-right: 5px; border-bottom: 1px solid #999 !important; }
-        .combat-row-1 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .combat-row-1 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .combat-row-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 20px; }
         .shield-box { border: 2px double var(--border-color); padding: 5px; text-align: center; border-radius: 5px 5px 50% 50%; display: flex; flex-direction: column; justify-content: center; }
         .rect-box { border: 2px double var(--border-color); padding: 5px; border-radius: 5px; display: flex; flex-direction: column; }
-        .box-title { font-family: sans-serif; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 5px;}
+        .box-title { font-family: sans-serif; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 2px;}
         .death-save-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; }
         .ds-bubbles { display: flex; gap: 5px; }
         .physical-traits-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 5px; }
@@ -69,44 +139,16 @@
         .equipment-table { width: 100%; border-collapse: collapse; }
         .equipment-table th { font-size: 0.7rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
         .equipment-table td { padding: 2px 0; border-bottom: 1px solid var(--faint-line); }
-        .remove-btn {
-            background: #a39081; /* Subtle brownish-grey */
-            color: #fdf6e3;
-            border: none;
-            border-radius: 3px;
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            line-height: 1;
-            padding: 0;
-            margin-left: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.6;
-            transition: all 0.2s ease;
-        }
+        .remove-btn { background: #a39081; /* Subtle brownish-grey */ color: #fdf6e3; border: none; border-radius: 3px; width: 18px; height: 18px; cursor: pointer; font-weight: bold; font-size: 14px; line-height: 1; padding: 0; margin-left: 5px; display: flex; align-items: center; justify-content: center; opacity: 0.6; transition: all 0.2s ease; }
         .remove-btn:hover { background: #800; opacity: 1; }
         .action-cell { width: 30px; text-align: center; border-bottom: none !important; }
         .bottom-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .panel { border: 2px solid var(--border-color); border-radius: 5px; padding: 10px; }
-
-        /* Ghost Overlay Styles */
         .ghost-container { position: relative; width: 100%; display: flex; }
-        .ghost-mirror {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            color: transparent; pointer-events: none; white-space: pre-wrap;
-            user-select: none;
-            word-wrap: break-word; overflow: hidden;
-            background: transparent;
-            /* Font styles copied via JS */
-        }
+        .ghost-mirror { position: absolute; top: 0; left: 0; width: 100%; height: 100%; color: transparent; pointer-events: none; white-space: pre-wrap; user-select: none; word-wrap: break-word; overflow: hidden; background: transparent; }
         .ghost-mirror span.highlight { border-bottom: 2px dotted #800; pointer-events: auto; cursor: help; }
         .ghost-mirror span.suggestion { color: #aaa; }
         .ghost-input { background: transparent !important; position: relative; z-index: 2; }
-
         .prof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem; margin-bottom: 10px; }
         .prof-check-row { display: flex; gap: 10px; align-items: center; }
         .inner-section { display: grid; gap: 20px; margin-top: 20px; border-top: 3px double var(--border-color); padding-top: 20px; }
@@ -213,12 +255,12 @@
 
         <div class="main-grid">
             <div class="stats-col">
-                <div class="ability-box"><span class="box-title" data-tip="Proficiency" tabindex="0">Prof. Bonus</span><input type="text" id="prof-bonus" style="font-size: 1.5rem; text-align: center; border:none;"></div>
                 <div id="ability-scores-container"></div>
             </div>
 
             <div class="main-col">
                 <div class="combat-row-1">
+                    <div class="shield-box"><span class="box-title" data-tip="Proficiency" tabindex="0">Prof. Bonus</span><input type="text" id="prof-bonus" style="text-align: center; font-size: 1rem;"></div>
                     <div class="shield-box"><span class="box-title" data-tip="AC" tabindex="0">AC</span><input type="number" id="ac" style="text-align: center; font-size: 1rem;"></div>
                     <div class="shield-box"><span class="box-title" data-tip="Initiative" tabindex="0">Initiative</span><input type="text" id="initiative" placeholder="d20 + dex mod" style="text-align: center; font-size: 1rem;"></div>
                     <div class="shield-box"><span class="box-title" data-tip="Speed" tabindex="0">Speed</span><input type="text" id="speed" style="text-align: center; font-size: 1rem;"></div>
@@ -550,32 +592,67 @@
             if (!isCloudOwner) return alert("You can only save characters you own.");
             const data = collectData();
             const now = new Date();
-            const nowIso = now.toISOString(); // Changed from .getTime()
+            const nowIso = now.toISOString();
+            const todayStr = now.toLocaleDateString();
 
             const charRef = doc(db, "characters", currentCharacterId);
             try {
+                // 1. Always update the main document (Head)
                 await setDoc(charRef, {
                     ownerId: currentUser.uid,
-                    lastUpdated: nowIso, // Store as ISO String
+                    lastUpdated: nowIso,
                     sheetData: data
                 }, { merge: true });
 
                 lastLoadedRemoteTimestamp = now.getTime();
 
-                // Use time math for the 5-minute auto-save throttle
+                // 2. Snapshot Logic
+                // Only trigger if manual OR enough time passed since last distinct auto-save logic
                 if (isManualSnapshot || (now.getTime() - lastAutoSnapshotTime > 5 * 60 * 1000)) {
-                    let name = "Auto-Save";
-                    if (isManualSnapshot) {
-                        // Default prompt name to a readable date
-                        name = prompt("Snapshot Name:", `Snapshot-${now.toLocaleDateString()}`);
-                        if (!name) return;
+                    const snapsCol = collection(db, "characters", currentCharacterId, "snapshots");
+                    
+                    // Check the most recent snapshot
+                    const recentQuery = query(snapsCol, orderBy("createdAt", "desc"), limit(1));
+                    const recentSnap = await getDocs(recentQuery);
+                    
+                    let shouldOverwrite = false;
+                    let overwriteId = null;
+
+                    if (!recentSnap.empty && !isManualSnapshot) {
+                        const lastSnap = recentSnap.docs[0].data();
+                        const lastSnapDate = new Date(lastSnap.createdAt).toLocaleDateString();
+
+                        // If last save was Auto-Save AND it was created today
+                        if (lastSnap.name === "Auto-Save" && lastSnapDate === todayStr) {
+                            shouldOverwrite = true;
+                            overwriteId = recentSnap.docs[0].id;
+                        }
                     }
-                    await addDoc(collection(db, "characters", currentCharacterId, "snapshots"), {
-                        name: name,
-                        createdAt: nowIso, // Store as ISO String
-                        sheetData: data,
-                        createdBy: currentUser.uid
-                    });
+
+                    if (shouldOverwrite) {
+                        // Overwrite the existing auto-save entry
+                        await setDoc(doc(snapsCol, overwriteId), {
+                            name: "Auto-Save",
+                            createdAt: nowIso, // Update time to now
+                            sheetData: data,
+                            createdBy: currentUser.uid
+                        });
+                        console.log("Auto-save overwritten.");
+                    } else {
+                        // Create new snapshot
+                        let name = "Auto-Save";
+                        if (isManualSnapshot) {
+                            name = prompt("Snapshot Name:", `Snapshot-${todayStr}`);
+                            if (!name) return;
+                        }
+                        await addDoc(snapsCol, {
+                            name: name,
+                            createdAt: nowIso,
+                            sheetData: data,
+                            createdBy: currentUser.uid
+                        });
+                        console.log("New snapshot created.");
+                    }
                     lastAutoSnapshotTime = now.getTime();
                 }
                 updateMyCharactersList();
@@ -908,38 +985,54 @@
         function updateModifiers() {
             const stats = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
             const profBonus = parseInt(document.getElementById('prof-bonus').value) || 0;
+            
+            const fmt = (val) => (val >= 0 ? "+" : "") + val;
+
             stats.forEach(stat => {
-                const scoreEl = document.getElementById(`${stat}-score`);
                 const modEl = document.getElementById(`${stat}-mod`);
+                const scoreEl = document.getElementById(`${stat}-score`);
                 if (scoreEl && modEl) {
                    const score = parseInt(scoreEl.value);
-                   if (isNaN(score)) { modEl.value = ""; } else {
+                   if (isNaN(score)) { 
+                       modEl.value = ""; 
+                   } else {
                        const mod = Math.floor((score - 10) / 2);
-                       modEl.value = (mod >= 0 ? "+" : "") + mod;
+                       modEl.value = fmt(mod);
+                       
                        const saveProf = document.getElementById(`save-prof-${stat}`).checked;
                        const saveVal = document.getElementById(`save-val-${stat}`);
                        const totalSave = mod + (saveProf ? profBonus : 0);
-                       saveVal.value = (totalSave >= 0 ? "+" : "") + totalSave;
+                       saveVal.value = fmt(totalSave);
+
                        document.querySelectorAll(`[id^="val-${stat}-"]`).forEach(skillInput => {
                            const skillId = skillInput.id.replace('val-', 'prof-');
                            const isProficient = document.getElementById(skillId).checked;
                            const totalSkill = mod + (isProficient ? profBonus : 0);
-                           skillInput.value = (totalSkill >= 0 ? "+" : "") + totalSkill;
+                           skillInput.value = fmt(totalSkill);
                        });
                     }
                 }
             });
+
             const selectedStat = document.getElementById('spell-ability').value;
             if (selectedStat) {
                 const scoreEl = document.getElementById(`${selectedStat}-score`);
                 const mod = Math.floor((parseInt(scoreEl.value || 10) - 10) / 2);
-                document.getElementById('spell-mod').value = (mod >= 0 ? "+" : "") + mod;
+                document.getElementById('spell-mod').value = fmt(mod);
                 document.getElementById('spell-save-dc').value = 8 + profBonus + mod;
-                document.getElementById('spell-atk').value = (profBonus + mod >= 0 ? "+" : "") + (profBonus + mod);
+                document.getElementById('spell-atk').value = fmt(profBonus + mod);
             }
-            const percVal = parseInt(document.getElementById('val-wisdom-perception').value) || 0;
+
+            // Task 4: Auto-calculate Passive Perception
+            // Logic: 10 + Wis Mod + (ProfBonus if proficient in Perception)
+            const wisScore = parseInt(document.getElementById('wisdom-score').value) || 10;
+            const wisMod = Math.floor((wisScore - 10) / 2);
+            const isPercProf = document.getElementById('prof-wisdom-perception')?.checked || false;
+            
             const passPercEl = document.getElementById('pass-perc');
-            if (passPercEl) passPercEl.value = 10 + percVal;
+            if (passPercEl) {
+                passPercEl.value = 10 + wisMod + (isPercProf ? profBonus : 0);
+            }
         }
 
         function handleInput(e) {
@@ -1097,9 +1190,24 @@
                     let skillsHtml = '';
                     skills.forEach(skill => {
                         const skillId = skill.replace(/\s+/g, '-').toLowerCase();
-                        skillsHtml += `<div class="skill-row"><input type="number" class="save-val-input" id="val-${lowStat}-${skillId}" placeholder="0"><input type="checkbox" class="prof-bubble" id="prof-${lowStat}-${skillId}"><span>${skill}</span></div>`;
+                        skillsHtml += `<div class="skill-row"><input type="text" class="save-val-input" id="val-${lowStat}-${skillId}" placeholder="+0" readonly><input type="checkbox" class="prof-bubble" id="prof-${lowStat}-${skillId}"><span>${skill}</span></div>`;
                     });
-                    html += `<div class="ability-box"><span class="box-title" data-tip="${stat}" tabindex="0">${stat}</span><div style="position: relative;"><input type="number" id="${lowStat}-score" class="ability-score" placeholder="10"><span class="label-sm">Score</span><input type="text" id="${lowStat}-mod" class="ability-mod" placeholder="+0"><span class="label-sm">Modifier</span></div><div class="skills-list"><div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;"><input type="text" class="save-val-input" id="save-val-${lowStat}" placeholder="0"><input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}"><span>Saving Throw</span></div>${skillsHtml}</div></div>`;
+                    html += `
+                    <div class="ability-box">
+                    <span class="box-title" data-tip="${stat}" tabindex="0">${stat}</span>
+                    <div class="ability-visual-container">
+                        <input type="text" id="${lowStat}-mod" class="ability-mod" placeholder="+0" readonly tabindex="-1">
+                        <input type="number" id="${lowStat}-score" class="ability-score" placeholder="10">
+                    </div>
+                    <div class="skills-list">
+                        <div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;">
+                            <input type="text" class="save-val-input" id="save-val-${lowStat}" placeholder="+0" readonly>
+                            <input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}">
+                            <span>Saving Throw</span>
+                        </div>
+                        ${skillsHtml}
+                    </div>
+                </div>`;
                 }
                 abilitiesContainer.innerHTML = html;
             }
