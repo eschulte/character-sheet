@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="D&D 5e Character Sheet PWA">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/apple-touch-icon-180x180.png">
+    <meta property="og:title" content="D&D 5e Character Sheet">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="/apple-touch-icon-180x180.png">
     <link rel="icon" href="/favicon.ico" sizes="48x48">
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -46,15 +51,15 @@
         .main-grid { display: grid; grid-template-columns: 1fr 2.6fr; gap: 25px; }
         .stats-col { display: flex; flex-direction: column; gap: 15px; }
         .save-val-input, .ability-mod { color: var(--text-color); }
-        .ability-box { 
-            border: none; 
-            background: transparent; 
+        .ability-box {
+            border: none;
+            background: transparent;
             margin-top: 10px;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        
+
         .ability-visual-container {
             position: relative;
             width: 90px;
@@ -81,9 +86,9 @@
             z-index: 0;
         }
 
-        .ability-mod { 
+        .ability-mod {
             font-size: 2rem; /* Slightly smaller for compression */
-            font-weight: bold; 
+            font-weight: bold;
             text-align: center;
             width: 65px; /* Slightly smaller circle */
             height: 65px;
@@ -99,13 +104,13 @@
             box-shadow: inset 0 0 8px rgba(0,0,0,0.15);
         }
 
-        .ability-score { 
-            font-size: 0.95rem; 
-            font-weight: bold; 
-            width: 40px; 
+        .ability-score {
+            font-size: 0.95rem;
+            font-weight: bold;
+            width: 40px;
             height: 24px;
-            text-align: center; 
-            border: 2px solid var(--border-color); 
+            text-align: center;
+            border: 2px solid var(--border-color);
             border-radius: 10px;
             background: var(--bg-color) !important;
             position: absolute;
@@ -610,11 +615,11 @@
                 // Only trigger if manual OR enough time passed since last distinct auto-save logic
                 if (isManualSnapshot || (now.getTime() - lastAutoSnapshotTime > 5 * 60 * 1000)) {
                     const snapsCol = collection(db, "characters", currentCharacterId, "snapshots");
-                    
+
                     // Check the most recent snapshot
                     const recentQuery = query(snapsCol, orderBy("createdAt", "desc"), limit(1));
                     const recentSnap = await getDocs(recentQuery);
-                    
+
                     let shouldOverwrite = false;
                     let overwriteId = null;
 
@@ -691,6 +696,26 @@
                     placeholder.innerText = "Error loading image";
                     container.classList.add('editing');
                 };
+
+                // Update Social Media Meta Tags for Link Sharing
+                const metaTags = [
+                    { property: 'og:image', value: url },
+                    { name: 'twitter:image', value: url },
+                ];
+
+                metaTags.forEach(tag => {
+                    let el = tag.property
+                        ? document.querySelector(`meta[property="${tag.property}"]`)
+                        : document.querySelector(`meta[name="${tag.name}"]`);
+
+                    if (!el) {
+                        el = document.createElement('meta');
+                        if (tag.property) el.setAttribute('property', tag.property);
+                        if (tag.name) el.setAttribute('name', tag.name);
+                        document.head.appendChild(el);
+                    }
+                    el.content = tag.value;
+                });
             } else {
                 img.style.display = 'none';
                 placeholder.style.display = 'block';
@@ -985,7 +1010,7 @@
         function updateModifiers() {
             const stats = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
             const profBonus = parseInt(document.getElementById('prof-bonus').value) || 0;
-            
+
             const fmt = (val) => (val >= 0 ? "+" : "") + val;
 
             stats.forEach(stat => {
@@ -993,12 +1018,12 @@
                 const scoreEl = document.getElementById(`${stat}-score`);
                 if (scoreEl && modEl) {
                    const score = parseInt(scoreEl.value);
-                   if (isNaN(score)) { 
-                       modEl.value = ""; 
+                   if (isNaN(score)) {
+                       modEl.value = "";
                    } else {
                        const mod = Math.floor((score - 10) / 2);
                        modEl.value = fmt(mod);
-                       
+
                        const saveProf = document.getElementById(`save-prof-${stat}`).checked;
                        const saveVal = document.getElementById(`save-val-${stat}`);
                        const totalSave = mod + (saveProf ? profBonus : 0);
@@ -1028,7 +1053,7 @@
             const wisScore = parseInt(document.getElementById('wisdom-score').value) || 10;
             const wisMod = Math.floor((wisScore - 10) / 2);
             const isPercProf = document.getElementById('prof-wisdom-perception')?.checked || false;
-            
+
             const passPercEl = document.getElementById('pass-perc');
             if (passPercEl) {
                 passPercEl.value = 10 + wisMod + (isPercProf ? profBonus : 0);
