@@ -21,12 +21,12 @@
         :root { --bg-color: #fdf6e3; --text-color: #2b2b2b; --border-color: #5c4b3f; --faint-line: #dcd6c7; }
         * { box-sizing: border-box; }
         body { font-family: 'Georgia', 'Times New Roman', serif; background-color: #222; margin: 0; padding: 20px; color: var(--text-color); display: flex; flex-direction: column; align-items: center; width: 100%; min-height: 100vh; padding: 0; margin: 0; }
-        #app-controls { position: sticky; top: 0; width: 100%; background: #2a2a2a; color: white; padding: 10px; display: flex; flex-wrap: wrap; gap: 5px; z-index: 1000; font-family: sans-serif; align-items: center; transition: max-height 0.3s ease; overflow: visible; max-height: 50px; }
+        #app-controls { position: sticky; top: 0; width: 100%; background: #2a2a2a; color: white; padding: 10px; display: flex; flex-wrap: wrap; gap: 5px; z-index: 1001; font-family: sans-serif; align-items: center; transition: max-height 0.3s ease; overflow: visible; max-height: 50px; }
         #app-controls .app-btn { display: inline-block; transition: all 0.3s ease; }
         #app-controls.expanded { flex-wrap: wrap; max-height: 500px; }
         #app-controls button { padding: 3px 6px; font-size: 0.85rem; white-space: nowrap; }
         #app-toggle-hamburger { display: none; }
-        .dropdown { position: relative; display: inline-block; }
+        .dropdown { position: relative; display: inline-block; z-index: 1002; }
         .dropdown-content {  display: none;  position: absolute;  background-color: #333;  min-width: 220px;  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);  z-index: 1001;  border: 1px solid #555;  padding: 10px;  border-radius: 4px;  top: 100%;  left: 0;  flex-direction: column; /* Ensure layout is vertical */ gap: 8px; }
         .dropdown-content.show { display: flex !important; }
         .dropdown:hover .dropdown-content { display: flex; flex-direction: column; gap: 8px; }
@@ -165,7 +165,7 @@
         .coins-container { border: 2px solid var(--border-color); padding: 5px; border-radius: 10px; display: flex; flex-direction: column; }
         .coins { display: flex; gap: 5px; justify-content: space-around; }
         .coin-slot input { width: 40px; text-align: center; }
-        #main-nav { display: flex; position: sticky; justify-content: center; background: #111; padding: 10px; gap: 10px; top: 43.5px; z-index: 1000; border-bottom: 2px solid var(--border-color); width: 100%; }
+        #main-nav { display: flex; position: sticky; justify-content: center; background: #111; padding: 10px; gap: 10px; top: 43.5px; z-index: 100; border-bottom: 2px solid var(--border-color); width: 100%; }
         #tabs-wrapper { display: flex; flex-direction: column; width: 100%; overflow-x: auto; overflow-y: visible; scroll-snap-type: y mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         #tabs-wrapper::-webkit-scrollbar { display: none; }
         .tab-btn { background: #444; color: #eee; border: 1px solid var(--border-color); padding: 10px 15px; cursor: pointer; font-family: 'Georgia', serif; font-size: 0.9rem; border-radius: 5px; transition: 0.2s; }
@@ -250,6 +250,8 @@
         <button class="tab-btn" onclick="switchTab('spells-page')">Spells</button>
         <button class="tab-btn" onclick="switchTab('equip-page')">Equipment</button>
         <button class="tab-btn" onclick="switchTab('items-page')">Item Plans</button>
+        <button class="tab-btn" onclick="switchTab('story-page')">Backstory</button>
+        <button class="tab-btn" onclick="switchTab('notes-page')">Notes</button>
     </nav>
 
     <div id="tabs-wrapper">
@@ -372,8 +374,8 @@
                 <div class="bottom-sections">
                     <div class="panel"><span class="box-title" data-tip="Appearance" tabindex="0">Appearance</span><textarea id="appearance" style="height: 320px; border:none;"></textarea></div>
                     <div class="panel" style="display: flex; flex-direction: column;">
-                        <span class="box-title" data-tip="Backstory" tabindex="0">Backstory & Personality</span>
-                        <textarea id="backstory" style="height: 280px; flex-grow: 1; border:none;"></textarea>
+                        <span class="box-title" data-tip="Backstory" tabindex="0">Personality</span>
+                        <textarea id="personality" style="height: 280px; flex-grow: 1; border:none;"></textarea>
                         <div style="margin-top: 5px; border-top: 1px solid #ccc; padding-top: 5px;">
                             <span class="label-sm" style="display:inline;" data-tip="Alignment" tabindex="0">Alignment:</span><input type="text" id="alignment" style="width: 70%; display:inline-block;">
                         </div>
@@ -480,6 +482,26 @@
                     <tbody id="magic-items-body"></tbody>
                 </table>
                 <button onclick="addMagicItemRow()" style="width: 100%;">+</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div id="story-page" class="tab-content" data-label="Backstory">
+    <div class="sheet-container">
+        <div class="inner-section">
+            <div class="panel">
+                <span class="box-title" data-tip="Backstory">Backstory</span>
+                <textarea id="backstory" style="min-height: 60vh; flex-grow: 1; border:none;"></textarea>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div id="notes-page" class="tab-content" data-label="Notes">
+    <div class="sheet-container">
+        <div class="inner-section">
+            <div class="panel">
+                <span class="box-title" data-tip="Notes">Notes</span>
+                <textarea id="notes" style="min-height: 60vh; flex-grow: 1; border:none;"></textarea>
             </div>
         </div>
     </div>
