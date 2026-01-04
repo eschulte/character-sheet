@@ -20,8 +20,8 @@
     <style>
         :root { --bg-color: #fdf6e3; --text-color: #2b2b2b; --border-color: #5c4b3f; --faint-line: #dcd6c7; }
         * { box-sizing: border-box; }
-        body { font-family: 'Georgia', 'Times New Roman', serif; background-color: #222; margin: 0; padding: 20px; color: var(--text-color); display: flex; justify-content: center; }
-        #app-controls { position: absolute; top: 0; left: 0; width: 100%; background: #333; color: white; padding: 5px 10px; display: flex; flex-wrap: nowrap; gap: 5px; z-index: 1000; font-family: sans-serif; align-items: center; transition: max-height 0.3s ease; overflow: visible; max-height: 50px; }
+        body { font-family: 'Georgia', 'Times New Roman', serif; background-color: #222; margin: 0; padding: 20px; color: var(--text-color); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 0; margin: 0; }
+        #app-controls { position: relative; width: 100%; background: #2a2a2a; color: white; padding: 10px; display: flex; flex-wrap: wrap; gap: 5px; z-index: 1000; font-family: sans-serif; align-items: center; transition: max-height 0.3s ease; overflow: visible; max-height: 50px; }
         #app-controls .app-btn { display: inline-block; transition: all 0.3s ease; }
         #app-controls.expanded { flex-wrap: wrap; max-height: 500px; }
         #app-controls button { padding: 3px 6px; font-size: 0.85rem; white-space: nowrap; }
@@ -167,16 +167,25 @@
         .coins-container { border: 2px solid var(--border-color); padding: 5px; border-radius: 10px; display: flex; flex-direction: column; }
         .coins { display: flex; gap: 5px; justify-content: space-around; }
         .coin-slot input { width: 40px; text-align: center; }
+        #main-nav { display: flex; justify-content: center; background: #111; padding: 10px; gap: 10px; position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid var(--border-color); width: 100%; }
+        .tab-btn { background: #444; color: #eee; border: 1px solid var(--border-color); padding: 10px 15px; cursor: pointer; font-family: 'Georgia', serif; font-size: 0.9rem; border-radius: 5px; transition: 0.2s; }
+        .tab-btn.active { background: var(--bg-color); color: var(--text-color); font-weight: bold; box-shadow: 0 -2px 0 var(--border-color) inset; }
+        .tab-content { display: none; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .tab-content.active { display: block; }
 
+        @media (max-width: 600px) {
+            #main-nav { padding: 5px; gap: 5px; }
+            .tab-btn { padding: 8px 5px; font-size: 0.75rem; flex: 1; }
+        }
         @media screen and (max-width: 768px) {
             body { display: block; padding: 0; }
-            #app-controls { position: absolute; flex-wrap: nowrap; overflow: hidden; max-height: 45px; transition: max-height 0.3s ease; }
+            #app-controls { position: relative; flex-wrap: nowrap; overflow: hidden; max-height: 45px; transition: max-height 0.3s ease; }
             #app-controls.expanded { max-height: 500px; flex-wrap: wrap; }
             #app-controls .app-btn { display: none; }
             #app-controls.expanded .app-btn { display: inline-block; }
             #status, #auth-btn, #app-toggle-hamburger { display: inline-block; }
             #app-controls button { padding: 3px 5px; font-size: 0.75rem; }
-            .sheet-container { margin-top: 0; padding: 10px; padding-top: 100px; border-radius: 0; box-shadow: none; }
+            .sheet-container { margin-top: 0; padding: 10px; padding-top: 20px; border-radius: 0; box-shadow: none; }
             .main-grid, .inner-section, .main-header, .combat-row-1, .combat-row-2, .spell-header, .bottom-sections, .prof-grid { display: flex; flex-direction: column; }
             #status { margin-left: 0; width: 100%; }
         }
@@ -194,7 +203,6 @@
     </style>
 </head>
 <body>
-
     <div id="ai-tooltip"></div>
 
     <div id="app-controls">
@@ -226,6 +234,14 @@
         <button id="app-toggle-hamburger">☰</button>
     </div>
 
+    <nav id="main-nav">
+        <button class="tab-btn active" onclick="switchTab('main-page')">Character</button>
+        <button class="tab-btn" onclick="switchTab('spells-page')">Spells</button>
+        <button class="tab-btn" onclick="switchTab('items-page')">Item Plans</button>
+        <button class="tab-btn" onclick="switchTab('equip-page')">Equipment</button>
+    </nav>
+
+    <div id="main-page" class="tab-content active">
     <div class="sheet-container">
         <div class="main-header">
             <div class="header-section">
@@ -257,7 +273,6 @@
                 </div>
             </div>
         </div>
-
         <div class="main-grid">
             <div class="stats-col">
                 <div id="ability-scores-container"></div>
@@ -355,7 +370,10 @@
                 </div>
             </div>
         </div>
-
+    </div>
+    </div>
+    <div id="spells-page" class="tab-content">
+    <div class="sheet-container">
         <div class="inner-section">
             <div>
                 <div class="spell-header">
@@ -392,7 +410,10 @@
                 </div>
             </div>
         </div>
-
+        </div>
+        </div>
+        <div id="items-page" class="tab-content">
+        <div class="sheet-container">
         <div class="inner-section">
             <div class="panel">
                 <span class="box-title" data-tip="Magic Item Plans">Magic Item Plans (Artificer)</span>
@@ -411,7 +432,10 @@
                 <button onclick="addMagicItemRow()" style="width: 100%;">+</button>
             </div>
         </div>
-
+    </div>
+    </div>
+    <div id="equip-page" class="tab-content">
+    <div class="sheet-container">
         <div class="inner-section">
             <div class="panel">
                 <span class="box-title" data-tip="Equipment">Equipment</span>
@@ -446,7 +470,7 @@
                 </div>
             </div>
         </div>
-
+    </div>
     </div>
 
     <script type="module">
@@ -1204,6 +1228,27 @@
                 window.location.href = window.location.pathname;
             }
         };
+
+        window.switchTab = function(tabId) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected content
+            document.getElementById(tabId).classList.add('active');
+
+            // Set button as active
+            event.currentTarget.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
 
         function generateStaticContent() {
             const abilityData = { "Strength": ["Athletics"], "Dexterity": ["Acrobatics", "Sleight of Hand", "Stealth"], "Constitution": [], "Intelligence": ["Arcana", "History", "Investigation", "Nature", "Religion"], "Wisdom": ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"], "Charisma": ["Deception", "Intimidation", "Performance", "Persuasion"] };
