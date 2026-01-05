@@ -135,6 +135,26 @@
         .ds-bubbles { display: flex; gap: 5px; }
         .physical-traits-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 5px; }
         .trait-item { text-align: center; }
+        /* Drag and Drop Styles */
+        .drag-handle {
+            background: #5c4b3f;
+            color: #fdf6e3;
+            border: none;
+            border-radius: 3px;
+            width: 18px;
+            height: 18px;
+            cursor: grab;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .drag-handle:active { cursor: grabbing; }
+        .drag-handle:hover { opacity: 1; }
+        .dragging { opacity: 0.5; background: #dcd6c7; }
+        .action-cell { display: flex; gap: 4px; align-items: center; justify-content: center; }
         .weapons-table, .spells-list-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
         .weapons-table th, .spells-list-table th { text-align: left; border-bottom: 2px solid var(--border-color); font-size: 0.8rem; }
         .weapons-table td, .spells-list-table td { border-bottom: 1px solid var(--faint-line); padding: 5px 0; }
@@ -144,7 +164,7 @@
         .equipment-table td { padding: 2px 0; border-bottom: 1px solid var(--faint-line); }
         .remove-btn { background: #a39081; /* Subtle brownish-grey */ color: #fdf6e3; border: none; border-radius: 3px; width: 18px; height: 18px; cursor: pointer; font-weight: bold; font-size: 14px; line-height: 1; padding: 0; margin-left: 5px; display: flex; align-items: center; justify-content: center; opacity: 0.6; transition: all 0.2s ease; }
         .remove-btn:hover { background: #800; opacity: 1; }
-        .action-cell { width: 30px; text-align: center; border-bottom: none !important; }
+        .action-cell { width: 45px; text-align: center; border-bottom: none !important; }
         .bottom-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .panel { border: 2px solid var(--border-color); border-radius: 5px; padding: 10px; }
         .ghost-container { position: relative; width: 100%; display: flex; }
@@ -252,6 +272,7 @@
         <button class="tab-btn" onclick="switchTab('items-page')">Item Plans</button>
         <button class="tab-btn" onclick="switchTab('story-page')">Backstory</button>
         <button class="tab-btn" onclick="switchTab('notes-page')">Notes</button>
+        <button class="tab-btn" onclick="switchTab('people-page')">People</button>
     </nav>
 
     <div id="tabs-wrapper">
@@ -413,7 +434,8 @@
                     <table class="spells-list-table">
                         <thead>
                             <tr>
-                                <th width="30">Lvl</th><th>Name</th>
+                                <th width="45px">Lvl</th>
+                                <th>Name</th>
                                 <th width="120" style="text-align: center;">
                                     <span title="Verbal" data-tip="Verbal" tabindex="0">V</span> / <span title="Somatic" data-tip="Somatic" tabindex="0">S</span> / <span title="Concentration" data-tip="Concentration" tabindex="0">C</span> / <span title="Ritual" data-tip="Ritual" tabindex="0">R</span> / <span title="Material" data-tip="Material" tabindex="0">M</span>
                                 <th class="action-cell"></th>
@@ -440,7 +462,7 @@
                             <th style="width: 15%">Qty</th>
                             <th style="width: 15%">Lbs</th>
                             <th style="width: 25%">Notes</th>
-                            <th style="width: 30px"></th>
+                            <th class="action-cell"></th>
                         </tr>
                     </thead>
                     <tbody id="equipment-body"></tbody>
@@ -504,6 +526,27 @@
             <div class="panel">
                 <span class="box-title" data-tip="Notes">Notes</span>
                 <textarea id="notes" style="min-height: 60vh; flex-grow: 1; border:none;"></textarea>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div id="people-page" class="tab-content" data-label="People">
+    <div class="sheet-container">
+        <div class="inner-section">
+            <div class="panel">
+                <span class="box-title">People</span>
+                <table class="people-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 20%">Name</th>
+                            <th style="width: 15%">Desc.</th>
+                            <th style="width: 65%">Notes</th>
+                            <th class="action-cell"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="people-body"></tbody>
+                </table>
+                <button onclick="addPeopleRow()" style="width: 100%;">+</button>
             </div>
         </div>
     </div>
@@ -1011,6 +1054,16 @@
                     notes: inputs[3].value
                 });
             });
+            data['people_table'] = [];
+            document.querySelectorAll('#people-body tr').forEach(tr => {
+                const inputs = tr.querySelectorAll('input');
+                const people_notes = tr.querySelector('textarea').value;
+                data['people_table'].push({
+                    name: inputs[0].value,
+                    desc: inputs[1].value,
+                    notes: people_notes
+                });
+            });
             data['spells'] = [];
             document.querySelectorAll('#spells-body tr').forEach(tr => {
                 const i = tr.querySelectorAll('input');
@@ -1037,6 +1090,18 @@
             } else if (typeof data.equipment === 'string' && data.equipment.trim() !== "") {
                 // Migration: If they had old text equipment, put it in the first row of the table
                 window.addEquipmentRow({name: data.equipment, qty: 1, lbs: 0, notes: "Imported from text"});
+            }
+            if(data.people_table) {
+                document.getElementById('people-body').innerHTML = '';
+                for(let i=0; i<Math.max(5, data.people_table.length); i++) window.addPeopleRow();
+                const rows = document.querySelectorAll('#people-body tr');
+                data.people_table.forEach((r, i) => { if(rows[i]) {
+                    let inputs = rows[i].querySelectorAll('input');
+                    let people_notes = rows[i].querySelector('textarea');
+                    inputs[0].value=r.name;
+                    inputs[1].value=r.desc;
+                    people_notes.value=r.notes;
+                }});
             }
             if(data.weapons) {
                 document.getElementById('weapons-body').innerHTML = '';
@@ -1150,12 +1215,18 @@
         window.addWeaponRow = () => {
             const tbody = document.getElementById('weapons-body');
             const tr = document.createElement('tr');
+            tr.draggable = true;
+            tr.addEventListener('dragstart', handleDragStart);
+            tr.addEventListener('dragover', handleDragOver);
+            tr.addEventListener('drop', handleDrop);
+            tr.addEventListener('dragend', handleDragEnd);
+
             tr.innerHTML = `
                 <td><input type="text"></td>
                 <td><input type="text"></td>
                 <td><input type="text"></td>
                 <td><input type="text"></td>
-                <td class="action-cell"><button class="remove-btn" tabindex="-1">-</button></td>`;
+                <td class="action-cell"><button class="drag-handle" title="Drag to reorder">☰</button><button class="remove-btn" tabindex="-1">-</button></td>`;
 
             tbody.appendChild(tr);
             const inputs = tr.querySelectorAll('input');
@@ -1176,6 +1247,11 @@
         window.addSpellRow = () => {
             const tbody = document.getElementById('spells-body');
             const tr = document.createElement('tr');
+            tr.draggable = true;
+            tr.addEventListener('dragstart', handleDragStart);
+            tr.addEventListener('dragover', handleDragOver);
+            tr.addEventListener('drop', handleDrop);
+            tr.addEventListener('dragend', handleDragEnd);
             tr.innerHTML = `
                 <td><input type="text" style="width:25px; text-align:center;"></td>
                 <td><input type="text"></td>
@@ -1186,7 +1262,7 @@
                     <input type="checkbox" class="diamond-check">
                     <input type="checkbox" class="diamond-check">
                 </td>
-                <td class="action-cell"><button class="remove-btn" tabindex="-1">-</button></td>`;
+                <td class="action-cell"><button class="drag-handle" title="Drag to reorder">☰</button><button class="remove-btn" tabindex="-1">-</button></td>`;
 
             tbody.appendChild(tr);
             const inputs = tr.querySelectorAll('input');
@@ -1206,7 +1282,11 @@
         window.addMagicItemRow = (item = null) => {
             const tbody = document.getElementById('magic-items-body');
             const tr = document.createElement('tr');
-
+            tr.draggable = true;
+            tr.addEventListener('dragstart', handleDragStart);
+            tr.addEventListener('dragover', handleDragOver);
+            tr.addEventListener('drop', handleDrop);
+            tr.addEventListener('dragend', handleDragEnd);
             tr.innerHTML = `
                 <td style="text-align: center;">
                     <input type="checkbox" ${item?.created ? 'checked' : ''} style="width: auto;">
@@ -1216,7 +1296,7 @@
                     <input type="checkbox" ${item?.attunement ? 'checked' : ''} style="width: auto;">
                 </td>
                 <td><input type="text" value="${item ? item.notes : ''}" placeholder="Details..."></td>
-                <td class="action-cell"><button onclick="this.parentElement.parentElement.remove(); handleInput();" class="remove-btn">-</button></td>
+                <td class="action-cell"><button class="drag-handle" title="Drag to reorder">☰</button><button onclick="this.parentElement.parentElement.remove(); handleInput();" class="remove-btn">-</button></td>
             `;
 
             tbody.appendChild(tr);
@@ -1227,17 +1307,80 @@
         window.addEquipmentRow = (item = null) => {
             const tbody = document.getElementById('equipment-body');
             const tr = document.createElement('tr');
+            tr.draggable = true;
+            tr.addEventListener('dragstart', handleDragStart);
+            tr.addEventListener('dragover', handleDragOver);
+            tr.addEventListener('drop', handleDrop);
+            tr.addEventListener('dragend', handleDragEnd);
             tr.innerHTML = `
                 <td><input type="text" value="${item ? item.name : ''}"></td>
                 <td><input type="number" value="${item ? item.qty : 1}" style="text-align:center;"></td>
                 <td><input type="number" value="${item ? item.lbs : 0}" style="text-align:center;"></td>
                 <td><input type="text" value="${item ? item.notes : ''}"></td>
-                <td><button onclick="this.parentElement.parentElement.remove(); updateWeight();" class="remove-btn">-</button></td>
+                <td class="action-cell"><button class="drag-handle" title="Drag to reorder">☰</button><button onclick="this.parentElement.parentElement.remove(); updateWeight();" class="remove-btn">-</button></td>
             `;
             tbody.appendChild(tr);
             tr.querySelectorAll('input').forEach(i => i.addEventListener('input', updateWeight));
             updateWeight();
         };
+
+        window.addPeopleRow = (item = null) => {
+            const tbody = document.getElementById('people-body');
+            const tr = document.createElement('tr');
+            tr.draggable = true;
+            tr.addEventListener('dragstart', handleDragStart);
+            tr.addEventListener('dragover', handleDragOver);
+            tr.addEventListener('drop', handleDrop);
+            tr.addEventListener('dragend', handleDragEnd);
+            tr.innerHTML = `
+                <td><input type="text" value="${item ? item.name : ''}"></td>
+                <td><input type="text" value="${item ? item.desc : ''}"></td>
+                <td><textarea value="${item ? item.notes : ''}" style="height:4lh;"></textarea></td>
+                <td class="action-cell"><button class="drag-handle" title="Drag to reorder">☰</button><button onclick="this.parentElement.parentElement.remove(); updateWeight();" class="remove-btn">-</button></td>
+            `;
+            tbody.appendChild(tr);
+            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', updateWeight));
+            updateWeight();
+        };
+
+        // --- Drag and Drop Logic ---
+        let dragSrcEl = null;
+
+        function handleDragStart(e) {
+            dragSrcEl = this;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.innerHTML);
+            this.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) e.stopPropagation();
+
+            if (dragSrcEl !== this && dragSrcEl.parentNode === this.parentNode) {
+                // Determine if dragging up or down
+                const allRows = Array.from(this.parentNode.children);
+                const dragIdx = allRows.indexOf(dragSrcEl);
+                const dropIdx = allRows.indexOf(this);
+
+                if (dragIdx < dropIdx) {
+                    this.parentNode.insertBefore(dragSrcEl, this.nextSibling);
+                } else {
+                    this.parentNode.insertBefore(dragSrcEl, this);
+                }
+                handleInput(); // Trigger your existing save logic
+            }
+            return false;
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+        }
 
         function updateWeight() {
             let total = 0;
