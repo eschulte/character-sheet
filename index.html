@@ -31,6 +31,10 @@
         .dropdown-content.show { display: flex !important; }
         .dropdown:hover .dropdown-content { display: flex; flex-direction: column; gap: 8px; }
         .menu-group-label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; margin-bottom: 2px; border-bottom: 1px solid #444; }
+        .hidden-class-feature { display: none !important; }
+        .class-badge { position: absolute; top: -2px; right: 2px; font-size: 1.1rem; opacity: 0.6; cursor: help; pointer-events: none; z-index: 10; }
+        .counter-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        .counter-label { font-size: 0.8rem; font-weight: bold; color: #555; }
         button { padding: 5px 10px; cursor: pointer; background: #555; color: white; border: 1px solid #777; }
         #portrait-container { width: 100%; height: 80px; /* Or your preferred height */ border: 2px solid var(--border-color); background: #eee; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; /* Clips the image if it's larger than the box */ cursor: pointer; }
         #portrait-container:hover #char-portrait { filter: brightness(0.8); }
@@ -127,7 +131,7 @@
         .prof-bubble { width: 12px; height: 12px; border: 1px solid black; border-radius: 50%; appearance: none; cursor: pointer; flex-shrink: 0; }
         .prof-bubble:checked { background: black; }
         .combat-row-1 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .combat-row-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .combat-row-2 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .shield-box { border: 2px double var(--border-color); padding: 5px; text-align: center; border-radius: 5px 5px 50% 50%; display: flex; flex-direction: column; justify-content: center; }
         .rect-box { border: 2px double var(--border-color); padding: 5px; border-radius: 5px; display: flex; flex-direction: column; }
         .box-title { font-family: sans-serif; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 2px;}
@@ -167,6 +171,7 @@
         .action-cell { width: 45px; text-align: center; border-bottom: none !important; }
         .bottom-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .panel { border: 2px solid var(--border-color); border-radius: 5px; padding: 10px; }
+        .panel, .class-input-wrapper { position: relative; }
         .ghost-container { position: relative; width: 100%; display: flex; }
         .ghost-mirror { position: absolute; top: 0; left: 0; width: 100%; height: 100%; color: transparent; pointer-events: none; white-space: pre-wrap; user-select: none; word-wrap: break-word; overflow: hidden; background: transparent; }
         .ghost-mirror span.highlight { border-bottom: 2px dotted #800; pointer-events: auto; cursor: help; }
@@ -190,7 +195,7 @@
         #tabs-wrapper::-webkit-scrollbar { display: none; }
         .tab-btn { background: #444; color: #eee; border: 1px solid var(--border-color); padding: 10px 15px; cursor: pointer; font-family: 'Georgia', serif; font-size: 0.9rem; border-radius: 5px; transition: 0.2s; }
         .tab-btn.active { background: var(--bg-color); color: var(--text-color); font-weight: bold; box-shadow: 0 -2px 0 var(--border-color) inset; }
-        .tab-content { display: block !important; width: 100%; flex-direction: column; align-items: center; scroll-snap-align: start; scroll-margin-top: 80px; }
+        .tab-content { display: block; width: 100%; flex-direction: column; align-items: center; scroll-snap-align: start; scroll-margin-top: 80px; }
         .tab-content.active { display: flex; }
 
         @media screen and (max-width: 768px) {
@@ -269,7 +274,9 @@
         <button class="tab-btn active" onclick="switchTab('main-page')">Character</button>
         <button class="tab-btn" onclick="switchTab('spells-page')">Spells</button>
         <button class="tab-btn" onclick="switchTab('equip-page')">Equipment</button>
-        <button class="tab-btn" onclick="switchTab('items-page')">Item Plans</button>
+        <button class="tab-btn class-specific class-artificer hidden-class-feature" onclick="switchTab('items-page')">Item Plans</button>
+        <button class="tab-btn class-specific class-druid hidden-class-feature" onclick="switchTab('wild-shape-page')">Wild Shape</button>
+        <button class="tab-btn class-specific class-warlock hidden-class-feature" onclick="switchTab('invocations-page')">Invocations</button>
         <button class="tab-btn" onclick="switchTab('story-page')">Backstory</button>
         <button class="tab-btn" onclick="switchTab('notes-page')">Notes</button>
         <button class="tab-btn" onclick="switchTab('people-page')">People</button>
@@ -288,8 +295,11 @@
                 </div>
             </div>
             <div class="header-section">
-                <input type="text" id="class"><span class="label-sm" data-tip="Class" tabindex="0">Class</span>
-                <input type="text" id="subclass"><span class="label-sm" data-tip="Subclass" tabindex="0">Subclass</span>
+                <div class="class-input-wrapper">
+                    <input type="text" id="class"><span class="label-sm" data-tip="Class" tabindex="0">Class</span>
+                    <input type="text" id="subclass"><span class="label-sm" data-tip="Subclass" tabindex="0">Subclass</span>
+                    <span id="class-input-badge" class="class-badge"></span>
+                </div>
             </div>
             <div class="header-section">
                 <input type="text" id="level"><span class="label-sm" data-tip="Level" tabindex="0">Level</span>
@@ -336,6 +346,107 @@
                         <span class="box-title" data-tip="Death Saves" tabindex="0">Death Saves</span>
                         <div class="death-save-row"><span data-tip="Successes" tabindex="0">Successes</span><div class="ds-bubbles"><input type="checkbox" class="prof-bubble" id="ds-s-1"><input type="checkbox" class="prof-bubble" id="ds-s-2"><input type="checkbox" class="prof-bubble" id="ds-s-3"></div></div>
                         <div class="death-save-row"><span data-tip="Failures" tabindex="0">Failures</span><div class="ds-bubbles"><input type="checkbox" class="prof-bubble" id="ds-f-1"><input type="checkbox" class="prof-bubble" id="ds-f-2"><input type="checkbox" class="prof-bubble" id="ds-f-3"></div></div>
+                    </div>
+                    <div id="class-features-container">
+                        <div class="rect-box class-specific class-barbarian hidden-class-feature class-input-wrapper">
+                            <span class="class-badge" title="Barbarian">🪓</span>
+                            <span class="box-title">Barbarian</span>
+                            <div class="counter-row">
+                                <span class="counter-label">Rages</span>
+                                <div class="ds-bubbles">
+                                    <input type="checkbox" class="prof-bubble" id="rage-1"><input type="checkbox" class="prof-bubble" id="rage-2">
+                                    <input type="checkbox" class="prof-bubble" id="rage-3"><input type="checkbox" class="prof-bubble" id="rage-4">
+                                    <input type="checkbox" class="prof-bubble" id="rage-5"><input type="checkbox" class="prof-bubble" id="rage-6">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rect-box class-specific class-bard hidden-class-feature class-input-wrapper">
+                            <span class="class-badge" title="Bard">🎻</span>
+                            <span class="box-title">Bardic Inspiration</span>
+                            <div class="counter-row">
+                                <span class="counter-label">Die Size</span>
+                                <input type="text" id="bardic-die" placeholder="d6" style="width: 50px; text-align: center;">
+                            </div>
+                            <div class="counter-row">
+                                <span class="counter-label">Uses</span>
+                                <div class="ds-bubbles">
+                                    <input type="checkbox" class="prof-bubble" id="bard-1"><input type="checkbox" class="prof-bubble" id="bard-2">
+                                    <input type="checkbox" class="prof-bubble" id="bard-3"><input type="checkbox" class="prof-bubble" id="bard-4"><input type="checkbox" class="prof-bubble" id="bard-5">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rect-box class-specific class-cleric class-paladin hidden-class-feature class-input-wrapper">
+                            <span class="class-badge" title="Cleric/Paladin">🔯</span>
+                            <span class="box-title">Channel Divinity</span>
+                            <div class="counter-row">
+                                <span class="counter-label">Uses</span>
+                                <div class="ds-bubbles">
+                                    <input type="checkbox" class="prof-bubble" id="channel-divinity-1">
+                                    <input type="checkbox" class="prof-bubble" id="channel-divinity-2">
+                                    <input type="checkbox" class="prof-bubble" id="channel-divinity-3">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="rect-box class-specific class-fighter hidden-class-feature class-input-wrapper">
+                            <span class="class-badge" title="Fighter">⚔️</span>
+                            <span class="box-title">Fighter Features</span>
+                            <div class="counter-row">
+                                <span class="counter-label">Second Wind</span>
+                                <div class="ds-bubbles">
+                                    <input type="checkbox" class="prof-bubble" id="second-wind-1">
+                                    <input type="checkbox" class="prof-bubble" id="second-wind-2">
+                                </div>
+                            </div>
+                             <div style="margin-top:10px;">
+                                <span class="counter-label">Weapon Mastery</span>
+                                <textarea id="weapon-mastery" style="height: 40px; border: 1px solid var(--faint-line);"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="rect-box class-specific class-monk hidden-class-feature class-input-wrapper">
+                            <span class="class-badge" title="Monk">🧘</span>
+                            <span class="box-title">Ki / Focus Points</span>
+                            <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                                <div style="flex:1; text-align: center;"><input type="number" id="ki-curr" placeholder="Curr" style="text-align:center;"><span class="label-sm">Current</span></div>
+                                <div style="flex:1; text-align: center;"><input type="number" id="ki-max" placeholder="Max" style="text-align:center;"><span class="label-sm">Max</span></div>
+                            </div>
+                            <div class="counter-row">
+                                <span class="counter-label">Unarmored Mvmt</span>
+                                <input type="text" id="unarmored-mvmt" placeholder="+10 ft" style="width: 60px; text-align: center;">
+                            </div>
+                            <div class="counter-row">
+                                <span class="counter-label">Martial Arts Die</span>
+                                <input type="text" id="martial-arts-die" placeholder="1d4" style="width: 60px; text-align: center;">
+                            </div>
+                        </div>
+
+                        <div class="rect-box class-specific class-ranger hidden-class-feature class-input-wrapper">
+                            <span class="class-badge" title="Ranger">🏹</span>
+                            <span class="box-title">Ranger</span>
+                            <span class="counter-label">Favored Enemy / Foe</span>
+                            <textarea id="favored-enemy" style="height: 60px; border: 1px solid var(--faint-line);"></textarea>
+                        </div>
+
+                        <div class="rect-box class-specific class-rogue hidden-class-feature class-input-wrapper">
+                            <span class="class-badge" title="Rogue">🗡️</span>
+                            <span class="box-title">Rogue</span>
+                            <div class="counter-row">
+                                <span class="counter-label">Sneak Attack Dmg</span>
+                                <input type="text" id="sneak-attack" placeholder="1d6" style="width: 80px; text-align: center;">
+                            </div>
+                        </div>
+
+                        <div class="rect-box class-specific class-sorcerer hidden-class-feature class-input-wrapper">
+                            <span class="class-badge" title="Sorcerer">🔮</span>
+                            <span class="box-title">Sorcery Points</span>
+                            <div style="display: flex; gap: 10px;">
+                                <div style="flex:1; text-align: center;"><input type="number" id="sorc-curr" placeholder="Curr" style="text-align:center;"><span class="label-sm">Current</span></div>
+                                <div style="flex:1; text-align: center;"><input type="number" id="sorc-max" placeholder="Max" style="text-align:center;"><span class="label-sm">Max</span></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -488,11 +599,12 @@
         </div>
     </div>
     </div>
-    <div id="items-page" class="tab-content" data-label="Item Plans">
+    <div id="items-page" class="tab-content class-specific class-artificer hidden-class-feature" data-label="Item Plans">
     <div class="sheet-container">
         <div class="inner-section">
             <div class="panel">
-                <span class="box-title" data-tip="Magic Item Plans">Magic Item Plans (Artificer)</span>
+                <span class="class-badge">⚙️</span>
+                <span class="box-title" data-tip="Magic Item Plans">Magic Item Plans</span>
                 <table class="weapons-table">
                     <thead>
                         <tr>
@@ -506,6 +618,56 @@
                     <tbody id="magic-items-body"></tbody>
                 </table>
                 <button onclick="addMagicItemRow()" style="width: 100%;">+</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div id="wild-shape-page" class="tab-content class-specific class-druid hidden-class-feature" data-label="Wild Shape">
+    <div class="sheet-container">
+        <div class="inner-section">
+            <div class="panel">
+                <span class="class-badge">🌿</span>
+                <span class="box-title">Wild Shapes</span>
+                <table class="weapons-table">
+                    <thead>
+                        <tr>
+                            <th>Beast Name</th>
+                            <th style="width: 50px">CR</th>
+                            <th style="width: 50px">HP</th>
+                            <th style="width: 50px">AC</th>
+                            <th style="width: 50px">Spd</th>
+                            <th>Attacks/Notes</th>
+                            <th class="action-cell"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="wild-shape-body"></tbody>
+                </table>
+                <button onclick="addWildShapeRow()" style="width: 100%;">+</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div id="invocations-page" class="tab-content class-specific class-warlock hidden-class-feature" data-label="Invocations">
+    <div class="sheet-container">
+        <div class="inner-section">
+            <div class="panel">
+                <span class="class-badge">👁️</span>
+                <span class="box-title">Eldritch Invocations</span>
+                <table class="weapons-table">
+                    <thead>
+                        <tr>
+                            <th>Invocation Name</th>
+                            <th>Description / Effect</th>
+                            <th class="action-cell"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="invocations-body"></tbody>
+                </table>
+                <button onclick="addInvocationRow()" style="width: 100%;">+</button>
+            </div>
+             <div class="panel" style="margin-top: 20px;">
+                <span class="box-title">Pact Boon</span>
+                <textarea id="pact-boon" style="height: 100px; border: none;"></textarea>
             </div>
         </div>
     </div>
@@ -828,8 +990,48 @@
             }
         }
 
-        // --- GHOST INPUT LOGIC ---
+        // --- CLASS SPECIFIC ELEMENTS ---
 
+        const classEmojiMap = {
+            'barbarian': '🪓', 'bard': '🎻', 'cleric': '🔯', 'druid': '🌿',
+            'fighter': '⚔️', 'monk': '🧘', 'paladin': '🔯', 'ranger': '🏹',
+            'rogue': '🗡️', 'sorcerer': '🔮', 'warlock': '👁️', 'artificer': '⚙️'
+        };
+
+        window.updateClassFeatures = function() {
+            const clsInput = document.getElementById('class').value || "";
+            const clsNormal = clsInput.toLowerCase();
+            const inputBadge = document.getElementById('class-input-badge');
+
+            // Reset input badge
+            inputBadge.textContent = '';
+
+            const allSpecifics = document.querySelectorAll('.class-specific');
+
+            allSpecifics.forEach(el => {
+                let isMatch = false;
+                el.classList.forEach(c => {
+                    if(c.startsWith('class-') && c !== 'class-specific') {
+                        const className = c.replace('class-', '');
+                        if (clsNormal.includes(className)) {
+                            isMatch = true;
+                            // Set the emoji in the main class input if matched
+                            if (classEmojiMap[className]) {
+                                inputBadge.textContent = classEmojiMap[className];
+                            }
+                        }
+                    }
+                });
+
+                if (isMatch) {
+                    el.classList.remove('hidden-class-feature');
+                } else {
+                    el.classList.add('hidden-class-feature');
+                }
+            });
+        };
+
+        // --- GHOST INPUT LOGIC ---
         function applyHighlights(text) {
             if (!AI_COMMENTS || Object.keys(AI_COMMENTS).length === 0 || !tipsEnabled) return text;
             const keys = Object.keys(AI_COMMENTS).sort((a, b) => b.length - a.length);
@@ -1035,6 +1237,17 @@
                 const i = tr.querySelectorAll('input');
                 data['weapons'].push({name: i[0].value, atk: i[1].value, dmg: i[2].value, notes: i[3].value});
             });
+            data.wild_shapes = [];
+            document.querySelectorAll('#wild-shape-body tr').forEach(tr => {
+                const i = tr.querySelectorAll('input');
+                data.wild_shapes.push({name: i[0].value, cr: i[1].value, hp: i[2].value, ac: i[3].value, spd: i[4].value, notes: i[5].value});
+            });
+
+            data.invocations = [];
+            document.querySelectorAll('#invocations-body tr').forEach(tr => {
+                const i = tr.querySelectorAll('input');
+                data.invocations.push({name: i[0].value, desc: i[1].value});
+            });
             data.magic_items = Array.from(document.querySelectorAll('#magic-items-body tr')).map(tr => {
                 const inputs = tr.querySelectorAll('input');
                 return {
@@ -1109,6 +1322,14 @@
                 const rows = document.querySelectorAll('#weapons-body tr');
                 data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.name; inputs[1].value=r.atk; inputs[2].value=r.dmg; inputs[3].value=r.notes; }});
             }
+            if(data.wild_shapes) {
+                document.getElementById('wild-shape-body').innerHTML = '';
+                data.wild_shapes.forEach(r => window.addWildShapeRow(r));
+            }
+            if(data.invocations) {
+                document.getElementById('invocations-body').innerHTML = '';
+                data.invocations.forEach(r => window.addInvocationRow(r));
+            }
             if (data.magic_items) {
                 document.getElementById('magic-items-body').innerHTML = '';
                 data.magic_items.forEach(item => window.addMagicItemRow(item));
@@ -1130,7 +1351,7 @@
             }
             // Trigger an input event on all ghost inputs to update mirrors
             document.querySelectorAll('.ghost-input').forEach(el => el.dispatchEvent(new Event('input')));
-          updateModifiers(); updatePageTitle(); updateWeight();
+          updateModifiers(); updatePageTitle(); updateWeight(); window.updateClassFeatures();
         }
 
         function updateModifiers() {
@@ -1191,6 +1412,10 @@
             const targetId = e?.target?.id || "";
             const targetType = e?.target?.type || "";
 
+            if (targetId === 'class') {
+                window.updateClassFeatures();
+            }
+
             if (targetId.endsWith('-score') || targetId === 'prof-bonus' || targetType === 'checkbox' || targetId === 'spell-ability') {
                 updateModifiers();
             }
@@ -1242,6 +1467,32 @@
 
             attachGhost(inputs[0]); // Name
             attachGhost(inputs[3]); // Notes
+        };
+
+        window.addWildShapeRow = (item = null) => {
+            const tbody = document.getElementById('wild-shape-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" value="${item ? item.name : ''}"></td>
+                <td><input type="text" value="${item ? item.cr : ''}" style="text-align:center"></td>
+                <td><input type="text" value="${item ? item.hp : ''}" style="text-align:center"></td>
+                <td><input type="text" value="${item ? item.ac : ''}" style="text-align:center"></td>
+                <td><input type="text" value="${item ? item.spd : ''}" style="text-align:center"></td>
+                <td><input type="text" value="${item ? item.notes : ''}"></td>
+                <td class="action-cell"><button onclick="this.parentElement.parentElement.remove(); handleInput();" class="remove-btn">-</button></td>`;
+            tbody.appendChild(tr);
+            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', handleInput));
+        };
+
+        window.addInvocationRow = (item = null) => {
+            const tbody = document.getElementById('invocations-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" value="${item ? item.name : ''}"></td>
+                <td><input type="text" value="${item ? item.desc : ''}"></td>
+                <td class="action-cell"><button onclick="this.parentElement.parentElement.remove(); handleInput();" class="remove-btn">-</button></td>`;
+            tbody.appendChild(tr);
+            tr.querySelectorAll('input').forEach(i => i.addEventListener('input', handleInput));
         };
 
         window.addSpellRow = () => {
