@@ -1143,5 +1143,100 @@
     "Progress points awarded for risk-taking and emotional damage.",
     "This is your progress bar.",
     "XP is the dungeon’s currency of suffering—earn it by killing, scheming, or accidentally solving puzzles. Stack enough, and you Level up, unlocking new ways to disappoint me. Run out of things to slaughter? Too bad, no XP for crying about it."
+  ],
+  "Bardic Inspiration": [
+    "Giving your friends a pep talk in the form of a die. It’s like a participation trophy that actually keeps them from dying.",
+    "Nothing says 'heroic' like a lute solo while the Fighter is getting his face chewed off. Use it to buff your allies, or just to feel superior when they finally succeed because of YOU.",
+    "Use a Bonus Action to give a friend a d6. If they still fail, it's officially their fault, not yours. I love that for you."
+  ],
+  "Cunning Action": [
+    "Why walk when you can Dash, Disengage, or Hide as a Bonus Action? You're basically a caffeinated squirrel with a knife.",
+    "Move fast, hit hard, and vanish before they can ask for your insurance information. It’s the Rogue way.",
+    "The art of being annoying and unreachable. A personal favorite of mine."
+  ],
+  "Channel Divinity": [
+    "A direct line to your boss. You ask for a favor, and they grant you a miracle or a fancy way to scare a skeleton.",
+    "Don't waste it on something stupid, crawler; the gods have a very low tolerance for 'accidental' fireballs during a sermon.",
+    "Limited uses. Maximum drama. Try not to embarrass your deity."
+  ],
+  "Divine Smite": [
+    "The classic 'Smite First, Ask Questions Never.' You convert spell slots into pure holy vengeance.",
+    "It’s the loudest way to tell an undead creature to go back to hell. 10/10 for dramatic effect, 0/10 for subtlety.",
+    "Burn a slot, add d8s, watch the boss melt. It’s simple, effective, and honestly a bit predictable."
+  ],
+  "Eldritch Invocations": [
+    "Weird little customizations your patron gave you in exchange for your soul. Want to see in magical darkness? Want to push people with a cantrip?",
+    "Here’s a treat from your cosmic sugar-daddy. Just don't read the fine print in your contract. Patrons hate it when you find the 'loopholes.'",
+    "Custom-built utility for the discerning sell-out."
+  ],
+  "Favored Enemy": [
+    "You've spent so much time hating one specific group of creatures that you've turned it into a science.",
+    "The System loves a specialist. Now you can track and kill your chosen targets with maximum efficiency and minimum mercy.",
+    "It’s not prejudice if they’re actually trying to eat you. Probably."
+  ],
+  "Infusions": [
+    "You took a perfectly good sword and glued magic to it. It’s DIY wizardry at its finest.",
+    "You’re basically a glorified fantasy plumber with a Glock. Keep tinkering, maybe it won't explode this time. No promises.",
+    "Turning mundane trash into magical treasure. It’s almost like you’re cheating, but I’ll allow it."
+  ],
+  "Ki": [
+    "The mystical energy of 'shut the hell up and let me punch you.' Use these points to move faster, dodge better, or turn an enemy's internal organs into salsa.",
+    "Very zen. Very violent. Mostly violent.",
+    "Spend them wisely, crawler. A Monk without Ki is just a guy in pajamas trying to start a fight."
+  ],
+  "Lay on Hands": [
+    "A touch-based healing service. You literally squeeze the 'hurt' out of someone and replace it with 'holy.'",
+    "Great for patching up the team, but don't get too close to the Bard. They'll make it weird.",
+    "A pool of HP you can dole out like candy. Try not to run out before the actual boss fight."
+  ],
+  "Martial Arts": [
+    "Who needs a sword when you have hands? You're a blur of elbows and knees.",
+    "It’s like a slap-fight, but with the force of a freight train hitting a bowl of pudding. Keep punching, crawler.",
+    "Bonus action unarmed strikes? How original. But hey, it works."
+  ],
+  "Metamagic": [
+    "The art of being a magical brat. Rules are for wizards, crawler. You’re just built different.",
+    "Bend the laws of magic until they scream. Double the range, twin the spell, or make it silent. The System is your playground.",
+    "Careful with those Sorcery Points. Once they're gone, you're just a person in a fancy robe with a lot of regrets."
+  ],
+  "Pact Boon": [
+    "The 'Thank You' gift from your cosmic patron. A magic book, a familiar that hates you, or a sword made of bad vibes.",
+    "Choose carefully; you're stuck with it until you crawl back and beg for a trade. Or until you die. Probably the dying part.",
+    "A little bit of extra power to sweeten the deal of eternal servitude."
+  ],
+  "Rage": [
+    "You get angry and things stop hurting. It's the ultimate 'no u' for physical damage.",
+    "Just remember to keep hitting things, crawler. If you stop to think about your feelings, the Rage ends and reality sets back in. And reality is usually a boot to the head.",
+    "Half damage from stabbing? Yes please. Double the screaming? Definitely."
+  ],
+  "Second Wind": [
+    "You’re too stubborn to stay down. You take a deep breath, ignore the punctured lung, and get back in the fight.",
+    "It's not a miracle; it's just pure, unadulterated spite. Useful for when the healer is busy 'finding themselves' in the back row.",
+    "A quick d10+level recovery. It’s the Fighter’s way of saying 'I didn't hear a bell.'"
+  ],
+  "Sneak Attack": [
+    "The gentleman's way of fighting. By which I mean, stabbing someone in the kidney while they're looking at the fighter.",
+    "It’s not 'cowardly,' it’s 'optimal damage output.' If they didn't want to get stabbed, they should have grown eyes in the back of their head.",
+    "Add those d6s, crawler. Witness the beauty of a well-timed backstab."
+  ],
+  "Sorcery Points": [
+    "Magic crack. You can burn these to cast more spells or twist your magic into weird shapes.",
+    "It’s volatile, dangerous, and likely to blow up in your face. I love it. Use them all at once; let's see what happens.",
+    "Conversion is key. Slots to points, points to slots. It’s like a magical Ponzi scheme."
+  ],
+  "Unarmored Movement": [
+    "Look at you go! Running up walls like a caffeinated gecko. Gravity is just a suggestion when you're this fast.",
+    "Just don't trip. The floor doesn't care about your 'inner peace'—it's still very much solid.",
+    "Speed is armor. If they can't catch you, they can't kill you. Usually."
+  ],
+  "Wild Shape": [
+    "Reject humanity, return to monke. Or bear. Or a very angry squirrel. You literally wear a beast like a meat-suit.",
+    "When the meat-suit dies, you pop out like a disgusting, hairy Russian nesting doll. It's gross, it's efficient, and I hate watching it.",
+    "Extra HP in animal form? That’s just cheating with extra steps. I love it."
+  ],
+  "Weapon Mastery": [
+    "Congratulations, you finally figured out which end of the stick is the pointy one. Now you can trip, push, or nick enemies with style.",
+    "It almost makes you look like you know what you're doing. Almost.",
+    "Special properties for your favorite toys. Try not to poke your own eye out."
   ]
 }
