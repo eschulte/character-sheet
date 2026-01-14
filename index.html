@@ -352,7 +352,7 @@
                             <span class="class-badge" title="Barbarian">🪓</span>
                             <span class="box-title">Barbarian</span>
                             <div class="counter-row">
-                                <span class="counter-label">Rages</span>
+                                <span class="counter-label" data-tip="Rage">Rages</span>
                                 <div class="ds-bubbles">
                                     <input type="checkbox" class="prof-bubble" id="rage-1"><input type="checkbox" class="prof-bubble" id="rage-2">
                                     <input type="checkbox" class="prof-bubble" id="rage-3"><input type="checkbox" class="prof-bubble" id="rage-4">
@@ -408,7 +408,7 @@
 
                         <div class="rect-box class-specific class-monk hidden-class-feature class-input-wrapper">
                             <span class="class-badge" title="Monk">🧘</span>
-                            <span class="box-title">Ki / Focus Points</span>
+                            <span class="box-title" data-tip="Ki">Ki / Focus Points</span>
                             <div style="display: flex; gap: 10px; margin-bottom: 5px;">
                                 <div style="flex:1; text-align: center;"><input type="number" id="ki-curr" placeholder="Curr" style="text-align:center;"><span class="label-sm">Current</span></div>
                                 <div style="flex:1; text-align: center;"><input type="number" id="ki-max" placeholder="Max" style="text-align:center;"><span class="label-sm">Max</span></div>
@@ -1034,6 +1034,84 @@
             });
         };
 
+        const CLASS_PROGRESSION = {
+            // Full Casters (Bard, Cleric, Druid, Sorcerer, Wizard)
+            fullCaster: {
+                1: [2,0,0,0,0,0,0,0,0], 2: [3,0,0,0,0,0,0,0,0], 3: [4,2,0,0,0,0,0,0,0],
+                4: [4,3,0,0,0,0,0,0,0], 5: [4,3,2,0,0,0,0,0,0], 6: [4,3,3,0,0,0,0,0,0],
+                7: [4,3,3,1,0,0,0,0,0], 8: [4,3,3,2,0,0,0,0,0], 9: [4,3,3,3,1,0,0,0,0],
+                10: [4,3,3,3,2,0,0,0,0], 11: [4,3,3,3,2,1,0,0,0], 12: [4,3,3,3,2,1,0,0,0],
+                13: [4,3,3,3,2,1,1,0,0], 14: [4,3,3,3,2,1,1,0,0], 15: [4,3,3,3,2,1,1,1,0],
+                16: [4,3,3,3,2,1,1,1,0], 17: [4,3,3,3,2,1,1,1,1], 18: [4,3,3,3,3,1,1,1,1],
+                19: [4,3,3,3,3,2,1,1,1], 20: [4,3,3,3,3,2,2,1,1]
+            },
+            // Half Casters (Paladin, Ranger) - Slots start at level 2
+            halfCaster: {
+                1: [2,0,0,0,0], 2: [2,0,0,0,0], 3: [3,0,0,0,0], 4: [3,0,0,0,0],
+                5: [4,2,0,0,0], 6: [4,2,0,0,0], 7: [4,3,0,0,0], 8: [4,3,0,0,0],
+                9: [4,3,2,0,0], 10: [4,3,2,0,0], 11: [4,3,3,0,0], 12: [4,3,3,1,0],
+                13: [4,3,3,1,0], 17: [4,3,3,3,1]
+            },
+            // Warlock (Unique: All slots are the same level)
+            warlock: {
+                slots: { 1:1, 2:2, 11:3, 17:4 },
+                level: { 1:1, 3:2, 5:3, 7:4, 9:5 }
+            },
+            // // Class Specific Non-Spell Resources
+            // features: {
+            //     barbarian: { rage: { 1:2, 3:3, 6:4, 12:5, 17:6, 20:99 } },
+            //     monk: { ki: (lvl) => (lvl >= 2 ? lvl : 0) },
+            //     artificer: { infusions: { 2:2, 6:3, 10:4, 14:5, 18:6 } },
+            //     rogue: { sneak: (lvl) => Math.ceil(lvl / 2) + "d6" }
+            // }
+            rage: { 1: 2, 3: 3, 6: 4, 12: 5, 17: 6, 20: 99 },
+            infusions: { 2: 2, 6: 3, 10: 4, 14: 5, 18: 6 }
+        };
+
+        function updateClassScaling() {
+            const level = parseInt(document.getElementById('level')?.value) || 1;
+            const className = document.getElementById('class')?.value.toLowerCase() || "";
+
+            // Determine caster type
+            let casterType = null;
+            if (/(wizard|cleric|druid|sorcerer|bard)/.test(className)) casterType = 'fullCaster';
+            else if (/(paladin|ranger|artificer)/.test(className)) casterType = 'halfCaster';
+            else if (classNAme.includes('warlock')) casterType = 'warlock';
+
+            // 1. Handle Spell Slots
+            const prog = CLASS_PROGRESSION[casterType];
+            const slots = prog[level] || [0,0,0,0,0,0,0,0,0,0];
+            for (let i = 1; i <= 9; i++) {
+                const container = document.getElementById(`spell-level-${i}-slots`);
+                if (!container) continue;
+                const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+                const allowed = slots[(i-1)] || 0;
+
+                checkboxes.forEach((cb, idx) => {
+                    if (idx >= allowed) {
+                        cb.style.opacity = "0.2";
+                        cb.disabled = true;
+                    } else {
+                        cb.style.opacity = "1";
+                        cb.disabled = false;
+                    }
+                });
+            }
+
+            if (className === 'barbarian') {
+                const rageLabel = document.querySelector('[data-tip="Rage"]');
+                const maxRage = Object.entries(CLASS_PROGRESSION.rage)
+                    .reverse().find(([lvl]) => level >= lvl)?.[1] || 2;
+                if (rageLabel) rageLabel.textContent = `Rages (${maxRage === 99 ? '∞' : maxRage})`;
+            }
+
+            if (className === 'monk') {
+                const kiInput = document.getElementById('ki-max');
+                if (kiInput) kiInput.value = level; // 1 per level
+            }
+        }
+        window.updateClassScaling = updateClassScaling;
+
         // --- GHOST INPUT LOGIC ---
         function applyHighlights(text) {
             if (!AI_COMMENTS || Object.keys(AI_COMMENTS).length === 0 || !tipsEnabled) return text;
@@ -1357,7 +1435,7 @@
                 }
                 // Trigger an input event on all ghost inputs to update mirrors
                 document.querySelectorAll('.ghost-input').forEach(el => el.dispatchEvent(new Event('input')));
-                updateModifiers(); updatePageTitle(); updateWeight(); window.updateClassFeatures();
+                updateModifiers(); updatePageTitle(); updateWeight(); window.updateClassFeatures(); updateClassScaling();
 
                 isAppReady = false;
             } catch (err) {
@@ -1427,6 +1505,10 @@
 
             if (targetId === 'class') {
                 window.updateClassFeatures();
+            }
+
+            if (targetId === 'class' || targetId === 'level') {
+                updateClassScaling();
             }
 
             if (targetId.endsWith('-score') || targetId === 'prof-bonus' || targetType === 'checkbox' || targetId === 'spell-ability') {
@@ -1751,7 +1833,7 @@
                 const slotCounts = [0, 4, 3, 3, 3, 3, 2, 2, 1, 1];
                 let html = '';
                 for(let i=1; i<=9; i++) {
-                    html += `<div>${i}${i===1?'st':i===2?'nd':i===3?'rd':'th'} `;
+                    html += `<div id="spell-level-${i}-slots">${i}${i===1?'st':i===2?'nd':i===3?'rd':'th'} `;
                     for(let j=0; j<slotCounts[i]; j++) html += `<input type="checkbox" class="diamond-check" id="slot-${i}-${j}">`;
                     html += `</div>`;
                 }
