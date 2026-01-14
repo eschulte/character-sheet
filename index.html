@@ -743,6 +743,7 @@
         let currentCharacterId = localStorage.getItem('dnd_char_id') || generateUUID();
         let isCloudOwner = true;
         let isLoading = false;
+        let isAppReady = false;
         const suggestLoadRemoteChanges = false;
         let lastLoadedRemoteTimestamp = 0;
         let lastLocalChangeTimestamp = 0;
@@ -850,7 +851,9 @@
         }
 
         function loadHeadData(data, timestamp) {
-            isLoading = true; populateData(data.sheetData);
+            isLoading = true;
+            isAppReady = false;
+            populateData(data.sheetData);
             lastLoadedRemoteTimestamp = typeof timestamp === 'number' ? timestamp : new Date(timestamp).getTime();
             if (data.sheetData['portrait-url']) {
                 updatePortraitFromURL(data.sheetData['portrait-url']);
@@ -1289,69 +1292,79 @@
 
         function populateData(data) {
             if(!data) return;
-            for (const [key, value] of Object.entries(data)) {
-                if(['spellSlots', 'weapons', 'spells', 'equipment', 'magic_items', 'portrait-upload'].includes(key)) continue;
-                const el = document.getElementById(key);
-                if (el) { if(el.type === 'checkbox') el.checked = value; else el.value = value; }
-            }
-            if (data.equipment_table && Array.isArray(data.equipment_table)) {
-                const tbody = document.getElementById('equipment-body');
-                tbody.innerHTML = ''; // Clear existing
-                data.equipment_table.forEach(item => {
-                    window.addEquipmentRow(item); // Pass item data to the row creator
-                });
-            } else if (typeof data.equipment === 'string' && data.equipment.trim() !== "") {
-                // Migration: If they had old text equipment, put it in the first row of the table
-                window.addEquipmentRow({name: data.equipment, qty: 1, lbs: 0, notes: "Imported from text"});
-            }
-            if(data.people_table) {
-                document.getElementById('people-body').innerHTML = '';
-                for(let i=0; i<Math.max(5, data.people_table.length); i++) window.addPeopleRow();
-                const rows = document.querySelectorAll('#people-body tr');
-                data.people_table.forEach((r, i) => { if(rows[i]) {
-                    let inputs = rows[i].querySelectorAll('input');
-                    let people_notes = rows[i].querySelector('textarea');
-                    inputs[0].value=r.name;
-                    inputs[1].value=r.desc;
-                    people_notes.value=r.notes;
-                }});
-            }
-            if(data.weapons) {
-                document.getElementById('weapons-body').innerHTML = '';
-                for(let i=0; i<Math.max(5, data.weapons.length); i++) window.addWeaponRow();
-                const rows = document.querySelectorAll('#weapons-body tr');
-                data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.name; inputs[1].value=r.atk; inputs[2].value=r.dmg; inputs[3].value=r.notes; }});
-            }
-            if(data.wild_shapes) {
-                document.getElementById('wild-shape-body').innerHTML = '';
-                data.wild_shapes.forEach(r => window.addWildShapeRow(r));
-            }
-            if(data.invocations) {
-                document.getElementById('invocations-body').innerHTML = '';
-                data.invocations.forEach(r => window.addInvocationRow(r));
-            }
-            if (data.magic_items) {
-                document.getElementById('magic-items-body').innerHTML = '';
-                data.magic_items.forEach(item => window.addMagicItemRow(item));
-            }
-            if(data.spells) {
-                document.getElementById('spells-body').innerHTML = '';
-                for(let i=0; i<Math.max(15, data.spells.length); i++) window.addSpellRow();
-                const rows = document.querySelectorAll('#spells-body tr');
-                data.spells.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.lvl; inputs[1].value=r.name; inputs[2].checked=r.conc; inputs[3].checked=r.rit; inputs[4].checked=r.mat; }});
-            }
-            if(data.spellSlots) {
-                for (const [slotId, checked] of Object.entries(data.spellSlots)) {
-                    const el = document.getElementById(slotId);
-                    if(el) el.checked = checked;
+            isAppReady = false;
+
+            try {
+                for (const [key, value] of Object.entries(data)) {
+                    if(['spellSlots', 'weapons', 'spells', 'equipment', 'magic_items', 'portrait-upload'].includes(key)) continue;
+                    const el = document.getElementById(key);
+                    if (el) { if(el.type === 'checkbox') el.checked = value; else el.value = value; }
                 }
+                if (data.equipment_table && Array.isArray(data.equipment_table)) {
+                    const tbody = document.getElementById('equipment-body');
+                    tbody.innerHTML = ''; // Clear existing
+                    data.equipment_table.forEach(item => {
+                        window.addEquipmentRow(item); // Pass item data to the row creator
+                    });
+                } else if (typeof data.equipment === 'string' && data.equipment.trim() !== "") {
+                    // Migration: If they had old text equipment, put it in the first row of the table
+                    window.addEquipmentRow({name: data.equipment, qty: 1, lbs: 0, notes: "Imported from text"});
+                }
+                if(data.people_table) {
+                    document.getElementById('people-body').innerHTML = '';
+                    for(let i=0; i<Math.max(5, data.people_table.length); i++) window.addPeopleRow();
+                    const rows = document.querySelectorAll('#people-body tr');
+                    data.people_table.forEach((r, i) => { if(rows[i]) {
+                        let inputs = rows[i].querySelectorAll('input');
+                        let people_notes = rows[i].querySelector('textarea');
+                        inputs[0].value=r.name;
+                        inputs[1].value=r.desc;
+                        people_notes.value=r.notes;
+                    }});
+                }
+                if(data.weapons) {
+                    document.getElementById('weapons-body').innerHTML = '';
+                    for(let i=0; i<Math.max(5, data.weapons.length); i++) window.addWeaponRow();
+                    const rows = document.querySelectorAll('#weapons-body tr');
+                    data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.name; inputs[1].value=r.atk; inputs[2].value=r.dmg; inputs[3].value=r.notes; }});
+                }
+                if(data.wild_shapes) {
+                    document.getElementById('wild-shape-body').innerHTML = '';
+                    data.wild_shapes.forEach(r => window.addWildShapeRow(r));
+                }
+                if(data.invocations) {
+                    document.getElementById('invocations-body').innerHTML = '';
+                    data.invocations.forEach(r => window.addInvocationRow(r));
+                }
+                if (data.magic_items) {
+                    document.getElementById('magic-items-body').innerHTML = '';
+                    data.magic_items.forEach(item => window.addMagicItemRow(item));
+                }
+                if(data.spells) {
+                    document.getElementById('spells-body').innerHTML = '';
+                    for(let i=0; i<Math.max(15, data.spells.length); i++) window.addSpellRow();
+                    const rows = document.querySelectorAll('#spells-body tr');
+                    data.spells.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.lvl; inputs[1].value=r.name; inputs[2].checked=r.conc; inputs[3].checked=r.rit; inputs[4].checked=r.mat; }});
+                }
+                if(data.spellSlots) {
+                    for (const [slotId, checked] of Object.entries(data.spellSlots)) {
+                        const el = document.getElementById(slotId);
+                        if(el) el.checked = checked;
+                    }
+                }
+                if (data.portraitUrl) {
+                    updatePortraitFromURL(data.portraitUrl);
+                }
+                // Trigger an input event on all ghost inputs to update mirrors
+                document.querySelectorAll('.ghost-input').forEach(el => el.dispatchEvent(new Event('input')));
+                updateModifiers(); updatePageTitle(); updateWeight(); window.updateClassFeatures();
+
+                isAppReady = false;
+            } catch (err) {
+                console.error("CRITICAL ERROR LOADING DATA:", err);
+                alert("There was an error loading your character data. Automatic saving has been disabled to prevent data loss. Please refresh the page or check the console.");
+                isAppReady = false; // Prevent saving
             }
-            if (data.portraitUrl) {
-                updatePortraitFromURL(data.portraitUrl);
-            }
-            // Trigger an input event on all ghost inputs to update mirrors
-            document.querySelectorAll('.ghost-input').forEach(el => el.dispatchEvent(new Event('input')));
-          updateModifiers(); updatePageTitle(); updateWeight(); window.updateClassFeatures();
         }
 
         function updateModifiers() {
@@ -1420,7 +1433,9 @@
                 updateModifiers();
             }
 
-            if (!isLoading) {
+            const charName = document.getElementById('char-name')?.value.trim();
+            if (!isLoading && isAppReady && charName !== "") {
+                // Also, don't save if the character does not have a name.
                 lastLocalChangeTimestamp = Date.now();
                 debounce(() => window.saveVersion(false), 2000)();
             }
@@ -1876,6 +1891,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const sharedId = urlParams.get('charId');
             if (sharedId) await loadSharedCharacter(sharedId);
+            if (!sharedId) isAppReady = true;
         });
     </script>
 </body>
