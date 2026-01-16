@@ -32,7 +32,7 @@
         .dropdown:hover .dropdown-content { display: flex; flex-direction: column; gap: 8px; }
         .menu-group-label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; margin-bottom: 2px; border-bottom: 1px solid #444; }
         .hidden-class-feature { display: none !important; }
-        .class-badge { position: absolute; top: -2px; right: 2px; font-size: 1.1rem; opacity: 0.6; cursor: help; pointer-events: none; z-index: 10; }
+        .class-badge { position: absolute; top: 2px; right: 2px; font-size: 1.1rem; opacity: 0.6; cursor: help; pointer-events: none; z-index: 10; }
         .counter-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
         .counter-label { font-size: 0.8rem; font-weight: bold; color: #555; }
         button { padding: 5px 10px; cursor: pointer; background: #555; color: white; border: 1px solid #777; }
@@ -298,7 +298,7 @@
                 <div class="class-input-wrapper">
                     <input type="text" id="class"><span class="label-sm" data-tip="Class" tabindex="0">Class</span>
                     <input type="text" id="subclass"><span class="label-sm" data-tip="Subclass" tabindex="0">Subclass</span>
-                    <span id="class-input-badge" class="class-badge"></span>
+                    <span class="class-badge variable-class-badge"></span>
                 </div>
             </div>
             <div class="header-section">
@@ -541,7 +541,8 @@
                 </div>
 
                 <div class="panel">
-                    <span class="box-title" data-tip="Cantrips" tabindex="0">Cantrips & Prepared Spells</span>
+                    <span class="box-title class-input-wrapper" data-tip="Cantrips" tabindex="0">Cantrips & Prepared Spells</span>
+                    <span class="class-badge variable-class-badge"></span>
                     <table class="spells-list-table">
                         <thead>
                             <tr>
@@ -1004,13 +1005,28 @@
         window.updateClassFeatures = function() {
             const clsInput = document.getElementById('class').value || "";
             const clsNormal = clsInput.toLowerCase();
-            const inputBadge = document.getElementById('class-input-badge');
-
-            // Reset input badge
-            inputBadge.textContent = '';
-
+            const variableBadges = document.querySelectorAll('.variable-class-badge');
             const allSpecifics = document.querySelectorAll('.class-specific');
 
+            // 1. RESET: Clear all variable badges once before we start
+            variableBadges.forEach(badge => {
+                badge.textContent = '';
+                badge.removeAttribute('data-tip');
+            });
+
+            // 2. GLOBAL BADGES: Set the icons based on the Class Input text
+            // We do this by checking which keys in our emoji map exist in the input string
+            Object.keys(classEmojiMap).forEach(className => {
+                if (clsNormal.includes(className.toLowerCase())) {
+                    variableBadges.forEach(badge => {
+                        badge.textContent += classEmojiMap[className];
+                        // Set the tip to the last matched class (or you can append them)
+                        badge.setAttribute('data-tip', className.charAt(0).toUpperCase() + className.slice(1));
+                    });
+                }
+            });
+
+            // 3. PANEL VISIBILITY: Show/Hide the specific feature boxes
             allSpecifics.forEach(el => {
                 let isMatch = false;
                 el.classList.forEach(c => {
@@ -1018,10 +1034,6 @@
                         const className = c.replace('class-', '');
                         if (clsNormal.includes(className)) {
                             isMatch = true;
-                            // Set the emoji in the main class input if matched
-                            if (classEmojiMap[className]) {
-                                inputBadge.textContent = classEmojiMap[className];
-                            }
                         }
                     }
                 });
