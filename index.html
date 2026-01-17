@@ -32,7 +32,7 @@
         .dropdown:hover .dropdown-content { display: flex; flex-direction: column; gap: 8px; }
         .menu-group-label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; margin-bottom: 2px; border-bottom: 1px solid #444; }
         .hidden-class-feature { display: none !important; }
-        .class-badge { position: absolute; top: 2px; right: 2px; font-size: 1.1rem; opacity: 0.6; cursor: help; pointer-events: none; z-index: 10; }
+            .class-badge { position: absolute; top: 2px; right: 2px; font-size: 1.1rem; opacity: 0.6; cursor: help; pointer-events: none; z-index: 10; }
         .counter-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
         .counter-label { font-size: 0.8rem; font-weight: bold; color: #555; }
         button { padding: 5px 10px; cursor: pointer; background: #555; color: white; border: 1px solid #777; }
@@ -502,17 +502,15 @@
                     <div class="panel"><span class="box-title" data-tip="Species Traits" tabindex="0">Species Traits</span><textarea id="species-traits" style="height: 140px; border:none;"></textarea></div>
                     <div class="panel"><span class="box-title" data-tip="Feats" tabindex="0">Feats</span><textarea id="feats" style="height: 140px; border:none;"></textarea></div>
                 </div>
-
-                <div class="bottom-sections">
-                    <div class="panel"><span class="box-title" data-tip="Appearance" tabindex="0">Appearance</span><textarea id="appearance" style="height: 320px; border:none;"></textarea></div>
-                    <div class="panel" style="display: flex; flex-direction: column;">
-                        <span class="box-title" data-tip="Backstory" tabindex="0">Personality</span>
-                        <textarea id="personality" style="height: 280px; flex-grow: 1; border:none;"></textarea>
-                        <div style="margin-top: 5px; border-top: 1px solid #ccc; padding-top: 5px;">
-                            <span class="label-sm" style="display:inline;" data-tip="Alignment" tabindex="0">Alignment:</span><input type="text" id="alignment" style="width: 70%; display:inline-block;">
-                        </div>
-                    </div>
-
+            </div>
+        </div>
+        <div class="bottom-sections">
+            <div class="panel"><span class="box-title" data-tip="Appearance" tabindex="0">Appearance</span><textarea id="appearance" style="height: 320px; border:none;"></textarea></div>
+            <div class="panel" style="display: flex; flex-direction: column;">
+                <span class="box-title" data-tip="Backstory" tabindex="0">Personality</span>
+                <textarea id="personality" style="height: 280px; flex-grow: 1; border:none;"></textarea>
+                <div style="margin-top: 5px; border-top: 1px solid #ccc; padding-top: 5px;">
+                    <span class="label-sm" style="display:inline;" data-tip="Alignment" tabindex="0">Alignment:</span><input type="text" id="alignment" style="width: 70%; display:inline-block;">
                 </div>
             </div>
         </div>
