@@ -63,3 +63,28 @@ const firebaseConfig = {
   appId: "1:554732035132:web:ed89be7af2ceea147a7739"
 };
 ```
+
+## Additional changes to make
+
+### The "Rest" Economy (Utility for All)
+
+**Problem:** Players have to manually uncheck 15+ spell slot checkboxes and reset HP after every session.
+**Suggestion:** Add a "Rest" dropdown in the Management menu or as a button in the Combat/Magic tabs.
+
+* **Short Rest:** Resets specific class resources (like Ki or Fighter’s Second Wind) and allows a "Hit Dice" input.
+* **Long Rest:** A "Nuke" button that clears all spell-slot checkboxes, resets HP to Max, and resets "Uses" counters on magic items.
+
+### Aesthetic "Theme" Integration (Visual Appeal)
+
+**Problem:** The dark grey `#app-controls` bar feels like a "Developer Tool" rather than part of the game.
+**Suggestion:** Apply the "Solarized" theme or a dark "Parchment" texture to the control bar.
+
+* Use a "Wax Seal" icon for the Save button or a "Spellbook" icon for Character Management.
+* This makes the PWA feel like a cohesive app rather than a website with a character sheet on it.
+
+### Interactive Dice "Hints" (Ease of Use)
+
+**Problem:** Players often ask "What do I roll for this?"
+**Suggestion:** In the "Skills" list, make the modifier (e.g., +5) look like a button.
+
+* Clicking it doesn't necessarily need a full 3D dice engine, but it could trigger a "Spark" that says: *"Rolling for Stealth? Roll 1d20 and add 5!"* This reinforces the core mechanic for beginners.

@@ -138,6 +138,15 @@
         .death-save-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; margin-top: 5px; }
         .ds-bubbles { display: flex; gap: 5px; }
         .physical-traits-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 5px; }
+        .split-panel-container { display: flex; gap: 15px; }
+        .phys-left-col { flex: 2; display: flex; flex-direction: column; gap: 10px; }
+        .phys-right-col { flex: 1; border-left: 1px solid var(--border-color); padding-left: 10px; display: flex; flex-direction: column; }
+        .physical-traits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } /* Changed to 2 cols for tighter space */
+        .status-grid { display: grid; grid-template-columns: 1fr; gap: 2px; overflow-y: auto; max-height: 150px; }
+        .status-row { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #555; cursor: pointer; }
+        .status-row:hover { color: var(--text-color); }
+        .status-row input:checked + span { color: #c00; font-weight: bold; text-shadow: 0 0 1px #800; }
+        .status-row input { margin: 0; cursor: pointer; }
         .trait-item { text-align: center; }
         /* Drag and Drop Styles */
         .drag-handle {
@@ -263,8 +272,8 @@
             </div>
         </div>
         <button class="app-btn" id="toggle-tips" onclick="toggleTips()" style="background: #222;">Tips: ON</button>
-        <button class="app-btn" onclick="shortRest()" style="background: #6b46c1;">Short Rest</button>
-        <button class="app-btn" onclick="longRest()" style="background: #2d3748;">Long Rest</button>
+        <button class="app-btn" onclick="shortRest()" data-tip="Short Rest" style="background: #6b46c1;">Short Rest</button>
+        <button class="app-btn" onclick="longRest()" data-tip="Long Rest" style="background: #2d3748;">Long Rest</button>
         <button class="app-btn" onclick="resetSheet()" style="background: #800;">New</button>
         <button class="app-btn" onclick="window.print()" style="background: #005f80;">Print</button>
         <button class="app-btn" onclick="shareSheet()" style="background: #28a745;">Share URL</button>
@@ -340,8 +349,14 @@
                         <span class="box-title" data-tip="Hit Points" tabindex="0">Hit Points</span>
                         <div style="display: flex; gap: 10px; height: 100%;">
                             <div style="flex:1; text-align: center;"><input type="number" id="hp-max" placeholder="Max" style="text-align:center;"><span class="label-sm">Max</span></div>
-                            <div style="flex:1; text-align: center;"><input type="number" id="hp-curr" placeholder="Current" style="text-align:center; font-size: 1.2rem; font-weight: bold;"><span class="label-sm">Current</span></div>
-                            <div style="flex:1; text-align: center;"><input type="number" id="hp-temp" placeholder="Temp" style="text-align:center;"><span class="label-sm">Temp</span></div>
+                            <div style="flex:1; text-align: center;">
+                                <input type="text" id="hp-curr" placeholder="Current" style="text-align:center; font-size: 1.2rem; font-weight: bold;">
+                                <span class="label-sm">Current</span>
+                            </div>
+                            <div style="flex:1; text-align: center;">
+                                <input type="text" id="hp-temp" placeholder="Temp" style="text-align:center;">
+                                <span class="label-sm">Temp</span>
+                            </div>
                         </div>
                     </div>
                     <div class="rect-box">
@@ -454,15 +469,29 @@
 
                 <div class="panel" style="margin-bottom: 15px;">
                     <span class="box-title" tabindex="0">Physical Characteristics</span>
-                    <div class="physical-traits-grid">
-                        <div class="trait-item"><input type="text" id="age" placeholder="25"><span class="label-sm">Age</span></div>
-                        <div class="trait-item"><input type="text" id="height" placeholder="5'10"><span class="label-sm">Height</span></div>
-                        <div class="trait-item"><input type="text" id="weight" placeholder="160 lbs"><span class="label-sm">Weight</span></div>
-                    </div>
-                    <div class="physical-traits-grid">
-                        <div class="trait-item"><input type="text" id="eyes" placeholder="Blue"><span class="label-sm">Eyes</span></div>
-                        <div class="trait-item"><input type="text" id="skin" placeholder="Fair"><span class="label-sm">Skin</span></div>
-                        <div class="trait-item"><input type="text" id="hair" placeholder="Brown"><span class="label-sm">Hair</span></div>
+                    <div class="split-panel-container">
+                        <div class="phys-left-col">
+                            <div class="physical-traits-grid">
+                                <div class="trait-item"><input type="text" id="age" placeholder="25"><span class="label-sm">Age</span></div>
+                                <div class="trait-item"><input type="text" id="height" placeholder="5'10"><span class="label-sm">Height</span></div>
+                                <div class="trait-item"><input type="text" id="weight" placeholder="160 lbs"><span class="label-sm">Weight</span></div>
+                                <div class="trait-item"><input type="text" id="eyes" placeholder="Blue"><span class="label-sm">Eyes</span></div>
+                                <div class="trait-item"><input type="text" id="skin" placeholder="Fair"><span class="label-sm">Skin</span></div>
+                                <div class="trait-item"><input type="text" id="hair" placeholder="Brown"><span class="label-sm">Hair</span></div>
+                            </div>
+                        </div>
+
+                        <div class="phys-right-col">
+                            <span class="label-sm" style="text-align:center; margin-bottom:5px;" data-tip="Conditions">Conditions</span>
+                            <div class="status-grid" id="status-container">
+                                </div>
+                            <div style="margin-top: 5px; border-top: 1px solid #ccc; padding-top: 2px;">
+                                <div class="status-row">
+                                    <span style="font-size: 0.7rem;">Exhaustion:</span>
+                                    <input type="number" id="exhaustion" min="0" max="6" style="width: 30px; text-align: center; border-bottom: 1px solid #888; height: 18px; font-size: 0.8rem;">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1260,6 +1289,67 @@
         }
 
         // --- SHARED UTILS ---
+        const CONDITIONS_LIST = [
+            "Blinded", "Charmed", "Deafened", "Frightened", "Grappled",
+            "Incapacitated", "Invisible", "Paralyzed", "Petrified",
+            "Poisoned", "Prone", "Restrained", "Stunned", "Unconscious"
+        ];
+
+        function generateStatusTracker() {
+            const container = document.getElementById('status-container');
+            if (!container) return;
+
+            let html = '';
+            CONDITIONS_LIST.forEach(cond => {
+                const id = `cond-${cond.toLowerCase()}`;
+                html += `
+                <label class="status-row" data-tip="${cond}"> <input type="checkbox" id="${id}">
+                    <span>${cond}</span>
+                </label>`;
+            });
+            container.innerHTML = html;
+
+            // Add listeners for autosave
+            container.querySelectorAll('input').forEach(cb => {
+                cb.addEventListener('change', handleInput);
+            });
+        }
+
+        function evaluateMathInput(e) {
+            const input = e.target;
+            let val = input.value.trim();
+
+            // Allow empty
+            if (val === "") return;
+
+            // Check if it's a math expression (contains +, -, *, /)
+            // We allow standard math, or relative math (e.g. "+5" adds to current, "-5" subtracts)
+
+            // If user typed "-5", they might mean "Subtract 5 from previous"
+            // BUT since we are on the input itself, the "previous" value is lost unless we track it
+            // OR we assume they typed "CurrentValue - 5".
+            // Better UX: The user types "35-5" (explicit) or just "-5" (relative).
+
+            try {
+                // Regex to check for simple math
+                if (/^[\d\s\.\+\-\*\/]+$/.test(val)) {
+                     // Safe eval using Function constructor restricted to math
+                     // If it starts with operator, prepending isn't easy without state.
+                     // SIMPLEST VERSION: Just eval what is there. User types "40-5" -> "35".
+
+                     const result = new Function('return ' + val)();
+                     if (isFinite(result)) {
+                         input.value = Math.floor(result); // HP is usually integer
+                         // Trigger save if value changed
+                         handleInput({target: input});
+                     }
+                }
+            } catch (err) {
+                // If invalid math, do nothing, leave text as is (or revert? leave as is so user can fix)
+                console.log("Math parsing error", err);
+            }
+        }
+
         async function loadSharedCharacter(sharedId) {
             isLoading = true;
             document.getElementById('status').innerText = "Loading Shared...";
@@ -1860,7 +1950,7 @@
                         <div class="skill-row" style="font-weight: bold; border-bottom: 2px solid #ccc;">
                             <input type="text" class="save-val-input" id="save-val-${lowStat}" placeholder="+0" readonly>
                             <input type="checkbox" class="prof-bubble" id="save-prof-${lowStat}">
-                            <span>Saving Throw</span>
+                            <span data-tip="Saving Throw">Saving Throw</span>
                         </div>
                         ${skillsHtml}
                     </div>
@@ -1879,6 +1969,7 @@
                 }
                 slotContainer.innerHTML = html;
             }
+            generateStatusTracker();
         }
 
         window.toggleManagementMenu = function(event) {
@@ -1993,6 +2084,13 @@
             document.querySelectorAll('.coin-slot input').forEach(coinInput => {
                 coinInput.addEventListener('input', updateWeight);
             });
+
+            // ADD LISTENERS FOR HP MATH
+            const hpCurr = document.getElementById('hp-curr');
+            const hpTemp = document.getElementById('hp-temp');
+
+            if(hpCurr) hpCurr.addEventListener('change', evaluateMathInput);
+            if(hpTemp) hpTemp.addEventListener('change', evaluateMathInput);
 
             // Portrait
             const portraitInput = document.getElementById('portrait-url');

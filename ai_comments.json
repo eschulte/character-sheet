@@ -831,7 +831,6 @@
     "Your Save DC is the dungeon’s respect for your magic, calculated from your Spell Ability and Proficiency. It’s what makes foes fail their saves and hate you. Keep it high, or your spells are just suggestions."
   ],
   "Saving Throws": [
-    "",
     "Saving Throws are your desperate attempt to not die when a fireball, poison, or mind-control spell comes for you. Roll a d20, add the right stat mod, and hope the DM isn’t cackling. Fail, and enjoy your new life as a toad.",
     "Think of this as your ‘please don’t let me die’ roll. Different stats for different threats—Dex for dodging, Wis for resisting charm, Con for not puking your guts out. Roll high or kiss your dignity goodbye."
   ],
@@ -1238,5 +1237,94 @@
     "Congratulations, you finally figured out which end of the stick is the pointy one. Now you can trip, push, or nick enemies with style.",
     "It almost makes you look like you know what you're doing. Almost.",
     "Special properties for your favorite toys. Try not to poke your own eye out."
+  ],
+  "Combat Actions": [
+    "Your turn is a puzzle. Solve it before the Orc solves your ribcage.",
+    "This is your 'Action Economy' dashboard. You get one Action, one Bonus Action, and one Reaction per round. Spend them wisely, because 'I stand there looking confused' is not a valid combat strategy.",
+    "Action (A) is for the big stuff—swinging swords, casting fireballs, or running away like a coward. Bonus Action (BA) is for the quick stuff. If you have both, use both. Efficiency kills.",
+    "The difference between a hero and a corpse is often a well-timed Bonus Action.",
+    "If it's marked 'A', it’s your main event. If it’s 'BA', it’s a side dish. If it's 'R', you’re doing it on someone else's turn. Don't mix them up, or the DM gets to sigh loudly at you."
+  ],
+  "Action Cost": [
+    "This is your 'Action Economy' dashboard. You get one Action, one Bonus Action, and one Reaction per round. Spend them wisely, because 'I stand there looking confused' is not a valid combat strategy.",
+    "Action (A) is for the big stuff—swinging swords, casting fireballs, or running away like a coward. Bonus Action (BA) is for the quick stuff. If you have both, use both. Efficiency kills.",
+    "If it's marked 'A', it’s your main event. If it’s 'BA', it’s a side dish. If it's 'R', you’re doing it on someone else's turn. Don't mix them up, or the DM gets to sigh loudly at you."
+  ],
+  "Conditions": [
+    "A collection of all the ways you are currently failing at existing. Collect them all for a free trip to the afterlife!",
+    "Status effects. If one of these is checked, you’re likely having a very bad day. Remember: being 'Prone' is just tactical napping until someone stabs you.",
+    "Conditions change the rules of the game for you—usually for the worse. 'Incapacitated' means you can't take actions. 'Poisoned' means you can't hit the broad side of a barn. Read them and weep.",
+    "The 'You're Screwed' checklist. Pro-tip: 'Invisible' is the only one on this list that's actually fun at parties.",
+    "Exhaustion is a stacking penalty. Level 1 is a nuisance; Level 6 is a funeral. Maybe take a nap before you die of tiredness?"
+  ],
+"Blinded": [
+    "Everything is heavily obscured. You attack with disadvantage, and everyone has advantage to hit you. Hope you like playing pinball in the dark.",
+    "You can't see. The dragon is right in front of you. This is going to be hilarious for everyone but you.",
+    "Your eyes are currently ornamental. Disadvantage on attacks, and you're a sitting duck for anything with a pulse."
+  ],
+  "Charmed": [
+    "You can't attack the charmer, and they have advantage on social checks against you. You're basically a fanboy/fangirl for the villain now.",
+    "You think the monster is your best friend. It thinks you're a snack. Guess who's right?",
+    "A magical crush that prevents you from doing your job. Stop staring and start resisting."
+  ],
+  "Deafened": [
+    "You can't hear. That's a failure on Wisdom (Perception) checks that rely on hearing. Also, you're missing out on some top-tier villain monologuing.",
+    "Silence is golden, unless a rogue is sneaking up behind you. Then it's just deadly.",
+    "The world is on mute. Don't worry, the sound of your own screaming will still be quite clear in your head."
+  ],
+  "Frightened": [
+    "You have disadvantage on checks and attacks while the source of fear is in sight, and you can't move closer. Bravery is apparently out of stock.",
+    "Your knees are knocking. You can't approach what's scaring you. Just run away; we won't tell anyone. (We will).",
+    "Adrenaline is great, but sheer terror is a mechanical nightmare. Turn around and find a corner to hide in."
+  ],
+  "Grappled": [
+    "Your speed is 0. You aren't going anywhere until you break free or the monster gets bored of holding you.",
+    "You're being hugged, but not in a good way. You can still fight, you just can't run.",
+    "Someone has a firm grip on your dignity. Break the grapple or accept your new life as a stationary target."
+  ],
+  "Incapacitated": [
+    "You can't take actions or reactions. You're basically a very expensive piece of scenery right now.",
+    "Action economy? More like action bankruptcy. You do nothing until this wears off.",
+    "You're alive, technically, but you're not participating. Enjoy the view while the rest of the party does the work."
+  ],
+  "Invisible": [
+    "You're impossible to see without magic or special senses. You have advantage on attacks, and they have disadvantage to hit you. Try not to trip over anything.",
+    "The only condition that's actually cool. You're a ghost with a sword. Don't waste it on something stupid.",
+    "They can't see you, but they can still hear your heavy breathing. Keep it together, stealth is 10% magic and 90% not stepping on dry leaves."
+  ],
+  "Paralyzed": [
+    "This is the big one. You're incapacitated, you can't move or speak, you fail Str/Dex saves, and attacks from within 5ft are auto-crits. Write your will.",
+    "You're a statue. A fleshy, soon-to-be-perforated statue. Hope your Cleric has 'Lesser Restoration' ready.",
+    "Automatic critical hits. That's all you need to know. Good luck with the death saves."
+  ],
+  "Petrified": [
+    "You're transformed into stone. You're heavy, you don't age, and you have resistance to all damage—because you're a rock. Hope someone has a chisel.",
+    "You've finally achieved your goal of being a garden gnome. You're incapacitated and won't be moving for a while.",
+    "Stone-cold and useless. You're immune to poison, but that's small comfort when you're a permanent statue."
+  ],
+  "Poisoned": [
+    "Disadvantage on attack rolls and ability checks. Your stomach is currently doing backflips.",
+    "Toxic chemicals or bad sushi—either way, you can't aim straight and you feel like garbage.",
+    "Everything is harder when you're trying not to vomit on your boots. Disadvantage on everything that matters."
+  ],
+  "Prone": [
+    "You're on the ground. Your only movement option is crawling. Melee attacks have advantage against you, but ranged attacks have disadvantage. Stand up.",
+    "Tactical napping. It's great against archers, but terrible when a giant is standing over you with a club.",
+    "Get off the floor. You're making the dungeon look messy."
+  ],
+  "Restrained": [
+    "Your speed is 0, attacks against you have advantage, and your own attacks have disadvantage. You also suck at Dexterity saves now. Fun!",
+    "Tangled in webs, vines, or bad life choices. You're stuck and vulnerable.",
+    "You're pinned. Expect to be hit. Often. And hard."
+  ],
+  "Stunned": [
+    "You're incapacitated, you can't move, and you speak only in faltering grunts. Everyone has advantage to hit you. Your brain is currently rebooting.",
+    "A temporary blackout. You fail Str/Dex saves and can't do anything. Think about what you did to get here.",
+    "The world is spinning. Stop it, and maybe you'll live to see the next turn."
+  ],
+  "Unconscious": [
+    "You're incapacitated, you drop whatever you're holding, and you fall prone. You fail Str/Dex saves. Attacks from within 5ft are crits. Sweet dreams.",
+    "Nighty-night. Hope someone heals you before the DM starts rolling the 'Is He Dead Yet?' dice.",
+    "You're out cold. If you don't wake up soon, you might be upgraded to the 'Dead' condition. It's much harder to cure."
   ]
 }
