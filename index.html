@@ -159,6 +159,8 @@
         .drag-handle:hover { opacity: 1; }
         .dragging { opacity: 0.5; background: #dcd6c7; }
         .action-cell { display: flex; gap: 4px; align-items: center; justify-content: center; }
+        .cost-select { width: 100%; text-align: center; border: none; background: transparent; font-weight: bold; cursor: pointer; color: var(--text-color); font-size: 0.85rem; appearance: none; -webkit-appearance: none; }
+        .cost-select option { background: var(--bg-color); color: var(--text-color); }
         .weapons-table, .spells-list-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
         .weapons-table th, .spells-list-table th { text-align: left; border-bottom: 2px solid var(--border-color); font-size: 0.8rem; }
         .weapons-table td, .spells-list-table td { border-bottom: 1px solid var(--faint-line); padding: 5px 0; }
@@ -465,9 +467,18 @@
                 </div>
 
                 <div class="panel">
-                    <span class="box-title" data-tip="Weapons" tabindex="0">Weapons & Damage Cantrips</span>
+                    <span class="box-title" data-tip="Combat Actions" tabindex="0">Combat Actions</span>
                     <table class="weapons-table">
-                        <thead><tr><th>Name</th><th data-tip="Atk/DC" tabindex="0">Atk/DC</th><th data-tip="Damage" tabindex="0">Damage</th><th>Notes</th><th class="action-cell"></th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th style="width: 40px; text-align: center;" data-tip="Action Cost" tabindex="0">Cost</th>
+                                <th data-tip="Atk/DC" tabindex="0">Atk/DC</th>
+                                <th data-tip="Damage" tabindex="0">Damage</th>
+                                <th>Notes</th>
+                                <th class="action-cell"></th>
+                            </tr>
+                        </thead>
                         <tbody id="weapons-body"></tbody>
                     </table>
                     <button onclick="addWeaponRow()" style="width: 100%;">+</button>
@@ -1325,8 +1336,16 @@
             });
             data['weapons'] = [];
             document.querySelectorAll('#weapons-body tr').forEach(tr => {
-                const i = tr.querySelectorAll('input');
-                data['weapons'].push({name: i[0].value, atk: i[1].value, dmg: i[2].value, notes: i[3].value});
+                // Select inputs AND selects to get the dropdown value
+                const i = tr.querySelectorAll('input, select');
+                // Map indices: 0=Name, 1=Cost, 2=Atk, 3=Dmg, 4=Notes
+                data['weapons'].push({
+                    name: i[0].value,
+                    cost: i[1].value,
+                    atk: i[2].value,
+                    dmg: i[3].value,
+                    notes: i[4].value
+                });
             });
             data.wild_shapes = [];
             document.querySelectorAll('#wild-shape-body tr').forEach(tr => {
@@ -1412,9 +1431,10 @@
                 }
                 if(data.weapons) {
                     document.getElementById('weapons-body').innerHTML = '';
-                    for(let i=0; i<Math.max(5, data.weapons.length); i++) window.addWeaponRow();
-                    const rows = document.querySelectorAll('#weapons-body tr');
-                    data.weapons.forEach((r, i) => { if(rows[i]) { let inputs = rows[i].querySelectorAll('input'); inputs[0].value=r.name; inputs[1].value=r.atk; inputs[2].value=r.dmg; inputs[3].value=r.notes; }});
+                    data.weapons.forEach(r => {
+                        if (!r.cost) r.cost = 'A';
+                        window.addWeaponRow(r);
+                    });
                 }
                 if(data.wild_shapes) {
                     document.getElementById('wild-shape-body').innerHTML = '';
@@ -1544,7 +1564,7 @@
             try { await navigator.clipboard.writeText(shareUrl); alert("Link copied!"); } catch (err) { prompt("Copy:", shareUrl); }
         }
 
-        window.addWeaponRow = () => {
+        window.addWeaponRow = (item = null) => {
             const tbody = document.getElementById('weapons-body');
             const tr = document.createElement('tr');
             tr.draggable = true;
@@ -1554,26 +1574,36 @@
             tr.addEventListener('dragend', handleDragEnd);
 
             tr.innerHTML = `
-                <td><input type="text"></td>
-                <td><input type="text"></td>
-                <td><input type="text"></td>
-                <td><input type="text"></td>
+                <td><input type="text" value="${item ? item.name : ''}" placeholder="Action/Weapon"></td>
+                <td>
+                    <select class="cost-select" title="Action Cost">
+                        <option value="A" ${item && item.cost === 'A' ? 'selected' : ''}>A</option>
+                        <option value="BA" ${item && item.cost === 'BA' ? 'selected' : ''}>BA</option>
+                        <option value="R" ${item && item.cost === 'R' ? 'selected' : ''}>R</option>
+                        <option value="-" ${item && item.cost === '-' ? 'selected' : ''}>-</option>
+                    </select>
+                </td>
+                <td><input type="text" value="${item ? item.atk : ''}" placeholder="+0"></td>
+                <td><input type="text" value="${item ? item.dmg : ''}" placeholder="1d6"></td>
+                <td><input type="text" value="${item ? item.notes : ''}" placeholder="Notes"></td>
                 <td class="action-cell"><button class="drag-handle" title="Drag to reorder">☰</button><button class="remove-btn" tabindex="-1">-</button></td>`;
 
             tbody.appendChild(tr);
-            const inputs = tr.querySelectorAll('input');
+
+            // Select both INPUT and SELECT for autosave listeners
+            const inputs = tr.querySelectorAll('input, select');
             inputs.forEach(i => i.addEventListener('input', handleInput));
 
-            // Logic for removal
             tr.querySelector('.remove-btn').onclick = () => {
-                if (confirm("Remove this weapon?")) {
+                if (confirm("Remove this action?")) {
                     tr.remove();
-                    handleInput({ target: document.body }); // Trigger autosave
+                    handleInput({ target: document.body });
                 }
             };
 
+            // Update Ghost attachments (Indices shifted by 1 due to new column)
             attachGhost(inputs[0]); // Name
-            attachGhost(inputs[3]); // Notes
+            attachGhost(inputs[4]); // Notes (Was previously index 3)
         };
 
         window.addWildShapeRow = (item = null) => {
