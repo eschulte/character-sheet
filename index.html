@@ -217,6 +217,8 @@
             #app-controls.expanded { max-height: 500px; flex-wrap: wrap; }
             #app-controls .app-btn { display: none; }
             #app-controls.expanded .app-btn { display: inline-block; }
+            .dropdown-content { position: relative !important; width: 100%; box-shadow: none; border-left: none; border-right: none; margin-top: 10px; }
+            .management-pane { overflow: visible !important; display: block !important; }
             #status, #auth-btn, #app-toggle-hamburger { display: inline-block; }
             #app-controls button { padding: 3px 5px; font-size: 0.75rem; }
             .sheet-container { margin-top: 0; padding: 10px; padding-top: 20px; border-radius: 0; box-shadow: none; }
@@ -782,6 +784,7 @@
         let currentCharacterId = localStorage.getItem('dnd_char_id') || generateUUID();
         let isCloudOwner = true;
         let isLoading = false;
+        let hasUnsavedChanges = false;
         let isAppReady = false;
         const suggestLoadRemoteChanges = false;
         let lastLoadedRemoteTimestamp = 0;
@@ -916,6 +919,14 @@
                     lastUpdated: nowIso,
                     sheetData: data
                 }, { merge: true });
+
+                hasUnsavedChanges = false;
+
+                const statusEl = document.getElementById('status');
+                if(statusEl) {
+                    statusEl.innerText = isCloudOwner ? "Online (Saved)" : "Online (Read Only)";
+                    statusEl.style.color = "#aaa"; // Reset color
+                }
 
                 lastLoadedRemoteTimestamp = now.getTime();
 
@@ -1637,9 +1648,18 @@
 
             const charName = document.getElementById('char-name')?.value.trim();
             if (!isLoading && isAppReady && charName !== "") {
-                // Also, don't save if the character does not have a name.
+                hasUnsavedChanges = true;
                 lastLocalChangeTimestamp = Date.now();
-                debounce(() => window.saveVersion(false), 2000)();
+
+                // 1. Visual Feedback immediately
+                const statusEl = document.getElementById('status');
+                if(statusEl) {
+                    statusEl.innerText = "Unsaved Changes...";
+                    statusEl.style.color = "#ff6b6b"; // Red warning color
+                }
+
+                // 2. Faster Debounce (2000ms -> 1000ms or 500ms)
+                debounce(() => window.saveVersion(false), 1000)();
             }
         }
 
@@ -2112,6 +2132,22 @@
             const sharedId = urlParams.get('charId');
             if (sharedId) await loadSharedCharacter(sharedId);
             if (!sharedId) isAppReady = true;
+        });
+
+        // 1. Warning on Refresh/Close if dirty
+        window.addEventListener('beforeunload', (e) => {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = ''; // Browsers require this to show the prompt
+            }
+        });
+
+        // 2. Save immediately if user hides tab (Mobile switch / Minimize)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden' && hasUnsavedChanges) {
+                // Force an immediate save without debounce
+                window.saveVersion(false);
+            }
         });
     </script>
 </body>
