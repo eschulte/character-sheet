@@ -2008,24 +2008,140 @@
             }
         });
 
+        function resetResourceBoxes(idPrefix) {
+            document.querySelectorAll(`input[id^="${idPrefix}"][type="checkbox"]`).forEach(cb => {
+                cb.checked = false;
+            });
+        }
+
         window.shortRest = function() {
             const hpMax = parseInt(document.getElementById('hp-max').value) || 0;
             const hpCurr = parseInt(document.getElementById('hp-curr').value) || 0;
-            if (hpCurr >= hpMax) return;
-            const roll = prompt("Short Rest: Enter total HP regained (Hit Dice rolls + Con mod):", "0");
-            if (roll === null) return;
-            const regained = parseInt(roll) || 0;
-            document.getElementById('hp-curr').value = Math.min(hpMax, hpCurr + regained);
+            const className = (document.getElementById('class').value || "").toLowerCase();
+
+            // 1. HP Recovery (Standard)
+            if (hpCurr < hpMax) {
+                const roll = prompt("Short Rest: Enter total HP regained (Hit Dice rolls + Con mod):", "0");
+                if (roll !== null) {
+                    const regained = parseInt(roll) || 0;
+                    document.getElementById('hp-curr').value = Math.min(hpMax, hpCurr + regained);
+                }
+            }
+
+            // 2. Class Specific Recovery
+            let alerts = [];
+
+            // Warlock: Pact Magic (Reset all slots)
+            if (className.includes('warlock')) {
+                if(confirm("Warlock: Regain all Pact Magic spell slots?")) {
+                    document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => cb.checked = false);
+                }
+            } else if (className.includes('wizard')) {
+                // Wizard: Arcane Recovery
+                alerts.push("Wizard: Remember 'Arcane Recovery' allows you to regain some spell slots!");
+            }
+
+            // Monk: Ki Points
+            if (className.includes('monk')) {
+                const kiMax = document.getElementById('ki-max').value;
+                if(kiMax) {
+                    document.getElementById('ki-curr').value = kiMax;
+                    alerts.push("Monk: Ki Points restored.");
+                }
+            }
+
+            // Fighter: Second Wind / Action Surge
+            if (className.includes('fighter')) {
+                resetResourceBoxes('second-wind');
+                alerts.push("Fighter: Second Wind & Action Surge restored.");
+            }
+
+            // Cleric / Paladin: Channel Divinity
+            if (className.includes('cleric') || className.includes('paladin')) {
+                resetResourceBoxes('channel-divinity');
+                alerts.push("Channel Divinity uses restored.");
+            }
+
+            // Druid: Wild Shape
+            if (className.includes('druid')) {
+                 alerts.push("Druid: Wild Shape uses restored.");
+            }
+
+            // Trigger Save & Notify
             handleInput({ target: document.getElementById('hp-curr') });
+            if (alerts.length > 0) alert(alerts.join('\n'));
         };
 
         window.longRest = function() {
-            if (!confirm("Confirm Long Rest? This will reset HP, Spell Slots, and remove Temp HP.")) return;
+            if (!confirm("Confirm Long Rest? This will reset HP, Spell Slots, Abilities, and remove Temp HP.")) return;
+
+            const className = (document.getElementById('class').value || "").toLowerCase();
+            let reminders = [];
+
+            // 1. General Reset
             document.getElementById('hp-curr').value = document.getElementById('hp-max').value;
             document.getElementById('hp-temp').value = "";
-            for (let i = 1; i <= 3; i++) { document.getElementById(`ds-s-${i}`).checked = false; document.getElementById(`ds-f-${i}`).checked = false; }
+
+            // Reset Death Saves
+            for (let i = 1; i <= 3; i++) { 
+                document.getElementById(`ds-s-${i}`).checked = false; 
+                document.getElementById(`ds-f-${i}`).checked = false; 
+            }
+
+            // Reset All Spell Slots
             document.querySelectorAll('.spell-slots-grid input[type="checkbox"]').forEach(cb => { cb.checked = false; });
+
+            // Reset Hit Dice (Visual only, as we don't track HD quantity in this specific HTML, but we can assume logic exists)
+            // (If you added Hit Dice tracking, reset half of max here)
+
+            // 2. Class Specific Resets
+
+            // Barbarian: Rage
+            if (className.includes('barbarian')) {
+                resetResourceBoxes('rage');
+            }
+
+            // Bard: Inspiration
+            if (className.includes('bard')) {
+                resetResourceBoxes('bard');
+            }
+
+            // Sorcerer: Sorcery Points
+            if (className.includes('sorcerer')) {
+                const sorcMax = document.getElementById('sorc-max').value;
+                if(sorcMax) document.getElementById('sorc-curr').value = sorcMax;
+            }
+
+            // Monk: Ki (In case they didn't short rest)
+            if (className.includes('monk')) {
+                const kiMax = document.getElementById('ki-max').value;
+                if(kiMax) document.getElementById('ki-curr').value = kiMax;
+            }
+
+            // Fighter, Cleric, Paladin (Reset SR resources too)
+            resetResourceBoxes('second-wind');
+            resetResourceBoxes('channel-divinity');
+
+            // 3. Preparation & Crafting Reminders
+
+            if (className.includes('artificer')) {
+                reminders.push("Artificer: You can change your 'Infusions' and replace one cantrip/spell.");
+            }
+
+            if (className.includes('wizard')) {
+                reminders.push("Wizard: You can prepare a new list of spells from your spellbook.");
+            }
+
+            if (className.includes('cleric') || className.includes('druid') || className.includes('paladin')) {
+                reminders.push("Divine Caster: You can prepare a new list of spells for the day.");
+            }
+
             handleInput({ target: document.getElementById('hp-curr') });
+
+            if(reminders.length > 0) {
+                // slight delay to allow the UI to update first
+                setTimeout(() => alert("Long Rest Complete.\n\n" + reminders.join('\n')), 100);
+            }
         };
 
         window.toggleTips = () => {
