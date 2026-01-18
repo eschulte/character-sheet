@@ -1137,7 +1137,7 @@
             let casterType = null;
             if (/(wizard|cleric|druid|sorcerer|bard)/.test(className)) casterType = 'fullCaster';
             else if (/(paladin|ranger|artificer)/.test(className)) casterType = 'halfCaster';
-            else if (classNAme.includes('warlock')) casterType = 'warlock';
+            else if (className.includes('warlock')) casterType = 'warlock';
 
             // 1. Handle Spell Slots
             const prog = CLASS_PROGRESSION[casterType];
