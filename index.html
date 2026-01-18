@@ -910,6 +910,19 @@
             const now = new Date();
             const nowIso = now.toISOString();
             const todayStr = now.toLocaleDateString();
+            const className = document.getElementById('class').value.trim();
+            const level = document.getElementById('level').value.trim();
+
+            // VALIDATION: Prevent saving if core identification is missing
+            if (!className || !level) {
+                const statusEl = document.getElementById('status');
+                if (statusEl) statusEl.innerText = "Error: Class and Level are required to save.";
+
+                if (isManual) {
+                    alert("Cannot save: Please ensure both 'Class' and 'Level' are filled out.");
+                }
+                return; // Stop the save process
+            }
 
             const charRef = doc(db, "characters", currentCharacterId);
             try {
@@ -1140,8 +1153,8 @@
             else if (className.includes('warlock')) casterType = 'warlock';
 
             // 1. Handle Spell Slots
-            const prog = CLASS_PROGRESSION[casterType];
-            const slots = prog[level] || [0,0,0,0,0,0,0,0,0,0];
+            const prog = casterType ? CLASS_PROGRESSION[casterType] : null;
+            const slots = (prog && prog[level]) ? prog[level] : [0,0,0,0,0,0,0,0,0];
             for (let i = 1; i <= 9; i++) {
                 const container = document.getElementById(`spell-level-${i}-slots`);
                 if (!container) continue;
