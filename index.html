@@ -1902,7 +1902,7 @@
         }
 
         window.resetSheet = function() {
-            if(confirm("Create new character? Unsaved changes will be lost.")) {
+            if(!hasUnsavedChanges || confirm("Create new character? Unsaved changes will be lost.")) {
                 currentCharacterId = generateUUID(); localStorage.setItem('dnd_char_id', currentCharacterId);
                 window.location.href = window.location.pathname;
             }
@@ -2028,6 +2028,13 @@
                 }
             }
 
+            // Clear Prone on a Short Rest
+            const proneBox = document.getElementById('cond-prone');
+            if (proneBox && proneBox.checked) {
+                proneBox.checked = false;
+                handleInput({ target: proneBox });
+            }
+
             // 2. Class Specific Recovery
             let alerts = [];
 
@@ -2086,6 +2093,12 @@
             for (let i = 1; i <= 3; i++) { 
                 document.getElementById(`ds-s-${i}`).checked = false; 
                 document.getElementById(`ds-f-${i}`).checked = false; 
+            }
+
+            // 1. Reduce Exhaustion by 1 (Rule: Basic Rules, Ch 11)
+            const exhaustInput = document.getElementById('exhaustion');
+            if (exhaustInput && exhaustInput.value > 0) {
+                exhaustInput.value = parseInt(exhaustInput.value) - 1;
             }
 
             // Reset All Spell Slots
