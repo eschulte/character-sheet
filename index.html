@@ -1557,7 +1557,7 @@
                 document.querySelectorAll('.ghost-input').forEach(el => el.dispatchEvent(new Event('input')));
                 updateModifiers(); updatePageTitle(); updateWeight(); window.updateClassFeatures(); updateClassScaling();
 
-                isAppReady = false;
+                isAppReady = true;
             } catch (err) {
                 console.error("CRITICAL ERROR LOADING DATA:", err);
                 alert("There was an error loading your character data. Automatic saving has been disabled to prevent data loss. Please refresh the page or check the console.");
