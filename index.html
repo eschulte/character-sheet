@@ -35,6 +35,15 @@
             .class-badge { position: absolute; top: 2px; right: 2px; font-size: 1.1rem; opacity: 0.6; cursor: help; pointer-events: none; z-index: 10; }
         .counter-row { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
         .counter-label { font-size: 0.8rem; font-weight: bold; color: #555; }
+        .sub-tab-bar { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); scrollbar-width: thin; }
+        .sub-tab-btn { background: #444; color: #aaa; border: 1px solid var(--border-color); padding: 5px 10px; border-radius: 5px 5px 0 0; cursor: pointer; font-size: 0.8rem; white-space: nowrap; user-select: none; display: flex; align-items: center; gap: 5px; }
+        .sub-tab-btn.active { background: var(--bg-color); color: var(--text-color); border-bottom: 1px solid var(--bg-color); margin-bottom: -1px; font-weight: bold; }
+        .sub-tab-btn:hover { color: #fff; }
+        .sub-tab-btn.active:hover { color: var(--text-color); }
+        .sub-tab-add { background: #2d3748; color: #fff; font-weight: bold; }
+        .sub-tab-close { font-size: 0.7rem; width: 16px; height: 16px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); margin-left: 5px; opacity: 0.6; }
+        .sub-tab-close:hover { background: #c00; color: white; opacity: 1; }
+        .sub-tab-btn.dragging { opacity: 0.5; background: #dcd6c7; }
         button { padding: 5px 10px; cursor: pointer; background: #555; color: white; border: 1px solid #777; }
         #portrait-container { width: 100%; height: 80px; /* Or your preferred height */ border: 2px solid var(--border-color); background: #eee; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; /* Clips the image if it's larger than the box */ cursor: pointer; }
         #portrait-container:hover #char-portrait { filter: brightness(0.8); }
@@ -606,7 +615,11 @@
     <div class="sheet-container">
         <div class="inner-section">
             <div class="panel">
-                <span class="box-title" data-tip="Equipment">Equipment</span>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="box-title" data-tip="Equipment">Equipment</span>
+                </div>
+                <div class="sub-tab-bar" id="tabs-equipment"></div>
+
                 <table class="equipment-table">
                     <thead>
                         <tr>
@@ -718,6 +731,7 @@
         <div class="inner-section">
             <div class="panel">
                 <span class="box-title" data-tip="Notes">Notes</span>
+                <div class="sub-tab-bar" id="tabs-notes"></div>
                 <textarea id="notes" style="min-height: 60vh; flex-grow: 1; border:none;"></textarea>
             </div>
         </div>
@@ -728,6 +742,7 @@
         <div class="inner-section">
             <div class="panel">
                 <span class="box-title">People</span>
+                <div class="sub-tab-bar" id="tabs-people"></div>
                 <table class="people-table">
                     <thead>
                         <tr>
@@ -749,6 +764,7 @@
         <div class="inner-section">
             <div class="panel">
                 <span class="box-title" data-tip="Backstory">Backstory</span>
+                <div class="sub-tab-bar" id="tabs-backstory"></div>
                 <textarea id="backstory" style="min-height: 60vh; flex-grow: 1; border:none;"></textarea>
             </div>
         </div>
@@ -918,7 +934,7 @@
                 const statusEl = document.getElementById('status');
                 if (statusEl) statusEl.innerText = "Error: Class and Level are required to save.";
 
-                if (isManual) {
+                if (isManualSnapshot) {
                     alert("Cannot save: Please ensure both 'Class' and 'Level' are filled out.");
                 }
                 return; // Stop the save process
@@ -1186,6 +1202,194 @@
         }
         window.updateClassScaling = updateClassScaling;
 
+        // --- SUB-TAB SYSTEM ---
+        let SUB_TABS = {
+            notes: [],
+            backstory: [],
+            equipment: [],
+            people: []
+        };
+        let ACTIVE_SUB_TABS = {
+            notes: null,
+            backstory: null,
+            equipment: null,
+            people: null
+        };
+
+        function initSubTabs(category, defaultContent = "") {
+            // If no tabs exist, create Default
+            if (!SUB_TABS[category] || SUB_TABS[category].length === 0) {
+                const id = generateUUID();
+                SUB_TABS[category] = [{ id: id, name: "Main", content: defaultContent }];
+                ACTIVE_SUB_TABS[category] = id;
+            }
+            // Ensure an active tab is set
+            if (!ACTIVE_SUB_TABS[category] && SUB_TABS[category].length > 0) {
+                ACTIVE_SUB_TABS[category] = SUB_TABS[category][0].id;
+            }
+            renderSubTabs(category);
+        }
+
+        function renderSubTabs(category) {
+            const bar = document.getElementById(`tabs-${category}`);
+            if (!bar) return;
+            bar.innerHTML = "";
+
+            SUB_TABS[category].forEach((tab, index) => {
+                const btn = document.createElement("div");
+                btn.className = `sub-tab-btn ${tab.id === ACTIVE_SUB_TABS[category] ? 'active' : ''}`;
+                btn.draggable = true;
+                btn.innerHTML = `<span onclick="switchSubTab('${category}', '${tab.id}')">${tab.name}</span>`;
+
+                // Rename on double click
+                btn.querySelector("span").ondblclick = (e) => {
+                    e.stopPropagation();
+                    const newName = prompt("Rename Tab:", tab.name);
+                    if (newName) { tab.name = newName; renderSubTabs(category); handleInput(); }
+                };
+
+                // Delete button (prevent deleting the last tab)
+                if (SUB_TABS[category].length > 1) {
+                    const close = document.createElement("span");
+                    close.className = "sub-tab-close";
+                    close.innerHTML = "×";
+                    close.onclick = (e) => {
+                        e.stopPropagation();
+                        if(confirm(`Delete tab "${tab.name}"?`)) deleteSubTab(category, index);
+                    };
+                    btn.appendChild(close);
+                }
+
+                // Drag events
+                btn.ondragstart = (e) => {
+                    e.dataTransfer.setData("text/plain", index);
+                    e.dataTransfer.effectAllowed = "move";
+                    btn.classList.add('dragging');
+                };
+                btn.ondragover = (e) => { e.preventDefault(); };
+                btn.ondrop = (e) => {
+                    e.preventDefault();
+                    const fromIdx = parseInt(e.dataTransfer.getData("text/plain"));
+                    const toIdx = index;
+                    if (fromIdx !== toIdx) {
+                        const item = SUB_TABS[category].splice(fromIdx, 1)[0];
+                        SUB_TABS[category].splice(toIdx, 0, item);
+                        renderSubTabs(category);
+                        handleInput();
+                    }
+                };
+                btn.ondragend = () => { btn.classList.remove('dragging'); };
+
+                bar.appendChild(btn);
+            });
+
+            // Add "+" Button
+            const addBtn = document.createElement("div");
+            addBtn.className = "sub-tab-btn sub-tab-add";
+            addBtn.innerText = "+";
+            addBtn.onclick = () => addSubTab(category);
+            bar.appendChild(addBtn);
+        }
+
+        function switchSubTab(category, newId) {
+            if (ACTIVE_SUB_TABS[category] === newId) return;
+
+            // 1. Scrape current page to save state of the OLD tab
+            scrapeSubTabPage(category);
+
+            // 2. Set new active
+            ACTIVE_SUB_TABS[category] = newId;
+
+            // 3. Render
+            renderSubTabs(category);
+            loadSubTabPage(category);
+        }
+        window.switchSubTab = switchSubTab
+
+        function addSubTab(category) {
+            scrapeSubTabPage(category); // Save current work
+            const name = prompt("New Tab Name:", "New Tab");
+            if (!name) return;
+
+            const id = generateUUID();
+            // Default content depends on type
+            let content = (category === 'equipment' || category === 'people') ? [] : "";
+
+            SUB_TABS[category].push({ id: id, name: name, content: content });
+            ACTIVE_SUB_TABS[category] = id;
+            renderSubTabs(category);
+            loadSubTabPage(category);
+            handleInput();
+        }
+
+        function deleteSubTab(category, index) {
+            const deletedId = SUB_TABS[category][index].id;
+            SUB_TABS[category].splice(index, 1);
+
+            // If we deleted the active tab, switch to the first one
+            if (ACTIVE_SUB_TABS[category] === deletedId) {
+                ACTIVE_SUB_TABS[category] = SUB_TABS[category][0].id;
+            }
+            renderSubTabs(category);
+            loadSubTabPage(category);
+            handleInput();
+        }
+
+        function scrapeSubTabPage(category) {
+            const activeId = ACTIVE_SUB_TABS[category];
+            if (!activeId) return;
+            const tabObj = SUB_TABS[category].find(t => t.id === activeId);
+            if (!tabObj) return;
+
+            if (category === 'notes') {
+                tabObj.content = document.getElementById('notes').value;
+            } else if (category === 'backstory') {
+                tabObj.content = document.getElementById('backstory').value;
+            } else if (category === 'equipment') {
+                // Scrape Table
+                const rows = [];
+                document.querySelectorAll('#equipment-body tr').forEach(tr => {
+                    const i = tr.querySelectorAll('input');
+                    rows.push({ name: i[0].value, qty: i[1].value, lbs: i[2].value, notes: i[3].value });
+                });
+                tabObj.content = rows;
+            } else if (category === 'people') {
+                // Scrape Table
+                const rows = [];
+                document.querySelectorAll('#people-body tr').forEach(tr => {
+                    const i = tr.querySelectorAll('input');
+                    const note = tr.querySelector('textarea').value;
+                    rows.push({ name: i[0].value, desc: i[1].value, notes: note });
+                });
+                tabObj.content = rows;
+            }
+        }
+
+        function loadSubTabPage(category) {
+            const activeId = ACTIVE_SUB_TABS[category];
+            const tabObj = SUB_TABS[category].find(t => t.id === activeId);
+            if (!tabObj) return;
+
+            if (category === 'notes') {
+                const el = document.getElementById('notes');
+                el.value = tabObj.content || "";
+                attachGhost(el); // Re-attach AI ghost
+            } else if (category === 'backstory') {
+                const el = document.getElementById('backstory');
+                el.value = tabObj.content || "";
+                attachGhost(el);
+            } else if (category === 'equipment') {
+                const tbody = document.getElementById('equipment-body');
+                tbody.innerHTML = "";
+                (tabObj.content || []).forEach(row => window.addEquipmentRow(row));
+                updateWeight();
+            } else if (category === 'people') {
+                const tbody = document.getElementById('people-body');
+                tbody.innerHTML = "";
+                (tabObj.content || []).forEach(row => window.addPeopleRow(row));
+            }
+        }
+
         // --- GHOST INPUT LOGIC ---
         function applyHighlights(text) {
             if (!AI_COMMENTS || Object.keys(AI_COMMENTS).length === 0 || !tipsEnabled) return text;
@@ -1448,6 +1652,8 @@
             document.querySelectorAll('input[id]:not([type="file"]), textarea[id], select[id]').forEach(el => {
                 data[el.id] = (el.type === 'checkbox') ? el.checked : el.value;
             });
+            data.sub_tabs = SUB_TABS;
+            data.active_sub_tabs = ACTIVE_SUB_TABS;
             data['weapons'] = [];
             document.querySelectorAll('#weapons-body tr').forEach(tr => {
                 // Select inputs AND selects to get the dropdown value
@@ -1521,28 +1727,42 @@
                     const el = document.getElementById(key);
                     if (el) { if(el.type === 'checkbox') el.checked = value; else el.value = value; }
                 }
-                if (data.equipment_table && Array.isArray(data.equipment_table)) {
-                    const tbody = document.getElementById('equipment-body');
-                    tbody.innerHTML = ''; // Clear existing
-                    data.equipment_table.forEach(item => {
-                        window.addEquipmentRow(item); // Pass item data to the row creator
-                    });
-                } else if (typeof data.equipment === 'string' && data.equipment.trim() !== "") {
-                    // Migration: If they had old text equipment, put it in the first row of the table
-                    window.addEquipmentRow({name: data.equipment, qty: 1, lbs: 0, notes: "Imported from text"});
+
+                if (data.sub_tabs) {
+                    SUB_TABS = data.sub_tabs;
+                    ACTIVE_SUB_TABS = data.active_sub_tabs || {};
+                } else {
+                    SUB_TABS = { notes: [], backstory: [], equipment: [], people: [] };
+                    ACTIVE_SUB_TABS = {};
+
+                    // Notes
+                    const oldNotes = data.notes || "";
+                    SUB_TABS.notes.push({ id: generateUUID(), name: "Main", content: oldNotes });
+
+                    // Backstory
+                    const oldStory = data.backstory || "";
+                    SUB_TABS.backstory.push({ id: generateUUID(), name: "Main", content: oldStory });
+
+                    // Equipment (Complex migration)
+                    let oldEquip = [];
+                    if (data.equipment_table) oldEquip = data.equipment_table;
+                    else if (data.equipment) oldEquip = [{ name: data.equipment, qty: 1, lbs: 0, notes: "Imported" }];
+                    SUB_TABS.equipment.push({ id: generateUUID(), name: "Main", content: oldEquip });
+
+                    // People
+                    const oldPeople = data.people_table || [];
+                    SUB_TABS.people.push({ id: generateUUID(), name: "Main", content: oldPeople });
                 }
-                if(data.people_table) {
-                    document.getElementById('people-body').innerHTML = '';
-                    for(let i=0; i<Math.max(5, data.people_table.length); i++) window.addPeopleRow();
-                    const rows = document.querySelectorAll('#people-body tr');
-                    data.people_table.forEach((r, i) => { if(rows[i]) {
-                        let inputs = rows[i].querySelectorAll('input');
-                        let people_notes = rows[i].querySelector('textarea');
-                        inputs[0].value=r.name;
-                        inputs[1].value=r.desc;
-                        people_notes.value=r.notes;
-                    }});
-                }
+
+                ['notes', 'backstory', 'equipment', 'people'].forEach(cat => {
+                    // Ensure active ID is valid
+                    if (!ACTIVE_SUB_TABS[cat] || !SUB_TABS[cat].find(t => t.id === ACTIVE_SUB_TABS[cat])) {
+                        if(SUB_TABS[cat].length > 0) ACTIVE_SUB_TABS[cat] = SUB_TABS[cat][0].id;
+                    }
+                    initSubTabs(cat);
+                    loadSubTabPage(cat);
+                });
+
                 if(data.weapons) {
                     document.getElementById('weapons-body').innerHTML = '';
                     data.weapons.forEach(r => {
@@ -2227,8 +2447,9 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             generateStaticContent();
-            initGhosts(); // Initialize ghosts on static inputs
+            initGhosts();
             await setupTooltips();
+            ['notes', 'backstory', 'equipment', 'people'].forEach(cat => initSubTabs(cat));
 
             document.body.addEventListener('mouseover', (e) => {
                 const target = e.target.closest('[data-tip]');
