@@ -72,6 +72,7 @@ export default async function handler(req, res) {
       });
     }
 
+    // Otherwise we need character sheet data
     const userId = interaction.member?.user.id || interaction.user.id;
     const charId = userMap[userId];
     console.log(`Using charId:${charId}`)
@@ -99,7 +100,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const data = snapshotQuery.docs[0].data();
+    const data = snapshotQuery.docs[0].data().sheetData;
     const { name } = interaction.data;
 
     // Command Logic
