@@ -74,7 +74,8 @@ export default async function handler(req, res) {
 
     // Otherwise we need character sheet data
     const userId = interaction.member?.user.id || interaction.user.id;
-    const charId = userMap[userId];
+    const userName = interaction.member?.user.username
+    const charId = userMap[userId] || userMap[userName];
     console.log(`Using charId:${charId}`)
 
     if (!charId) {
@@ -114,9 +115,8 @@ export default async function handler(req, res) {
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
-          content: `🛡️ **${data.charName}** (Level ${data.level} ${data.species})\n` +
-                   `**AC:** ${data.ac} | **HP:** ${data['hp-curr']}/${data['hp-max']}\n` +
-                   `**XP:** ${data.xp}`
+          content: `🛡️ **${data.charName}** (Level ${data.level} ${data.species} ${data.class})\n` +
+                   `**AC:** ${data.ac} | **HP:** ${data['hp-curr']}/${data['hp-max']}`
         }
       });
     }
