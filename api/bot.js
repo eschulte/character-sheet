@@ -101,7 +101,6 @@ export default async function handler(req, res) {
     }
 
     const data = snapshotQuery.docs[0].data().sheetData;
-    const { name } = interaction.data;
 
     // Command Logic
     if (name === 'data') {
