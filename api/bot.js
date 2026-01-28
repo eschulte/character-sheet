@@ -4,13 +4,25 @@ import userMap from '../user-map.json'; // Import your mapping file
 
 // 1. Initialize Firebase Admin
 if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    }),
-  });
+  try {
+    const rawKey = process.env.FIREBASE_PRIVATE_KEY;
+
+    // Aggressive newline cleanup
+    const formattedKey = rawKey
+      ? rawKey.replace(/\\n/gm, '\n').replace(/"/g, '')
+      : undefined;
+
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: formattedKey,
+      }),
+    });
+    console.log("✅ Firebase Admin successfully initialized.");
+  } catch (error) {
+    console.error("❌ Firebase Initialization Error:", error.stack);
+  }
 }
 const db = admin.firestore();
 
