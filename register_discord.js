@@ -32,6 +32,27 @@ const commands = [
     ],
   },
 
+  {
+    name: "combat",
+    description: "View details or roll for a weapon",
+    type: 1,
+    options: [
+      {
+        name: "name",
+        description: "Select a weapon (click to see list)",
+        type: 3,
+        required: true,
+        autocomplete: true,
+      },
+      {
+        name: "roll",
+        description: "Actually roll the attack?",
+        type: 5,
+        required: false,
+      },
+    ],
+  },
+
   // --- Ability Checks ---
   {
     name: "str_check",

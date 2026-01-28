@@ -81,6 +81,39 @@ export default async function handler(req, res) {
     return res.send({ type: InteractionResponseType.PONG });
   }
 
+  if (interaction.type === InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE) {
+    const { name, options } = interaction.data;
+    if (name === "combat") {
+      const userId = interaction.member?.user.id || interaction.user.id;
+      const charId = userMap[userId];
+
+      // Fetch data (identical to your main command fetch)
+      const snap = await db
+        .collection("characters")
+        .doc(charId)
+        .collection("snapshots")
+        .orderBy("createdAt", "desc")
+        .limit(1)
+        .get();
+      const sheetData = snap.docs[0].data().sheetData;
+      const weapons = sheetData.weapons || [];
+
+      const focusedOption = options.find((o) => o.focused === true);
+      const query = focusedOption.value.toLowerCase();
+
+      // Filter based on query, or return all if query is empty
+      const choices = weapons
+        .filter((w) => w.name && w.name.toLowerCase().includes(query))
+        .map((w) => ({ name: w.name, value: w.name }))
+        .slice(0, 25);
+
+      return res.send({
+        type: 8,
+        data: { choices },
+      });
+    }
+  }
+
   if (interaction.type === InteractionType.APPLICATION_COMMAND) {
     const { name, options } = interaction.data;
 
@@ -180,6 +213,40 @@ export default async function handler(req, res) {
               thumbnail: {
                 url: portrait,
               },
+            },
+          ],
+        },
+      });
+    }
+
+    if (name === "combat") {
+      const weaponName = options.find((o) => o.name === "name").value;
+      const shouldRoll = options.find((o) => o.name === "roll")?.value;
+      const weapon = data.weapons.find((w) => w.name === weaponName);
+
+      if (!weapon)
+        return res.send({ type: 4, data: { content: "❌ Weapon not found." } });
+
+      let content = `⚔️ **${weapon.name}**\n`;
+      content += `**Atk:** ${weapon.atk || "—"} | **Damage:** ${weapon.dmg || "—"} | **Type:** ${weapon.type || "—"}`;
+
+      if (shouldRoll) {
+        const d20 = Math.floor(Math.random() * 20) + 1;
+        const mod = parseInt(weapon.atk) || 0;
+        const total = d20 + mod;
+        content += `\n🎲 **Attack Roll:** 1d20 (${d20}) + ${mod} = **${total}**`;
+      }
+
+      return res.send({
+        type: 4,
+        data: {
+          embeds: [
+            {
+              title: weapon.name,
+              description: content,
+              color: 0x992d22,
+              footer: { text: weapon.notes || "" },
+              thumbnail: { url: data["portrait-url"] },
             },
           ],
         },
