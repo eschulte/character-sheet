@@ -1,6 +1,6 @@
 import { InteractionType, InteractionResponseType, verifyKey } from 'discord-interactions';
 import admin from 'firebase-admin';
-import userMap from '../user-map.json';
+import userMap from '../user-map.json' assert { type: 'json' };;
 
 if (!admin.apps.length) {
   try {
