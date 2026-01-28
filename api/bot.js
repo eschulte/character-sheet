@@ -4,25 +4,22 @@ import userMap from '../user-map.json';
 
 if (!admin.apps.length) {
   try {
-    // Get the key and immediately clean it
-    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+    const encodedKey = process.env.FIREBASE_PRIVATE_KEY;
+    let decodedKey;
 
-    if (privateKey) {
-      // This regex handles:
-      // 1. Literal \n strings (backslash + n)
-      // 2. Extra quotes that might have been pasted in Vercel
-      // 3. Any accidental double-escaped backslashes
-      privateKey = privateKey
-        .replace(/\\n/g, '\n')
-        .replace(/"/g, '')
-        .trim();
+    // Detect if the key is Base64 (doesn't start with dashes) or Raw
+    if (encodedKey && !encodedKey.startsWith('-----')) {
+       decodedKey = Buffer.from(encodedKey, 'base64').toString('utf-8');
+    } else {
+       // Fallback in case you revert to the old key style
+       decodedKey = encodedKey;
     }
 
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: privateKey,
+        privateKey: decodedKey ? decodedKey.replace(/\\n/g, '\n') : undefined,
       }),
     });
     console.log("✅ Firebase Admin successfully initialized.");
