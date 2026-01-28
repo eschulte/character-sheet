@@ -1,5 +1,4 @@
-Simple D&D 5e Character Sheet
-=============================
+# Simple D&D 5e Character Sheet
 
 https://eschulte.github.io/character-sheet
 
@@ -21,12 +20,14 @@ https://eschulte.github.io/character-sheet
 - Use the status element to indicate if the current changes have sync'd to firebase
 
 Features:
+
 - Switch to a tabbed interface on mobile with tabs like "Combat," "Skills," "Spells," "Bio"
 - Touch friendly interface on mobile with "+" and "-" buttons to avoid raising the keyboard as much
 - Make some section collapsible on mobile to save space
 - Add lookup from https://open5e.com for completion of spells, equipment, and anything else
 
 Needed Tool Tips:
+
 - Need tool tips for the following:
 - simple weapons
 - Alchemist's Supplies
@@ -43,6 +44,7 @@ Needed Tool Tips:
 ## Misc notes and helpful snippets
 
 ### JSON DB Maintenance
+
 ```bash
 # Merge two JSON files keeping keys unique.
 jq -nS 'reduce inputs as $item ({}; . + $item | to_entries | map({key, value: .value | unique}) | from_entries)' \
@@ -51,24 +53,30 @@ mv merged_ai_comments.json ai_comments.json
 ```
 
 ### Run a JavaScript REPL
+
 From the base of this directory.
 Needs a local `.env` file with all of the required secrets.
+
 ```bash
 node --experimental-repl-await -i -e "$(< repl.js)"
 ```
 
 ### Local testing (or at least syntax checking) for bot.js
+
 Simple and fast syntax check.
+
 ```bash
 node --check api/bot.js
 ```
 
 Run vercel locally
+
 ```bash
 vercel dev
 ```
 
 ### Firebase Config
+
 ```js
 // Your web app's Firebase configuration
 // https://console.firebase.google.com/project/dnd-character-sheet-5e/
@@ -78,11 +86,12 @@ const firebaseConfig = {
   projectId: "dnd-character-sheet-5e",
   storageBucket: "dnd-character-sheet-5e.firebasestorage.app",
   messagingSenderId: "554732035132",
-  appId: "1:554732035132:web:ed89be7af2ceea147a7739"
+  appId: "1:554732035132:web:ed89be7af2ceea147a7739",
 };
 ```
 
 ### Discord Config
+
 Developer Portal:
 https://discord.com/developers/applications/1465858284564250836/information
 
@@ -99,20 +108,20 @@ https://discord.com/oauth2/authorize?client_id=1465858284564250836&permissions=2
 **Problem:** Players have to manually uncheck 15+ spell slot checkboxes and reset HP after every session.
 **Suggestion:** Add a "Rest" dropdown in the Management menu or as a button in the Combat/Magic tabs.
 
-* **Short Rest:** Resets specific class resources (like Ki or Fighter’s Second Wind) and allows a "Hit Dice" input.
-* **Long Rest:** A "Nuke" button that clears all spell-slot checkboxes, resets HP to Max, and resets "Uses" counters on magic items.
+- **Short Rest:** Resets specific class resources (like Ki or Fighter’s Second Wind) and allows a "Hit Dice" input.
+- **Long Rest:** A "Nuke" button that clears all spell-slot checkboxes, resets HP to Max, and resets "Uses" counters on magic items.
 
 ### Aesthetic "Theme" Integration (Visual Appeal)
 
 **Problem:** The dark grey `#app-controls` bar feels like a "Developer Tool" rather than part of the game.
 **Suggestion:** Apply the "Solarized" theme or a dark "Parchment" texture to the control bar.
 
-* Use a "Wax Seal" icon for the Save button or a "Spellbook" icon for Character Management.
-* This makes the PWA feel like a cohesive app rather than a website with a character sheet on it.
+- Use a "Wax Seal" icon for the Save button or a "Spellbook" icon for Character Management.
+- This makes the PWA feel like a cohesive app rather than a website with a character sheet on it.
 
 ### Interactive Dice "Hints" (Ease of Use)
 
 **Problem:** Players often ask "What do I roll for this?"
 **Suggestion:** In the "Skills" list, make the modifier (e.g., +5) look like a button.
 
-* Clicking it doesn't necessarily need a full 3D dice engine, but it could trigger a "Spark" that says: *"Rolling for Stealth? Roll 1d20 and add 5!"* This reinforces the core mechanic for beginners.
+- Clicking it doesn't necessarily need a full 3D dice engine, but it could trigger a "Spark" that says: _"Rolling for Stealth? Roll 1d20 and add 5!"_ This reinforces the core mechanic for beginners.
