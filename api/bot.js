@@ -1,6 +1,10 @@
 import { InteractionType, InteractionResponseType, verifyKey } from 'discord-interactions';
 import admin from 'firebase-admin';
-import userMap from '../user-map.json' assert { type: 'json' };;
+import { readFileSync } from 'fs';
+import path from 'path';
+const userMap = JSON.parse(
+  readFileSync(path.resolve(process.cwd(), 'user-map.json'), 'utf8')
+);
 
 if (!admin.apps.length) {
   try {
