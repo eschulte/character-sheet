@@ -133,12 +133,12 @@ export default async function handler(req, res) {
         // Formatting: Adds a '+' sign for positive numbers for readability
         const sign = mod >= 0 ? "+" : "";
         return {
-          content: `🎲 **${label}**: 1d20 (${d20}) ${sign}${mod} = **${total}**`,
+          content: `🎲 **${label}** for ${data.charName}: 1d20 (${d20}) ${sign}${mod} = **${total}**`,
         };
       } else {
         const sign = mod >= 0 ? "+" : "";
         return {
-          content: `ℹ️ **${label}**: Formula is 1d20 ${sign}${mod}`,
+          content: `ℹ️ **${label}** for ${data.charName}: Formula is 1d20 ${sign}${mod}`,
         };
       }
     };
