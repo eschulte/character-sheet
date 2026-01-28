@@ -47,6 +47,21 @@ async function getRawBody(readable) {
   return Buffer.concat(chunks);
 }
 
+const classEmojiMap = {
+  barbarian: "🪓",
+  bard: "🎻",
+  cleric: "🔯",
+  druid: "🌿",
+  fighter: "⚔️",
+  monk: "🧘",
+  paladin: "🔯",
+  ranger: "🏹",
+  rogue: "🗡️",
+  sorcerer: "🔮",
+  warlock: "👁️",
+  artificer: "⚙️",
+};
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(200).send("Bot is online!");
 
@@ -175,7 +190,7 @@ export default async function handler(req, res) {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           content:
-            `🛡️ **${data.charName}** (Level ${data.level} ${data.species} ${data.class})\n` +
+            `${classEmojiMap[data.classtoLowerCase()]} **${data.charName}** (Level ${data.level} ${data.species} ${data.class})\n` +
             `**AC:** ${data.ac} | **HP:** ${data["hp-curr"]}/${data["hp-max"]}`,
         },
       });
