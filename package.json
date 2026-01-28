@@ -5,6 +5,7 @@
     "discord-interactions": "^3.4.0",
     "dotenv": "^17.2.3",
     "firebase-admin": "^11.0.0",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "protobufjs": "^7.2.4"
   }
 }
