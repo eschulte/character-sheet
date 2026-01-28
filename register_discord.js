@@ -1,4 +1,5 @@
-require('dotenv').config(); // This loads the .env file
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const APP_ID = process.env.DISCORD_APP_ID;
 const BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
