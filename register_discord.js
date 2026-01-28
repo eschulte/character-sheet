@@ -13,9 +13,24 @@ const rollOption = {
 };
 
 const commands = [
+  { name: "roll", description: "Roll a D20.", type: 1 },
   { name: "stats", description: "Show character overview", type: 1 },
   { name: "hp", description: "Check current health", type: 1 },
   { name: "inventory", description: "List your equipment", type: 1 },
+
+  {
+    name: "say",
+    description: "Speak as your character",
+    type: 1,
+    options: [
+      {
+        name: "message",
+        description: "What do you want to say?",
+        type: 3, // String
+        required: true,
+      },
+    ],
+  },
 
   // --- Ability Checks ---
   {

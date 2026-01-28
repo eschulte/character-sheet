@@ -143,6 +143,33 @@ export default async function handler(req, res) {
       }
     };
 
+    if (name === "say") {
+      const message = options.find((o) => o.name === "message").value;
+
+      // Use the character's portrait and name from Firebase
+      const charName = data.charName || "Unknown Hero";
+      const portrait = data["portrait-url"] || "";
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          embeds: [
+            {
+              author: {
+                name: charName,
+                icon_url: portrait,
+              },
+              description: message,
+              color: 0xd4af37,
+              thumbnail: {
+                url: portrait,
+              },
+            },
+          ],
+        },
+      });
+    }
+
     if (name === "stats") {
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
