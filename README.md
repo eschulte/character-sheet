@@ -64,6 +64,10 @@ const firebaseConfig = {
 };
 ```
 
+### Discord Config
+- Application ID: 1465858284564250836
+- Public Key: 25e5036ee33ca475729a27b0baa07084f8a04719e2359546fd7dedfb777e8899
+
 ## Additional changes to make
 
 ### The "Rest" Economy (Utility for All)
