@@ -9,7 +9,7 @@ const rollOption = {
   name: "roll",
   description: "Actually roll the d20?",
   type: 5, // Boolean
-  required: false
+  required: false,
 };
 
 const commands = [
@@ -18,40 +18,190 @@ const commands = [
   { name: "inventory", description: "List your equipment", type: 1 },
 
   // --- Ability Checks ---
-  { name: "str_check", description: "Strength Check", type: 1, options: [rollOption] },
-  { name: "dex_check", description: "Dexterity Check", type: 1, options: [rollOption] },
-  { name: "con_check", description: "Constitution Check", type: 1, options: [rollOption] },
-  { name: "int_check", description: "Intelligence Check", type: 1, options: [rollOption] },
-  { name: "wis_check", description: "Wisdom Check", type: 1, options: [rollOption] },
-  { name: "cha_check", description: "Charisma Check", type: 1, options: [rollOption] },
+  {
+    name: "str_check",
+    description: "Strength Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "dex_check",
+    description: "Dexterity Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "con_check",
+    description: "Constitution Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "int_check",
+    description: "Intelligence Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "wis_check",
+    description: "Wisdom Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "cha_check",
+    description: "Charisma Check",
+    type: 1,
+    options: [rollOption],
+  },
 
   // --- Saving Throws ---
-  { name: "str_save", description: "Strength Saving Throw", type: 1, options: [rollOption] },
-  { name: "dex_save", description: "Dexterity Saving Throw", type: 1, options: [rollOption] },
-  { name: "con_save", description: "Constitution Saving Throw", type: 1, options: [rollOption] },
-  { name: "int_save", description: "Intelligence Saving Throw", type: 1, options: [rollOption] },
-  { name: "wis_save", description: "Wisdom Saving Throw", type: 1, options: [rollOption] },
-  { name: "cha_save", description: "Charisma Saving Throw", type: 1, options: [rollOption] },
+  {
+    name: "str_save",
+    description: "Strength Saving Throw",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "dex_save",
+    description: "Dexterity Saving Throw",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "con_save",
+    description: "Constitution Saving Throw",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "int_save",
+    description: "Intelligence Saving Throw",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "wis_save",
+    description: "Wisdom Saving Throw",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "cha_save",
+    description: "Charisma Saving Throw",
+    type: 1,
+    options: [rollOption],
+  },
 
   // --- Skills ---
-  { name: "athletics", description: "Athletics (Str) Check", type: 1, options: [rollOption] },
-  { name: "acrobatics", description: "Acrobatics (Dex) Check", type: 1, options: [rollOption] },
-  { name: "sleight_of_hand", description: "Sleight of Hand (Dex) Check", type: 1, options: [rollOption] },
-  { name: "stealth", description: "Stealth (Dex) Check", type: 1, options: [rollOption] },
-  { name: "arcana", description: "Arcana (Int) Check", type: 1, options: [rollOption] },
-  { name: "history", description: "History (Int) Check", type: 1, options: [rollOption] },
-  { name: "investigation", description: "Investigation (Int) Check", type: 1, options: [rollOption] },
-  { name: "nature", description: "Nature (Int) Check", type: 1, options: [rollOption] },
-  { name: "religion", description: "Religion (Int) Check", type: 1, options: [rollOption] },
-  { name: "animal_handling", description: "Animal Handling (Wis) Check", type: 1, options: [rollOption] },
-  { name: "insight", description: "Insight (Wis) Check", type: 1, options: [rollOption] },
-  { name: "medicine", description: "Medicine (Wis) Check", type: 1, options: [rollOption] },
-  { name: "perception", description: "Perception (Wis) Check", type: 1, options: [rollOption] },
-  { name: "survival", description: "Survival (Wis) Check", type: 1, options: [rollOption] },
-  { name: "deception", description: "Deception (Cha) Check", type: 1, options: [rollOption] },
-  { name: "intimidation", description: "Intimidation (Cha) Check", type: 1, options: [rollOption] },
-  { name: "performance", description: "Performance (Cha) Check", type: 1, options: [rollOption] },
-  { name: "persuasion", description: "Persuasion (Cha) Check", type: 1, options: [rollOption] }
+  {
+    name: "athletics",
+    description: "Athletics (Str) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "acrobatics",
+    description: "Acrobatics (Dex) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "sleight_of_hand",
+    description: "Sleight of Hand (Dex) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "stealth",
+    description: "Stealth (Dex) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "arcana",
+    description: "Arcana (Int) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "history",
+    description: "History (Int) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "investigation",
+    description: "Investigation (Int) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "nature",
+    description: "Nature (Int) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "religion",
+    description: "Religion (Int) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "animal_handling",
+    description: "Animal Handling (Wis) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "insight",
+    description: "Insight (Wis) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "medicine",
+    description: "Medicine (Wis) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "perception",
+    description: "Perception (Wis) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "survival",
+    description: "Survival (Wis) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "deception",
+    description: "Deception (Cha) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "intimidation",
+    description: "Intimidation (Cha) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "performance",
+    description: "Performance (Cha) Check",
+    type: 1,
+    options: [rollOption],
+  },
+  {
+    name: "persuasion",
+    description: "Persuasion (Cha) Check",
+    type: 1,
+    options: [rollOption],
+  },
 ];
 
 async function register() {
