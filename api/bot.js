@@ -1,27 +1,33 @@
 import { InteractionType, InteractionResponseType, verifyKey } from 'discord-interactions';
 import admin from 'firebase-admin';
-import userMap from '../user-map.json'; // Import your mapping file
+import userMap from '../user-map.json';
 
-// 1. Initialize Firebase Admin
 if (!admin.apps.length) {
   try {
-    const rawKey = process.env.FIREBASE_PRIVATE_KEY;
+    // Get the key and immediately clean it
+    let privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
-    // Aggressive newline cleanup
-    const formattedKey = rawKey
-      ? rawKey.replace(/\\n/gm, '\n').replace(/"/g, '')
-      : undefined;
+    if (privateKey) {
+      // This regex handles:
+      // 1. Literal \n strings (backslash + n)
+      // 2. Extra quotes that might have been pasted in Vercel
+      // 3. Any accidental double-escaped backslashes
+      privateKey = privateKey
+        .replace(/\\n/g, '\n')
+        .replace(/"/g, '')
+        .trim();
+    }
 
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: formattedKey,
+        privateKey: privateKey,
       }),
     });
     console.log("✅ Firebase Admin successfully initialized.");
   } catch (error) {
-    console.error("❌ Firebase Initialization Error:", error.stack);
+    console.error("❌ Firebase Init Error:", error.message);
   }
 }
 const db = admin.firestore();
