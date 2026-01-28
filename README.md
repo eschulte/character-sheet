@@ -68,6 +68,9 @@ const firebaseConfig = {
 Developer Portal:
 https://discord.com/developers/applications/1465858284564250836/information
 
+Discord Add-App-To-Server:
+https://discord.com/oauth2/authorize?client_id=1465858284564250836&permissions=2147485696&integration_type=0&scope=bot+applications.commands
+
 - Application ID: 1465858284564250836
 - Public Key: 25e5036ee33ca475729a27b0baa07084f8a04719e2359546fd7dedfb777e8899
 
