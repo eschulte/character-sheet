@@ -50,6 +50,13 @@ jq -nS 'reduce inputs as $item ({}; . + $item | to_entries | map({key, value: .v
 mv merged_ai_comments.json ai_comments.json
 ```
 
+### Run a JavaScript REPL
+From the base of this directory.
+Needs a local `.env` file with all of the required secrets.
+```bash
+node --experimental-repl-await -i -e "$(< repl.js)"
+```
+
 ### Firebase Config
 ```js
 // Your web app's Firebase configuration
