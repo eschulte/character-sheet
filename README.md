@@ -57,6 +57,17 @@ Needs a local `.env` file with all of the required secrets.
 node --experimental-repl-await -i -e "$(< repl.js)"
 ```
 
+### Local testing (or at least syntax checking) for bot.js
+Simple and fast syntax check.
+```bash
+node --check api/bot.js
+```
+
+Run vercel locally
+```bash
+vercel dev
+```
+
 ### Firebase Config
 ```js
 // Your web app's Firebase configuration
