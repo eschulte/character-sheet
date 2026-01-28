@@ -57,8 +57,20 @@ export default async function handler(req, res) {
   }
 
   if (interaction.type === InteractionType.APPLICATION_COMMAND) {
+    const { name, options } = interaction.data;
+    
+    // 1. Handle Simple Roll immediately
+    if (name === 'roll') {
+      const roll = Math.floor(Math.random() * 20) + 1;
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: { content: `🎲 **${interaction.member?.user.username || 'You'}** rolled a **${roll}**!` }
+      });
+    }
+
     const userId = interaction.member?.user.id || interaction.user.id;
     const charId = userMap[userId];
+    console.log(`Using charId:${charId}`)
 
     if (!charId) {
       return res.send({
@@ -68,18 +80,32 @@ export default async function handler(req, res) {
     }
 
     // Fetch character data from Firebase
-    const charDoc = await db.collection('characters').doc(charId).get();
-    if (!charDoc.exists) {
+    const snapshotQuery = await db
+        .collection('characters')
+        .doc(charId)
+        .collection('snapshots')
+        .orderBy('timestamp', 'desc')
+        .limit(1)
+        .get();
+
+    if (snapshotQuery.empty) {
       return res.send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: { content: "❌ Character data not found in Firebase." }
+        type: 4,
+        data: { content: "❌ No snapshots found for this character." }
       });
     }
 
-    const data = charDoc.data();
+    const data = snapshotQuery.docs[0].data();
     const { name } = interaction.data;
 
     // Command Logic
+    if (name === 'data') {
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: { content: `DATA: ${data}` }
+      });
+    }
+
     if (name === 'stats') {
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
