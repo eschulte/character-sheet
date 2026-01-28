@@ -164,6 +164,7 @@ export default async function handler(req, res) {
       // Use the character's portrait and name from Firebase
       const charName = data.charName || "Unknown Hero";
       const portrait = data["portrait-url"] || "";
+      const classEmoji = classEmojiMap[data.classtoLowerCase()];
 
       return res.send({
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
@@ -190,7 +191,7 @@ export default async function handler(req, res) {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: {
           content:
-            `${classEmojiMap[data.classtoLowerCase()]} **${data.charName}** (Level ${data.level} ${data.species} ${data.class})\n` +
+            `${classEmoji} **${data.charName}** (Level ${data.level} ${data.species} ${data.class})\n` +
             `**AC:** ${data.ac} | **HP:** ${data["hp-curr"]}/${data["hp-max"]}`,
         },
       });
