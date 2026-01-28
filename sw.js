@@ -1,10 +1,10 @@
 // 1. Versioning: Update this (v2, v3, etc.) whenever you push a new version to GitHub.
 // This forces the browser to recognize a change and clean up old files.
-const CACHE_NAME = "dnd-sheet-v2";
-const ASSETS = ["./", "./index.html", "./manifest.json"];
+const CACHE_NAME = 'dnd-sheet-v2';
+const ASSETS = ['./', './index.html', './manifest.json'];
 
 // 2. Install Event: Cache core assets immediately
-self.addEventListener("install", (e) => {
+self.addEventListener('install', (e) => {
   // Forces this new service worker to become active immediately, skipping the "waiting" state
   self.skipWaiting();
 
@@ -16,13 +16,13 @@ self.addEventListener("install", (e) => {
 });
 
 // 3. Activate Event: Clean up old caches from previous versions
-self.addEventListener("activate", (e) => {
+self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keyList) => {
       return Promise.all(
         keyList.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log("[SW] Removing old cache", key);
+            console.log('[SW] Removing old cache', key);
             return caches.delete(key);
           }
         }),
@@ -34,12 +34,9 @@ self.addEventListener("activate", (e) => {
 });
 
 // 4. Fetch Event: Network-First Strategy
-self.addEventListener("fetch", (e) => {
+self.addEventListener('fetch', (e) => {
   // Ignore Firebase/Google API requests (let them go to network standardly)
-  if (
-    e.request.url.includes("googleapis.com") ||
-    e.request.url.includes("firebaseapp.com")
-  ) {
+  if (e.request.url.includes('googleapis.com') || e.request.url.includes('firebaseapp.com')) {
     return;
   }
 
@@ -51,7 +48,7 @@ self.addEventListener("fetch", (e) => {
     fetch(e.request)
       .then((response) => {
         // Check if we received a valid response
-        if (!response || response.status !== 200 || response.type !== "basic") {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
         }
 

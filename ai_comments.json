@@ -759,10 +759,7 @@
     "Tasks you’re licensed to attempt.",
     "This is your license to be competent at specific things, like swinging axes or lying to kings. Proficiencies boost your rolls, but the dungeon boosts its traps. Stay sharp, or I’ll revoke your license."
   ],
-  "Proficiency": [
-    "Congratulations, you now fail with confidence.",
-    "Official recognition that you’ve practiced."
-  ],
+  "Proficiency": ["Congratulations, you now fail with confidence.", "Official recognition that you’ve practiced."],
   "Proficiency Bonus": [
     "One bonus to rule them all.",
     "Proficiency Bonus is the System’s grudging nod to your so-called ‘skills.’ Add this to stuff you’re good at—swords, spells, or lying to NPCs. Low level? It’s a measly +2. High level? You’re still not as cool as you think.",
