@@ -84,7 +84,7 @@ export default async function handler(req, res) {
         .collection('characters')
         .doc(charId)
         .collection('snapshots')
-        .orderBy('timestamp', 'desc')
+        .orderBy('createdAt', 'desc')
         .limit(1)
         .get();
 
