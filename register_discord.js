@@ -42,6 +42,13 @@ const commands = [
     ],
   },
 
+  {
+    name: 'equipment',
+    description: 'Look up an item in your inventory',
+    type: 1,
+    options: [{ name: 'name', description: 'Item name', type: 3, required: true, autocomplete: true }],
+  },
+
   // --- Ability Checks ---
   { name: 'str_check', description: 'Strength Check', type: 1, options: [rollOption] },
   { name: 'dex_check', description: 'Dexterity Check', type: 1, options: [rollOption] },

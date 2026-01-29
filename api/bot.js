@@ -41,6 +41,51 @@ async function getRawBody(readable) {
   return Buffer.concat(chunks);
 }
 
+const charCache = {}; // Global in-memory cache
+const CACHE_TTL = 10000; // 10 seconds
+
+const itemEmojiMap = {
+  armor: '🛡️',
+  shield: '🛡️',
+  sword: '⚔️',
+  dagger: '⚔️',
+  axe: '⚔️',
+  mace: '⚔️',
+  spear: '⚔️',
+  bow: '🏹',
+  crossbow: '🏹',
+  potion: '🧪',
+  elixir: '🧪',
+  poison: '☠️',
+  scroll: '📜',
+  book: '📖',
+  tome: '📖',
+  letter: '📄',
+  note: '📄',
+  gold: '💰',
+  silver: '💰',
+  copper: '💰',
+  coin: '💰',
+  gem: '💎',
+  food: '🍖',
+  ration: '🍖',
+  water: '💧',
+  key: '🔑',
+  tool: '🛠️',
+  kit: '🛠️',
+  ring: '💍',
+  amulet: '📿',
+  bag: '🎒',
+  pack: '🎒',
+  default: '🎒',
+};
+
+function getItemEmoji(name) {
+  const lower = name.toLowerCase();
+  const key = Object.keys(itemEmojiMap).find((k) => lower.includes(k));
+  return itemEmojiMap[key] || itemEmojiMap.default;
+}
+
 const classEmojiMap = {
   barbarian: '🪓',
   bard: '🎻',
@@ -101,6 +146,33 @@ export default async function handler(req, res) {
 
       return res.send({ type: 8, data: { choices } });
     }
+    if (name === 'equipment') {
+      const userId = interaction.member?.user.id || interaction.user.id;
+      const charId = userMap[userId];
+
+      // Note: For autocomplete, we skip the heavy cache logic to keep it snappy,
+      // or you could reuse the cache if you want. Here is the safest direct fetch for now:
+      const snap = await db
+        .collection('characters')
+        .doc(charId)
+        .collection('snapshots')
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get();
+
+      const sheetData = snap.docs[0].data().sheetData;
+      const equipment = sheetData.equipment_table || [];
+
+      const focusedOption = options.find((o) => o.focused === true);
+      const query = focusedOption.value.toLowerCase();
+
+      const choices = equipment
+        .filter((item) => item.name && item.name.toLowerCase().includes(query))
+        .map((item) => ({ name: item.name, value: item.name }))
+        .slice(0, 25);
+
+      return res.send({ type: 8, data: { choices } });
+    }
   }
 
   if (interaction.type === InteractionType.APPLICATION_COMMAND) {
@@ -129,19 +201,65 @@ export default async function handler(req, res) {
     }
 
     // Fetch character data from Firebase
-    const snapshotQuery = await db
-      .collection('characters')
-      .doc(charId)
-      .collection('snapshots')
-      .orderBy('createdAt', 'desc')
-      .limit(1)
-      .get();
+    // (with caching)
+    const now = Date.now();
+    let data = null;
+    let shouldFetchFull = true;
 
-    if (snapshotQuery.empty) {
-      return res.send({ type: 4, data: { content: '❌ No snapshots found for this character.' } });
+    // 1. Check if we have valid cached data
+    if (charCache[charId]) {
+      const cached = charCache[charId];
+
+      // If polled recently (within 10s), trust the cache blindly
+      if (now - cached.lastPoll < CACHE_TTL) {
+        console.log(`⚡ Using Hot Cache for ${charId}`);
+        data = cached.data;
+        shouldFetchFull = false;
+      } else {
+        // Cache is "stale", poll Firebase metadata only
+        console.log(`🔍 Polling Metadata for ${charId}`);
+        const metaSnap = await db
+          .collection('characters')
+          .doc(charId)
+          .collection('snapshots')
+          .orderBy('createdAt', 'desc')
+          .limit(1)
+          .select('createdAt') // Only fetch the timestamp field
+          .get();
+
+        if (!metaSnap.empty) {
+          const cloudTimestamp = metaSnap.docs[0].data().createdAt;
+          if (cloudTimestamp === cached.snapshotCreatedAt) {
+            console.log(`✅ Cache Valid (No changes). Updating poll timer.`);
+            charCache[charId].lastPoll = now;
+            data = cached.data;
+            shouldFetchFull = false;
+          }
+        }
+      }
     }
 
-    const data = snapshotQuery.docs[0].data().sheetData;
+    // 2. Fetch full data if needed (Cache miss or Data changed)
+    if (shouldFetchFull) {
+      console.log(`☁️ Downloading FULL data for ${charId}`);
+      const snapshotQuery = await db
+        .collection('characters')
+        .doc(charId)
+        .collection('snapshots')
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get();
+
+      if (snapshotQuery.empty) {
+        return res.send({ type: 4, data: { content: '❌ No snapshots found for this character.' } });
+      }
+
+      const docData = snapshotQuery.docs[0].data();
+      data = docData.sheetData;
+
+      // Update Cache
+      charCache[charId] = { data: data, snapshotCreatedAt: docData.createdAt, lastPoll: now };
+    }
 
     // --- HELPER FUNCTION FOR CHECKS & SAVES ---
     // Reads a specific key from the sheet (e.g., 'val-wisdom-perception'),
@@ -216,6 +334,33 @@ export default async function handler(req, res) {
               description: content,
               color: 0x992d22,
               footer: { text: weapon.notes || '' },
+              thumbnail: { url: data['portrait-url'] },
+            },
+          ],
+        },
+      });
+    }
+
+    if (name === 'equipment') {
+      const itemName = options.find((o) => o.name === 'name').value;
+      const item = (data.equipment_table || []).find((i) => i.name === itemName);
+
+      if (!item) return res.send({ type: 4, data: { content: '❌ Item not found.' } });
+
+      const emoji = getItemEmoji(item.name);
+
+      let description = `**Qty:** ${item.qty || 1}`;
+      if (item.lbs && item.lbs !== '0') description += ` | **Weight:** ${item.lbs} lbs`;
+
+      return res.send({
+        type: 4,
+        data: {
+          embeds: [
+            {
+              title: `${emoji} ${item.name}`,
+              description: description,
+              color: 0x2b2b2b, // Dark Grey
+              footer: { text: item.notes || '' },
               thumbnail: { url: data['portrait-url'] },
             },
           ],
