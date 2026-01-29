@@ -101,6 +101,158 @@ const classEmojiMap = {
   artificer: '⚙️',
 };
 
+function evaluateDice(expression) {
+  // 1. Tokenize: Grab only numbers and valid operators. Ignore everything else.
+  //    Matches: Digits, or single characters d, +, -, *, /, (, )
+  const tokens = expression.match(/\d+|[d\+\-\*\/\(\)]/g);
+
+  if (!tokens || tokens.length === 0) {
+    // Default fallback if input was just text or empty
+    return evaluateDice('1d20');
+  }
+
+  let cursor = 0;
+  const rollsLog = [];
+
+  // --- PARSER FUNCTIONS (Builds the Tree) ---
+
+  function peek() {
+    return tokens[cursor];
+  }
+
+  function consume(expected) {
+    if (expected && peek() !== expected) return false;
+    const token = tokens[cursor];
+    cursor++;
+    return token;
+  }
+
+  // Grammar: Expression -> Term { +|- Term }
+  function parseExpression() {
+    let left = parseTerm();
+    while (peek() === '+' || peek() === '-') {
+      const operator = consume();
+      const right = parseTerm();
+      left = { type: 'binary', operator, left, right };
+    }
+    return left;
+  }
+
+  // Grammar: Term -> DiceExpression { *|/ DiceExpression }
+  function parseTerm() {
+    let left = parseDiceExpression();
+    while (peek() === '*' || peek() === '/') {
+      const operator = consume();
+      const right = parseDiceExpression();
+      left = { type: 'binary', operator, left, right };
+    }
+    return left;
+  }
+
+  // Grammar: DiceExpression -> [Factor] d Factor
+  function parseDiceExpression() {
+    // Check if the very first thing is 'd' (e.g. "d20")
+    if (peek() === 'd') {
+      consume(); // eat 'd'
+      const sides = parseFactor();
+      return { type: 'dice', count: { type: 'literal', value: 1 }, sides };
+    }
+
+    let left = parseFactor();
+
+    // If we have a number/factor, check if a 'd' follows it (e.g. "2d6")
+    if (peek() === 'd') {
+      consume(); // eat 'd'
+      const sides = parseFactor();
+      return { type: 'dice', count: left, sides };
+    }
+
+    return left;
+  }
+
+  // Grammar: Factor -> Number | (Expression)
+  function parseFactor() {
+    const token = peek();
+
+    if (token === '(') {
+      consume('(');
+      const expr = parseExpression();
+      if (peek() !== ')') {
+        // Be forgiving: if missing closing paren, just return what we have
+        return expr;
+      }
+      consume(')');
+      return expr;
+    }
+
+    // It should be a number
+    if (/^\d+$/.test(token)) {
+      consume();
+      return { type: 'literal', value: parseInt(token, 10) };
+    }
+
+    // Fallback for syntax errors (e.g. "2 + * 5") -> Treat missing factor as 0
+    return { type: 'literal', value: 0 };
+  }
+
+  // --- EVALUATOR (Walks the Tree) ---
+  function evaluate(node) {
+    if (!node) return 0;
+
+    if (node.type === 'literal') {
+      return node.value;
+    }
+
+    if (node.type === 'binary') {
+      const l = evaluate(node.left);
+      const r = evaluate(node.right);
+      switch (node.operator) {
+        case '+':
+          return l + r;
+        case '-':
+          return l - r;
+        case '*':
+          return l * r;
+        case '/':
+          return r === 0 ? 0 : Math.floor(l / r); // Protect div by zero
+      }
+    }
+
+    if (node.type === 'dice') {
+      const count = evaluate(node.count);
+      const sides = evaluate(node.sides);
+
+      // Safety Limits
+      const safeCount = Math.min(Math.max(count, 0), 100); // 0 to 100 dice
+      const safeSides = Math.min(Math.max(sides, 1), 1000); // 1 to 1000 sides
+
+      const currentRolls = [];
+      let total = 0;
+      for (let i = 0; i < safeCount; i++) {
+        const r = Math.floor(Math.random() * safeSides) + 1;
+        currentRolls.push(r);
+        total += r;
+      }
+
+      // Log formatted like "2d6: [3, 4]"
+      rollsLog.push(`**${safeCount}d${safeSides}**: [${currentRolls.join(', ')}]`);
+      return total;
+    }
+    return 0;
+  }
+
+  // 2. Parse
+  const parseTree = parseExpression();
+
+  // 3. Evaluate
+  const result = evaluate(parseTree);
+
+  // Reconstruct clean math string from tokens for display
+  const cleanMath = tokens.join(' ');
+
+  return { total: result, log: rollsLog, math: cleanMath };
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(200).send('Bot is online!');
 
@@ -180,11 +332,40 @@ export default async function handler(req, res) {
 
     // 1. Handle Simple Roll immediately
     if (name === 'roll') {
-      const roll = Math.floor(Math.random() * 20) + 1;
-      return res.send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: { content: `🎲 **${interaction.member?.user.username || 'You'}** rolled a **${roll}**!` },
-      });
+      // Default to 1d20 if no argument provided
+      const rawExpression = options?.find((o) => o.name === 'expression')?.value || '1d20';
+
+      try {
+        const result = evaluateDice(rawExpression);
+
+        let description = `**Input:** \`${rawExpression}\`\n`;
+
+        // Only show cleaned math if it differs significantly from input
+        if (result.math.replace(/\s/g, '') !== rawExpression.replace(/\s/g, '')) {
+          description += `**Parsed:** \`${result.math}\`\n`;
+        }
+
+        if (result.log.length > 0) {
+          description += `**Dice:** ${result.log.join(', ')}\n`;
+        }
+
+        description += `\n# 🎲 Result: ${result.total}`;
+
+        return res.send({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+            embeds: [
+              {
+                title: 'Dice Roller',
+                description: description,
+                color: 0x4caf50, // Green
+              },
+            ],
+          },
+        });
+      } catch (error) {
+        return res.send({ type: 4, data: { content: `❌ Parser Error: ${error.message}` } });
+      }
     }
 
     // Otherwise we need character sheet data
@@ -328,15 +509,7 @@ export default async function handler(req, res) {
       return res.send({
         type: 4,
         data: {
-          embeds: [
-            {
-              title: weapon.name,
-              description: content,
-              color: 0x992d22,
-              footer: { text: weapon.notes || '' },
-              thumbnail: { url: data['portrait-url'] },
-            },
-          ],
+          embeds: [{ title: weapon.name, description: content, color: 0x992d22, footer: { text: weapon.notes || '' } }],
         },
       });
     }

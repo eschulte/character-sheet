@@ -13,7 +13,19 @@ const rollOption = {
 };
 
 const commands = [
-  { name: 'roll', description: 'Roll a D20.', type: 1 },
+  {
+    name: 'roll',
+    description: 'Calculate a dice roll (e.g. 2d6 + 5)',
+    type: 1,
+    options: [
+      {
+        name: 'expression',
+        description: 'Formula (default: 1d20)',
+        type: 3, // String
+        required: false,
+      },
+    ],
+  },
   { name: 'stats', description: 'Show character overview', type: 1 },
   { name: 'hp', description: 'Check current health', type: 1 },
   { name: 'inventory', description: 'List your equipment', type: 1 },
