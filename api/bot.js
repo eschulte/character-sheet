@@ -361,7 +361,6 @@ export default async function handler(req, res) {
               description: description,
               color: 0x2b2b2b, // Dark Grey
               footer: { text: item.notes || '' },
-              thumbnail: { url: data['portrait-url'] },
             },
           ],
         },
