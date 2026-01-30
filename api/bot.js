@@ -533,10 +533,11 @@ export default async function handler(req, res) {
         data: {
           embeds: [
             {
+              // Using italics for the action
               description: `***${charName} ${action}***`,
-              color: 0x7289da, // Discord Blurple - distinctly different from the gold /say
-              image: {
-                url: portrait, // Large image at the bottom vs. tiny thumbnail in the top right
+              color: 0x4f545c, // "Dark Mode" Grey for a subtle narrative feel
+              thumbnail: {
+                url: portrait, // This makes the picture small and placed in the corner
               },
             },
           ],
@@ -616,7 +617,7 @@ export default async function handler(req, res) {
               description: `*${randomTip}*`,
               color: 0xcc0000, // Tactical Red
               footer: {
-                text: 'World Dungeon Authority • Tactical Metadata Service',
+                text: 'Tactical Metadata Service',
                 icon_url: 'https://www.gstatic.com/images/icons/material/system/2x/warning_amber_white_24dp.png',
               },
             },
