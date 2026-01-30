@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dungeon Dashboard | Bot Support</title>
+    <style>
+      :root {
+        --discord-blurple: #5865f2;
+        --discord-dark: #313338;
+        --discord-card: #2b2d31;
+        --text-main: #dbdee1;
+        --text-muted: #949ba4;
+        --gold: #d4af37;
+        --red: #ff4444;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--discord-dark);
+        color: var(--text-main);
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      header {
+        text-align: center;
+        padding-bottom: 40px;
+        border-bottom: 1px solid #4e5058;
+      }
+
+      h1 {
+        color: #fff;
+        margin-bottom: 10px;
+      }
+      .subtitle {
+        color: var(--text-muted);
+        font-size: 1.2rem;
+      }
+
+      .btn-install {
+        display: inline-block;
+        background-color: var(--discord-blurple);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-top: 20px;
+        transition: background 0.2s;
+      }
+
+      .btn-install:hover {
+        background-color: #4752c4;
+      }
+
+      section {
+        margin-top: 40px;
+      }
+      h2 {
+        color: var(--gold);
+        border-bottom: 1px solid #4e5058;
+        padding-bottom: 10px;
+      }
+
+      .command-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .card {
+        background: var(--discord-card);
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid var(--discord-blurple);
+      }
+
+      .card h3 {
+        margin-top: 0;
+        font-family: monospace;
+        color: #fff;
+      }
+      .card p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      .example {
+        background: #1e1f22;
+        padding: 15px;
+        border-radius: 4px;
+        margin-top: 10px;
+        border: 1px solid #4e5058;
+      }
+
+      .embed-sim {
+        border-left: 4px solid var(--gold);
+        background: #2b2d31;
+        padding: 10px;
+        margin-top: 5px;
+      }
+
+      .embed-title {
+        font-weight: bold;
+        color: #fff;
+      }
+      .embed-desc {
+        font-style: italic;
+        font-size: 0.9rem;
+      }
+
+      .tag {
+        font-size: 0.7rem;
+        background: #4e5058;
+        padding: 2px 6px;
+        border-radius: 3px;
+        text-transform: uppercase;
+        margin-right: 5px;
+      }
+
+      footer {
+        margin-top: 60px;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      a {
+        color: var(--discord-blurple);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>⚔️ Dungeon Dashboard</h1>
+        <p class="subtitle">The Discord bridge for your PWA Character Sheet.</p>
+        <a href="#" class="btn-install">Add to Discord</a>
+      </header>
+
+      <section id="features">
+        <h2>Why Dungeon Dashboard?</h2>
+        <p>
+          This bot connects your live Firebase character sheet directly to your Discord session. No more switching tabs
+          to check your AC, roll a save, or verify how many spell slots you have left.
+        </p>
+      </section>
+
+      <section id="commands">
+        <h2>Available Commands</h2>
+
+        <div class="command-grid">
+          <div class="card">
+            <h3>/roll <span class="tag">Expression</span></h3>
+            <p>Advanced dice parser. Supports math and complex notation.</p>
+            <div class="example">
+              <code>/roll 2d6 + 5</code><br />
+              <span style="color: #4caf50">Result: 12</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>/stats</h3>
+            <p>A high-level overview of your character's ability scores, AC, and proficiency bonus.</p>
+          </div>
+
+          <div class="card">
+            <h3>/remaining <span class="tag">Type</span></h3>
+            <p>Check expendable resources. Autocompletes based on your class (Spells, Rages, Infusions, etc).</p>
+          </div>
+
+          <div class="card">
+            <h3>/say <span class="tag">Message</span></h3>
+            <p>Speak in-character using your sheet's portrait and name.</p>
+            <div class="embed-sim">
+              <span class="embed-title">Y'un</span><br />
+              "I suggest we don't touch the glowing orb."
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>/me <span class="tag">Action</span></h3>
+            <p>Describe an action. Formatted as a narrative scene description.</p>
+            <div class="embed-sim" style="border-color: #7289da">
+              <span class="embed-desc">***Y'un carefully examines the ancient runes.***</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>/combat <span class="tag">Name</span></h3>
+            <p>Pulls data from your Weapons table. Features dynamic tab-complete for your arsenal.</p>
+          </div>
+
+          <div class="card">
+            <h3>/condition</h3>
+            <p>Check active status effects with tactical commentary from the AI.</p>
+            <div class="embed-sim" style="border-color: #ffaa00">
+              <span class="embed-title">⚠️ Poisoned</span><br />
+              <span class="embed-desc">> "Your internal systems are failing. How embarrassing."</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>/tip <span class="tag">Topic</span></h3>
+            <p>Get a tactical breakdown of D&D rules in the Dungeon Crawler Carl AI voice.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="skills">
+        <h2>Skill & Ability Checks</h2>
+        <p>
+          Every standard D&D 5e skill is supported. Use the <code>roll: true</code> argument to automatically add your
+          modifier to a d20 roll.
+        </p>
+        <div class="card" style="border-left-color: var(--gold)">
+          <code>/perception roll:true</code><br />
+          <code>/stealth</code><br />
+          <code>/athletics roll:true</code>
+        </div>
+      </section>
+
+      <section id="support">
+        <h2>Get Help & Feedback</h2>
+        <p>Running into issues? Want to request a feature?</p>
+        <ul>
+          <li>
+            <strong>Technical Support:</strong> Open an issue or leave a comment on our
+            <a href="https://github.com/eschulte/character-sheet">GitHub Repository</a>.
+          </li>
+          <li>
+            <strong>Character Sync:</strong> Ensure your PWA has saved to Firebase (look for the "Synced" indicator)
+            before running commands.
+          </li>
+        </ul>
+      </section>
+
+      <footer>
+        <p>&copy; 2024 Dungeon Dashboard. Not an official Wizards of the Coast product.</p>
+      </footer>
+    </div>
+  </body>
+</html>
