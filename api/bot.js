@@ -423,7 +423,10 @@ export default async function handler(req, res) {
               description:
                 'Need help with commands? Want to see how to link your character? Visit our official support page for a full command list and troubleshooting guide.',
               color: 0x94a5ff, // Using our light blue branding
-              footer: { text: 'Tactical Support System' },
+              footer: {
+                text: 'Tactical Support System',
+                icon_url: 'https://www.gstatic.com/images/icons/material/system/2x/warning_amber_white_24dp.png',
+              },
             },
           ],
           components: [
@@ -793,7 +796,10 @@ export default async function handler(req, res) {
               fields: embedFields,
               color: 0xffaa00, // Alert Orange
               thumbnail: { url: data['portrait-url'] },
-              footer: { text: 'Tactical Status Monitor' },
+              footer: {
+                text: 'Tactical Status Monitor',
+                icon_url: 'https://www.gstatic.com/images/icons/material/system/2x/warning_amber_white_24dp.png',
+              },
             },
           ],
         },
