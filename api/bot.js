@@ -44,6 +44,26 @@ async function getRawBody(readable) {
 const charCache = {}; // Global in-memory cache
 const CACHE_TTL = 10000; // 10 seconds
 
+const AI_COMMENTS_URL = 'https://eschulte.github.io/character-sheet/ai_comments.json';
+const AI_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+let aiCache = { data: null, lastFetch: 0 };
+
+async function getAiComments() {
+  const now = Date.now();
+  if (!aiCache.data || now - aiCache.lastFetch > AI_CACHE_TTL) {
+    console.log('🤖 Fetching fresh AI comments from web...');
+    try {
+      const response = await fetch(AI_COMMENTS_URL);
+      aiCache.data = await response.json();
+      aiCache.lastFetch = now;
+    } catch (err) {
+      console.error('❌ Failed to fetch AI comments:', err);
+      return aiCache.data || {}; // Return stale data if fetch fails
+    }
+  }
+  return aiCache.data;
+}
+
 const itemEmojiMap = {
   armor: '🛡️',
   shield: '🛡️',
@@ -325,6 +345,20 @@ export default async function handler(req, res) {
 
       return res.send({ type: 8, data: { choices } });
     }
+    if (name === 'tip') {
+      const comments = await getAiComments();
+      const keys = Object.keys(comments);
+
+      const focusedOption = options.find((o) => o.focused === true);
+      const query = focusedOption.value.toLowerCase();
+
+      const choices = keys
+        .filter((key) => key.toLowerCase().includes(query))
+        .map((key) => ({ name: key, value: key }))
+        .slice(0, 25);
+
+      return res.send({ type: 8, data: { choices } });
+    }
   }
 
   if (interaction.type === InteractionType.APPLICATION_COMMAND) {
@@ -555,6 +589,36 @@ export default async function handler(req, res) {
               description: description,
               color: 0x2b2b2b, // Dark Grey
               footer: { text: item.notes || '' },
+            },
+          ],
+        },
+      });
+    }
+
+    if (name === 'tip') {
+      const topic = options.find((o) => o.name === 'topic').value;
+      const comments = await getAiComments();
+
+      const category = comments[topic];
+      if (!category || category.length === 0) {
+        return res.send({ type: 4, data: { content: '❌ Topic not found in database.' } });
+      }
+
+      // Select a random tip from the array
+      const randomTip = category[Math.floor(Math.random() * category.length)];
+
+      return res.send({
+        type: 4,
+        data: {
+          embeds: [
+            {
+              title: `🛠️ SYSTEM ADVISORY: ${topic}`,
+              description: `*${randomTip}*`,
+              color: 0xcc0000, // Tactical Red
+              footer: {
+                text: 'World Dungeon Authority • Tactical Metadata Service',
+                icon_url: 'https://www.gstatic.com/images/icons/material/system/2x/warning_amber_white_24dp.png',
+              },
             },
           ],
         },

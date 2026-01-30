@@ -75,6 +75,21 @@ const commands = [
     options: [{ name: 'name', description: 'Item name', type: 3, required: true, autocomplete: true }],
   },
 
+  {
+    name: 'tip',
+    description: 'Get a tactical breakdown of a D&D concept (AI Voice)',
+    type: 1,
+    options: [
+      {
+        name: 'topic',
+        description: 'Concept to explain (click for list)',
+        type: 3, // String
+        required: true,
+        autocomplete: true,
+      },
+    ],
+  },
+
   // --- Ability Checks ---
   { name: 'str_check', description: 'Strength Check', type: 1, options: [rollOption] },
   { name: 'dex_check', description: 'Dexterity Check', type: 1, options: [rollOption] },
