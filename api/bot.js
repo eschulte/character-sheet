@@ -489,6 +489,27 @@ export default async function handler(req, res) {
       });
     }
 
+    if (name === 'me') {
+      const action = options.find((o) => o.name === 'action').value;
+      const charName = data.charName || 'The Hero';
+      const portrait = data['portrait-url'] || '';
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          embeds: [
+            {
+              description: `***${charName} ${action}***`,
+              color: 0x7289da, // Discord Blurple - distinctly different from the gold /say
+              image: {
+                url: portrait, // Large image at the bottom vs. tiny thumbnail in the top right
+              },
+            },
+          ],
+        },
+      });
+    }
+
     if (name === 'combat') {
       const weaponName = options.find((o) => o.name === 'name').value;
       const shouldRoll = options.find((o) => o.name === 'roll')?.value;

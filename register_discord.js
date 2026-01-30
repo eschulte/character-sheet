@@ -45,6 +45,20 @@ const commands = [
   },
 
   {
+    name: 'me',
+    description: 'Perform an action as your character',
+    type: 1,
+    options: [
+      {
+        name: 'action',
+        description: 'What are you doing? (e.g. lunges forward with his blade)',
+        type: 3, // String
+        required: true,
+      },
+    ],
+  },
+
+  {
     name: 'combat',
     description: 'View details or roll for a weapon',
     type: 1,
