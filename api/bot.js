@@ -273,6 +273,40 @@ function evaluateDice(expression) {
   return { total: result, log: rollsLog, math: cleanMath };
 }
 
+function getAvailableResourceOptions(data) {
+  const options = [];
+
+  // Spells (Check if any slots are defined)
+  if (data.spellSlots && Object.keys(data.spellSlots).length > 0) {
+    options.push({ name: '🔮 Spells', value: 'spells' });
+  }
+
+  // Generic Class Resource (e.g. Rage, Ki, Sorcery Points)
+  if (data['class-resource-name'] && data['class-resource-name'].trim() !== '') {
+    options.push({ name: `🏷️ ${data['class-resource-name']}`, value: 'class_resource' });
+  }
+
+  // Artificer Infusions
+  if (data['infusions-max'] && parseInt(data['infusions-max']) > 0) {
+    options.push({ name: '🛠️ Infusions', value: 'infusions' });
+  }
+
+  // Battle Master Superiority Dice
+  if (data['superiority-dice-max'] && parseInt(data['superiority-dice-max']) > 0) {
+    options.push({ name: '🎲 Superiority Dice', value: 'superiority_dice' });
+  }
+
+  // Paladin Lay on Hands
+  if (data['lay-on-hands-max'] && parseInt(data['lay-on-hands-max']) > 0) {
+    options.push({ name: '🤲 Lay on Hands', value: 'lay_on_hands' });
+  }
+
+  // Hit Dice (Always exists based on Level)
+  options.push({ name: '🎲 Hit Dice', value: 'hit_dice' });
+
+  return options;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(200).send('Bot is online!');
 
@@ -342,6 +376,21 @@ export default async function handler(req, res) {
         .filter((item) => item.name && item.name.toLowerCase().includes(query))
         .map((item) => ({ name: item.name, value: item.name }))
         .slice(0, 25);
+
+      return res.send({ type: 8, data: { choices } });
+    }
+    if (name === 'remaining') {
+      const userId = interaction.member?.user.id || interaction.user.id;
+      const charId = userMap[userId];
+
+      // Use the smart caching fetch logic here to get 'data'
+      // ... (Ensure 'data' is populated via your caching logic) ...
+
+      const resourceOptions = getAvailableResourceOptions(data);
+      const focusedOption = options.find((o) => o.focused === true);
+      const query = focusedOption.value.toLowerCase();
+
+      const choices = resourceOptions.filter((opt) => opt.name.toLowerCase().includes(query)).slice(0, 25);
 
       return res.send({ type: 8, data: { choices } });
     }
@@ -590,6 +639,132 @@ export default async function handler(req, res) {
               description: description,
               color: 0x2b2b2b, // Dark Grey
               footer: { text: item.notes || '' },
+            },
+          ],
+        },
+      });
+    }
+
+    if (name === 'remaining') {
+      const resourceType = options.find((o) => o.name === 'type').value;
+      let title = '';
+      let status = '';
+
+      switch (resourceType) {
+        case 'spells':
+          title = '🔮 Spell Slots';
+          const levels = [];
+          for (let lvl = 1; lvl <= 9; lvl++) {
+            let avail = 0,
+              total = 0;
+            Object.keys(data.spellSlots || {}).forEach((k) => {
+              if (k.startsWith(`slot-${lvl}-`)) {
+                total++;
+                if (data.spellSlots[k] === false) avail++; // unchecked = available
+              }
+            });
+            if (total > 0) levels.push(`**Lvl ${lvl}:** ${avail}/${total}`);
+          }
+          status = levels.join('\n') || 'No slots configured.';
+          break;
+
+        case 'class_resource':
+          title = `🏷️ ${data['class-resource-name']}`;
+          status = `**${data['class-resource-val'] || 0}** remaining`;
+          break;
+
+        case 'infusions':
+          title = '🛠️ Infusions';
+          status = `**${data['infusions-curr'] || 0}** / ${data['infusions-max']}`;
+          break;
+
+        case 'superiority_dice':
+          title = '🎲 Superiority Dice';
+          status = `**${data['superiority-dice-curr'] || 0}** / ${data['superiority-dice-max']}`;
+          break;
+
+        case 'hit_dice':
+          title = '🎲 Hit Dice';
+          status = `**${data['hd-curr'] || 0}** / ${data.level}`;
+          break;
+
+        case 'lay_on_hands':
+          title = '🤲 Lay on Hands';
+          status = `**${data['lay-on-hands-curr'] || 0}** / ${data['lay-on-hands-max']} HP`;
+          break;
+      }
+
+      return res.send({
+        type: 4,
+        data: {
+          embeds: [
+            {
+              title: title,
+              description: status,
+              color: 0x3498db, // Blue
+              thumbnail: { url: data['portrait-url'] },
+              footer: { text: `Status for ${data.charName}` },
+            },
+          ],
+        },
+      });
+    }
+
+    if (name === 'condition') {
+      const aiComments = await getAiComments();
+
+      // Typical condition list in 5e sheets or boolean flags
+      // We'll check for common 5e conditions
+      const possibleConditions = [
+        'Blinded',
+        'Charmed',
+        'Deafened',
+        'Frightened',
+        'Grappled',
+        'Incapacitated',
+        'Invisible',
+        'Paralyzed',
+        'Petrified',
+        'Poisoned',
+        'Prone',
+        'Restrained',
+        'Stunned',
+        'Unconscious',
+      ];
+
+      // Filter data for active conditions (case-insensitive match)
+      const active = possibleConditions.filter((cond) => {
+        // Checks if data['condition-blinded'] is true, etc.
+        const key = `condition-${cond.toLowerCase()}`;
+        return data[key] === true;
+      });
+
+      if (active.length === 0) {
+        return res.send({
+          type: 4,
+          data: { content: `✨ **${data.charName}** is currently free of any debilitating conditions.` },
+        });
+      }
+
+      const embedFields = active.map((cond) => {
+        // Try to find a snarky comment from the AI
+        const comments = aiComments[cond] || [];
+        const randomComment =
+          comments.length > 0 ? `\n> *${comments[Math.floor(Math.random() * comments.length)]}*` : '';
+
+        return { name: `⚠️ ${cond}`, value: `You are currently ${cond.toLowerCase()}.${randomComment}`, inline: false };
+      });
+
+      return res.send({
+        type: 4,
+        data: {
+          embeds: [
+            {
+              title: `Status Report: ${data.charName}`,
+              fields: embedFields,
+              color: 0xffaa00, // Alert Orange
+              thumbnail: { url: data['portrait-url'] },
+              footer: { text: 'Tactical Status Monitor' },
             },
           ],
         },

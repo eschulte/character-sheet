@@ -75,6 +75,23 @@ const commands = [
     options: [{ name: 'name', description: 'Item name', type: 3, required: true, autocomplete: true }],
   },
 
+  { name: 'condition', description: 'Check your current conditions and status effects', type: 1 },
+
+  {
+    name: 'remaining',
+    description: 'Check how many uses of a resource you have left',
+    type: 1,
+    options: [
+      {
+        name: 'type',
+        description: 'Which resource to check?',
+        type: 3, // String
+        required: true,
+        autocomplete: true,
+      },
+    ],
+  },
+
   {
     name: 'tip',
     description: 'Get a tactical breakdown of a D&D concept (AI Voice)',
