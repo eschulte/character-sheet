@@ -413,7 +413,36 @@ export default async function handler(req, res) {
   if (interaction.type === InteractionType.APPLICATION_COMMAND) {
     const { name, options } = interaction.data;
 
-    // 1. Handle Simple Roll immediately
+    if (name === 'help') {
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          embeds: [
+            {
+              title: '📖 Dungeon Dashboard Guide',
+              description:
+                'Need help with commands? Want to see how to link your character? Visit our official support page for a full command list and troubleshooting guide.',
+              color: 0x94a5ff, // Using our light blue branding
+              footer: { text: 'Tactical Support System' },
+            },
+          ],
+          components: [
+            {
+              type: 1, // Action Row
+              components: [
+                {
+                  type: 2, // Button
+                  style: 5, // Link Style
+                  label: 'Open Support Page',
+                  url: 'https://eschulte.github.io/character-sheet/bot-support.html',
+                },
+              ],
+            },
+          ],
+        },
+      });
+    }
+
     if (name === 'roll') {
       // Default to 1d20 if no argument provided
       const rawExpression = options?.find((o) => o.name === 'expression')?.value || '1d20';

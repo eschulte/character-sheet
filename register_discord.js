@@ -26,6 +26,8 @@ const commands = [
       },
     ],
   },
+  { name: 'help', description: 'Get a link to the command guide and support page', type: 1 },
+
   { name: 'stats', description: 'Show character overview', type: 1 },
   { name: 'hp', description: 'Check current health', type: 1 },
   { name: 'inventory', description: 'List your equipment', type: 1 },
