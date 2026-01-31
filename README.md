@@ -2,44 +2,7 @@
 
 https://eschulte.github.io/character-sheet
 
-- Offline storage and functionality
-- Snapshots to easily view and recover old versions
-- Mobile friendly
-- Simple and easy to use
-- Sharing links
-- Update the title to match the name, species, and class
-- Hide the up/down arrows when not hovering for better look
-- Automate modifier calculation
-- Conflict Detection with modification on multiple devices add a "last updated" field to check on update
-- Add a "New Version available - Click to Update" button in the status element when applicable
-- Automate Skill/Save calculation
-- Add short/long rest buttons for automatic reset
-- Update the status element to indicate when offline
-- Tool tips on hover
-- Suggested smart completion for spell names
-- Use the status element to indicate if the current changes have sync'd to firebase
-
-Features:
-
-- Switch to a tabbed interface on mobile with tabs like "Combat," "Skills," "Spells," "Bio"
-- Touch friendly interface on mobile with "+" and "-" buttons to avoid raising the keyboard as much
-- Make some section collapsible on mobile to save space
-- Add lookup from https://open5e.com for completion of spells, equipment, and anything else
-
-Needed Tool Tips:
-
-- Need tool tips for the following:
-- simple weapons
-- Alchemist's Supplies
-- Tool Proficiencies
-- Tool Profeciency
-- Languages
-- Dungeoneer's Pack
-- Traveler's Clothes
-- Quarterstaff
-- Pouches
-- Catapult
-- Poison Spray
+With an attached discord bot: https://eschulte.github.io/character-sheet/bot
 
 ## Misc notes and helpful snippets
 
@@ -100,6 +63,9 @@ https://discord.com/oauth2/authorize?client_id=1465858284564250836&permissions=2
 
 - Application ID: 1465858284564250836
 - Public Key: 25e5036ee33ca475729a27b0baa07084f8a04719e2359546fd7dedfb777e8899
+
+### Vercel Config
+https://vercel.com/eschultes-projects/character-sheet/deployments
 
 ## Additional changes to make
 

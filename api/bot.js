@@ -437,7 +437,7 @@ export default async function handler(req, res) {
                   type: 2, // Button
                   style: 5, // Link Style
                   label: 'Open Support Page',
-                  url: 'https://eschulte.github.io/character-sheet/bot-support.html',
+                  url: 'https://eschulte.github.io/character-sheet/bot',
                 },
               ],
             },
