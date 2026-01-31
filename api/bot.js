@@ -419,7 +419,7 @@ export default async function handler(req, res) {
         data: {
           embeds: [
             {
-              title: '📖 Dungeon Dashboard Guide',
+              title: '📖 Character Sheet Bot',
               description:
                 'Need help with commands? Want to see how to link your character? Visit our official support page for a full command list and troubleshooting guide.',
               color: 0x94a5ff, // Using our light blue branding
