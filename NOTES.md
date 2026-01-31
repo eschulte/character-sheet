@@ -59,6 +59,7 @@ https://discord.com/oauth2/authorize?client_id=1465858284564250836&permissions=2
 - Public Key: 25e5036ee33ca475729a27b0baa07084f8a04719e2359546fd7dedfb777e8899
 
 ### Vercel Config
+
 https://vercel.com/eschultes-projects/character-sheet/deployments
 
 ## Additional changes to make

@@ -516,8 +516,8 @@
         color: #fdf6e3;
         border: none;
         border-radius: 3px;
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         cursor: grab;
         font-size: 12px;
         display: flex;
@@ -538,7 +538,6 @@
       }
       .action-cell {
         display: flex;
-        gap: 4px;
         align-items: center;
         justify-content: center;
       }
@@ -598,8 +597,8 @@
         color: #fdf6e3;
         border: none;
         border-radius: 3px;
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         cursor: pointer;
         font-weight: bold;
         font-size: 14px;
@@ -615,6 +614,64 @@
       .remove-btn:hover {
         background: #800;
         opacity: 1;
+      }
+      .move-btn {
+        background: #4a5568;
+        color: #fdf6e3;
+        border: none;
+        border-radius: 3px;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.6;
+        margin-right: 4px;
+        transition: all 0.2s ease;
+      }
+      .move-btn:hover {
+        background: #2b6cb0;
+        opacity: 1;
+      }
+      #move-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      #move-modal {
+        background: var(--bg-color);
+        padding: 20px;
+        border-radius: 8px;
+        border: 2px solid var(--text-color);
+        min-width: 250px;
+        max-width: 400px;
+      }
+      .tab-choice-btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        color: var(--text-color);
+        background: #eee;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        text-align: left;
+      }
+      .tab-choice-btn:hover {
+        background: #ddd;
+      }
+      .new-tab-btn {
+        background: #d4f8d4;
+        font-weight: bold;
       }
       .action-cell {
         width: 45px;
@@ -1749,6 +1806,19 @@
       </div>
     </div>
 
+    <div id="move-modal-overlay">
+      <div id="move-modal">
+        <h3 style="margin-top: 0">Move to Tab...</h3>
+        <div id="tab-choices"></div>
+        <button
+          onclick="document.getElementById('move-modal-overlay').style.display = 'none'"
+          style="margin-top: 10px; width: 100%"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
       import {
@@ -2750,6 +2820,7 @@
       }
 
       function collectData() {
+        ['notes', 'backstory', 'equipment', 'people'].forEach((cat) => scrapeSubTabPage(cat));
         const data = { charName: document.getElementById('charName').value };
         document.querySelectorAll('input[id]:not([type="file"]), textarea[id], select[id]').forEach((el) => {
           data[el.id] = el.type === 'checkbox' ? el.checked : el.value;
@@ -3206,7 +3277,11 @@
                 <td><input type="number" value="${item ? item.qty : 1}" style="text-align:center;"></td>
                 <td><input type="number" value="${item ? item.lbs : 0}" style="text-align:center;"></td>
                 <td><input type="text" value="${item ? item.notes : ''}"></td>
-                <td class="action-cell"><button class="drag-handle" title="Drag to reorder">☰</button><button onclick="this.parentElement.parentElement.remove(); updateWeight();" class="remove-btn">-</button></td>
+                <td class="action-cell">
+                    <button class="move-btn" onclick="moveRowToTab(this, 'equipment')" title="Move to another tab">➡</button>
+                    <button class="drag-handle" title="Drag to reorder">☰</button>
+                    <button onclick="this.parentElement.parentElement.remove(); updateWeight();" class="remove-btn">-</button>
+                </td>
             `;
         tbody.appendChild(tr);
         tr.querySelectorAll('input').forEach((i) => i.addEventListener('input', updateWeight));
@@ -3224,13 +3299,74 @@
         tr.innerHTML = `
                 <td><input type="text" value="${item ? item.name : ''}"></td>
                 <td><input type="text" value="${item ? item.desc : ''}"></td>
-                <td><textarea value="${item ? item.notes : ''}" style="height:4lh;"></textarea></td>
-                <td class="action-cell"><button class="drag-handle" title="Drag to reorder">☰</button><button onclick="this.parentElement.parentElement.remove(); updateWeight();" class="remove-btn">-</button></td>
+                <td><textarea style="height:4lh;">${item ? item.notes : ''}</textarea></td>
+                <td class="action-cell">
+                    <button class="move-btn" onclick="moveRowToTab(this, 'people')" title="Move to another tab">➡</button>
+                    <button class="drag-handle" title="Drag to reorder">☰</button>
+                    <button onclick="this.parentElement.parentElement.remove(); updateWeight();" class="remove-btn">-</button>
+                </td>
             `;
         tbody.appendChild(tr);
-        tr.querySelectorAll('input').forEach((i) => i.addEventListener('input', updateWeight));
+        tr.querySelectorAll('input, textarea').forEach((i) => i.addEventListener('input', updateWeight));
         updateWeight();
       };
+
+      window.moveRowToTab = function (btn, category) {
+        const tr = btn.closest('tr');
+        const inputs = tr.querySelectorAll('input, textarea');
+        let rowData =
+          category === 'equipment'
+            ? { name: inputs[0].value, qty: inputs[1].value, lbs: inputs[2].value, notes: inputs[3].value }
+            : { name: inputs[0].value, desc: inputs[1].value, notes: inputs[2].value };
+
+        const overlay = document.getElementById('move-modal-overlay');
+        const container = document.getElementById('tab-choices');
+        container.innerHTML = ''; // Clear old buttons
+
+        // 1. Create "New Tab" button
+        const newBtn = document.createElement('button');
+        newBtn.className = 'tab-choice-btn new-tab-btn';
+        newBtn.innerText = '＋ Create New Tab';
+        newBtn.onclick = () => {
+          const name = prompt('Enter name for new tab:');
+          if (name) finalizeMove(rowData, tr, category, name);
+        };
+        container.appendChild(newBtn);
+
+        // 2. Create buttons for existing tabs
+        const currentTabId = ACTIVE_SUB_TABS[category];
+        SUB_TABS[category].forEach((tab) => {
+          if (tab.id === currentTabId) return; // Skip current
+
+          const b = document.createElement('button');
+          b.className = 'tab-choice-btn';
+          b.innerText = `📁 ${tab.name}`;
+          b.onclick = () => finalizeMove(rowData, tr, category, tab.name);
+          container.appendChild(b);
+        });
+
+        overlay.style.display = 'flex';
+      };
+
+      function finalizeMove(rowData, tr, category, targetName) {
+        document.getElementById('move-modal-overlay').style.display = 'none';
+
+        let targetTab = SUB_TABS[category].find((t) => t.name.toLowerCase() === targetName.trim().toLowerCase());
+
+        if (!targetTab) {
+          targetTab = { id: generateUUID(), name: targetName.trim(), content: [] };
+          SUB_TABS[category].push(targetTab);
+          renderSubTabs(category);
+        }
+
+        if (!Array.isArray(targetTab.content)) targetTab.content = [];
+        targetTab.content.push(rowData);
+
+        tr.remove();
+        if (category === 'equipment') updateWeight();
+        scrapeSubTabPage(category);
+        handleInput({ target: document.body });
+      }
 
       // --- Drag and Drop Logic ---
       let dragSrcEl = null;
