@@ -2,7 +2,6 @@ import { InteractionType, InteractionResponseType, verifyKey } from 'discord-int
 import admin from 'firebase-admin';
 import { readFileSync } from 'fs';
 import path from 'path';
-const userMap = JSON.parse(readFileSync(path.resolve(process.cwd(), 'user-map.json'), 'utf8'));
 
 if (!admin.apps.length) {
   try {
@@ -62,6 +61,31 @@ async function getAiComments() {
     }
   }
   return aiCache.data;
+}
+
+const userMap = JSON.parse(readFileSync(path.resolve(process.cwd(), 'user-map.json'), 'utf8'));
+let firebaseUserMap = {};
+let mapLastFetch = 0;
+const MAP_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+
+async function getFirebaseUserMap() {
+  const now = Date.now();
+  // Fetch if cache is empty OR stale
+  if (Object.keys(firebaseUserMap).length === 0 || now - mapLastFetch > MAP_CACHE_TTL) {
+    console.log('🗺️ Fetching Discord-to-Character map from Firebase...');
+    try {
+      const snapshot = await db.collection('discord_mappings').get();
+      snapshot.forEach((doc) => {
+        // Map: DiscordUserID -> CharacterID
+        firebaseUserMap[doc.id] = doc.data().charId;
+      });
+      mapLastFetch = now;
+      console.log(`✅ Cached ${Object.keys(firebaseUserMap).length} user mappings.`);
+    } catch (err) {
+      console.error('❌ Failed to fetch user map:', err);
+    }
+  }
+  return firebaseUserMap;
 }
 
 const itemEmojiMap = {
@@ -328,7 +352,9 @@ export default async function handler(req, res) {
     const { name, options } = interaction.data;
     if (name === 'combat') {
       const userId = interaction.member?.user.id || interaction.user.id;
-      const charId = userMap[userId];
+      const userName = interaction.member?.user.username;
+      const charId = userMap[userId] || userMap[userName] || firebaseUserMap[userId] || firebaseUserMap[userName];
+      console.log(`User: ${userId} -> CharId: ${charId}`);
 
       // Fetch data (identical to your main command fetch)
       const snap = await db
@@ -354,7 +380,9 @@ export default async function handler(req, res) {
     }
     if (name === 'equipment') {
       const userId = interaction.member?.user.id || interaction.user.id;
-      const charId = userMap[userId];
+      const userName = interaction.member?.user.username;
+      const charId = userMap[userId] || userMap[userName] || firebaseUserMap[userId] || firebaseUserMap[userName];
+      console.log(`User: ${userId} -> CharId: ${charId}`);
 
       // Note: For autocomplete, we skip the heavy cache logic to keep it snappy,
       // or you could reuse the cache if you want. Here is the safest direct fetch for now:
@@ -381,7 +409,9 @@ export default async function handler(req, res) {
     }
     if (name === 'remaining') {
       const userId = interaction.member?.user.id || interaction.user.id;
-      const charId = userMap[userId];
+      const userName = interaction.member?.user.username;
+      const charId = userMap[userId] || userMap[userName] || firebaseUserMap[userId] || firebaseUserMap[userName];
+      console.log(`User: ${userId} -> CharId: ${charId}`);
 
       // Use the smart caching fetch logic here to get 'data'
       // ... (Ensure 'data' is populated via your caching logic) ...
@@ -483,11 +513,47 @@ export default async function handler(req, res) {
       }
     }
 
+    if (name === 'register') {
+      const newCharId = options.find((o) => o.name === 'character_id').value;
+      const userId = interaction.member?.user.id || interaction.user.id;
+      const userName = interaction.member?.user.username || 'User';
+
+      // Optional: Check if the character actually exists to prevent bad links
+      const charSnap = await db.collection('characters').doc(newCharId).get();
+      if (!charSnap.exists) {
+        return res.send({
+          type: 4,
+          data: { content: `❌ Character ID \`${newCharId}\` does not exist in the database.` },
+        });
+      }
+
+      try {
+        // Write to Firebase "discord_mappings" collection
+        await db
+          .collection('discord_mappings')
+          .doc(userId)
+          .set({ charId: newCharId, username: userName, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+
+        // Update local cache immediately so it works instantly
+        firebaseUserMap[userId] = newCharId;
+
+        return res.send({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+            content: `✅ **Success!** Discord User \`@${userName}\` is now linked to Character ID \`${newCharId}\`.\nYou can now use commands like \`/stats\` and \`/roll\`!`,
+          },
+        });
+      } catch (err) {
+        console.error('Registration Error:', err);
+        return res.send({ type: 4, data: { content: `❌ Database Error: ${err.message}` } });
+      }
+    }
+
     // Otherwise we need character sheet data
     const userId = interaction.member?.user.id || interaction.user.id;
     const userName = interaction.member?.user.username;
-    const charId = userMap[userId] || userMap[userName];
-    console.log(`Using charId:${charId}`);
+    const charId = userMap[userId] || userMap[userName] || firebaseUserMap[userId] || firebaseUserMap[userName];
+    console.log(`User: ${userId} -> CharId: ${charId}`);
 
     if (!charId) {
       return res.send({

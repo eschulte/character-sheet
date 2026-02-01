@@ -28,6 +28,19 @@ const commands = [
   },
   { name: 'help', description: 'Get a link to the command guide and support page', type: 1 },
 
+  {
+    name: 'register',
+    description: 'Link your Discord account to a Character Sheet',
+    type: 1,
+    options: [
+      {
+        name: 'character_id',
+        description: 'The ID of your character (found in your sheet URL)',
+        type: 3, // String
+        required: true,
+      },
+    ],
+  },
   { name: 'stats', description: 'Show character overview', type: 1 },
   { name: 'hp', description: 'Check current health', type: 1 },
   { name: 'inventory', description: 'List your equipment', type: 1 },
