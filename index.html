@@ -2051,48 +2051,56 @@
           lastLoadedRemoteTimestamp = now.getTime();
 
           // 2. Snapshot Logic
-          // Only trigger if manual OR enough time passed since last distinct auto-save logic
-          if (isManualSnapshot || now.getTime() - lastAutoSnapshotTime > 5 * 60 * 1000) {
-            const snapsCol = collection(db, 'characters', currentCharacterId, 'snapshots');
+          const snapsCol = collection(db, 'characters', currentCharacterId, 'snapshots');
 
-            // Check the most recent snapshot
-            const recentQuery = query(snapsCol, orderBy('createdAt', 'desc'), limit(1));
-            const recentSnap = await getDocs(recentQuery);
-
-            let shouldOverwrite = false;
-            let overwriteId = null;
-
-            if (!recentSnap.empty && !isManualSnapshot) {
-              const lastSnap = recentSnap.docs[0].data();
-              const lastSnapDate = new Date(lastSnap.createdAt).toLocaleDateString();
-
-              // If last save was Auto-Save AND it was created today
-              if (lastSnap.name === 'Auto-Save' && lastSnapDate === todayStr) {
-                shouldOverwrite = true;
-                overwriteId = recentSnap.docs[0].id;
-              }
-            }
-
-            if (shouldOverwrite) {
-              // Overwrite the existing auto-save entry
-              await setDoc(doc(snapsCol, overwriteId), {
-                name: 'Auto-Save',
-                createdAt: nowIso, // Update time to now
-                sheetData: data,
-                createdBy: currentUser.uid,
-              });
-              console.log('Auto-save overwritten.');
-            } else {
-              // Create new snapshot
-              let name = 'Auto-Save';
-              if (isManualSnapshot) {
-                name = prompt('Snapshot Name:', `Snapshot-${todayStr}`);
-                if (!name) return;
-              }
+          if (isManualSnapshot) {
+            // MANUAL SNAPSHOT: Always create a new entry, never overwrite
+            const name = prompt('Snapshot Name:', `Snapshot-${todayStr}`);
+            if (name) {
               await addDoc(snapsCol, { name: name, createdAt: nowIso, sheetData: data, createdBy: currentUser.uid });
-              console.log('New snapshot created.');
+              console.log('Manual snapshot created.');
+              alert('Snapshot saved successfully!');
             }
-            lastAutoSnapshotTime = now.getTime();
+          } else {
+            // AUTO-SAVE: Check throttle (5 minutes)
+            if (now.getTime() - lastAutoSnapshotTime > 5 * 60 * 1000) {
+              // Check the very last snapshot created to see if we can collapse this auto-save
+              const q = query(snapsCol, orderBy('createdAt', 'desc'), limit(1));
+              const querySnapshot = await getDocs(q);
+
+              let overwritten = false;
+
+              // If a snapshot exists and it is an "Auto-Save", we overwrite it.
+              // If the last snapshot was "Level 4 Upgrade" (Manual), we do NOT overwrite it.
+              if (!querySnapshot.empty) {
+                const lastSnapDoc = querySnapshot.docs[0];
+                const lastSnapData = lastSnapDoc.data();
+
+                if (lastSnapData.name === 'Auto-Save') {
+                  await setDoc(doc(snapsCol, lastSnapDoc.id), {
+                    name: 'Auto-Save',
+                    createdAt: nowIso,
+                    sheetData: data,
+                    createdBy: currentUser.uid,
+                  });
+                  console.log('Previous Auto-Save overwritten.');
+                  overwritten = true;
+                }
+              }
+
+              // If we didn't overwrite (because last one was Manual or collection empty), create new
+              if (!overwritten) {
+                await addDoc(snapsCol, {
+                  name: 'Auto-Save',
+                  createdAt: nowIso,
+                  sheetData: data,
+                  createdBy: currentUser.uid,
+                });
+                console.log('New Auto-Save created.');
+              }
+
+              lastAutoSnapshotTime = now.getTime();
+            }
           }
           updateMyCharactersList();
         } catch (e) {
