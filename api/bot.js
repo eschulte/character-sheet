@@ -540,7 +540,7 @@ export default async function handler(req, res) {
         return res.send({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
-            content: `✅ **Success!** Discord User \`@${userName}\` is now linked to Character ID \`${newCharId}\`.\nYou can now use commands like \`/stats\` and \`/roll\`!`,
+            content: `✅ **Success!** Discord User \`@${userName}\` is now linked to Character ID \`${newCharId}\`.\nYou can now use commands like \`/stats\` and \`/combat\`!`,
           },
         });
       } catch (err) {
