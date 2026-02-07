@@ -585,8 +585,37 @@ export default async function handler(req, res) {
       } else if (subCmd === 'list') {
         const entries = Object.entries(currentParty);
         if (entries.length === 0) return res.send({ type: 4, data: { content: 'Your party list is empty.' } });
-        const listStr = entries.map(([k, v]) => `• **${k}**: \`${v}\``).join('\n');
-        return res.send({ type: 4, data: { content: `**Your Party Shortcuts:**\n${listStr}` } });
+        const tableRows = [];
+        tableRows.push(`${'KEY'.padEnd(12)} | ${'ID (6)'.padEnd(8)} | ${'CHARACTER NAME'}`);
+        tableRows.push(`${'-'.repeat(12)}-|- ${'-'.repeat(8)}-|-${'-'.repeat(20)}`);
+
+        for (const [key, charId] of entries) {
+          let charName = 'Unknown/Error';
+          try {
+            // Fetch the character data to get the name
+            const snapshotQuery = await db
+              .collection('characters')
+              .doc(charId)
+              .collection('snapshots')
+              .orderBy('createdAt', 'desc')
+              .limit(1)
+              .get();
+
+            if (!snapshotQuery.empty) {
+              const sheetData = snapshotQuery.docs[0].data().sheetData;
+              charName = sheetData.charName || 'Unnamed';
+            }
+          } catch (e) {
+            console.error(`Error fetching name for ${charId}:`, e);
+          }
+
+          const shortId = charId.substring(0, 6);
+          tableRows.push(`${key.padEnd(12)} | ${shortId.padEnd(8)} | ${charName}`);
+        }
+
+        const table = '```\n' + tableRows.join('\n') + '\n```';
+
+        return res.send({ type: 4, data: { content: `### 👥 DM Party Shortcuts\n${table}` } });
       }
     }
 
