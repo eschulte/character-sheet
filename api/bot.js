@@ -600,7 +600,7 @@ export default async function handler(req, res) {
 
       // Priority: Party Shortcut -> Discord ID Mapping -> Raw Input
       await getFirebaseUserMap();
-      charIdToUse = partyMap[targetVal] || userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
+      charId = partyMap[targetVal] || userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
 
       // Update reference for the rest of the handler
       name = subCmdObj.name;
