@@ -88,6 +88,11 @@ async function getFirebaseUserMap() {
   return firebaseUserMap;
 }
 
+async function getDmParty(userId) {
+  const doc = await db.collection('dm_parties').doc(userId).get();
+  return doc.exists ? doc.data().members || {} : {};
+}
+
 const itemEmojiMap = {
   armor: '🛡️',
   shield: '🛡️',
@@ -397,11 +402,10 @@ export default async function handler(req, res) {
 
     // 1. DM Target Autocomplete (Used in /dm and /party remove)
     if (focusedOption.name === 'target' || (name === 'party' && focusedOption.name === 'name')) {
-      const party = await getDmParty(userId);
-      const choices = party
-        .filter((m) => m.name.toLowerCase().includes(query))
-        .map((m) => ({ name: `${m.name} (${m.type})`, value: m.value })) // Value is either CharID or UserID
-        .slice(0, 25);
+      const partyMap = await getDmParty(userId); // Returns { "Bob": "123..." }
+      const choices = Object.entries(partyMap)
+        .filter(([key]) => key.toLowerCase().includes(query))
+        .map(([key, id]) => ({ name: key, value: key }));
       return res.send({ type: 8, data: { choices } });
     }
 
@@ -415,8 +419,10 @@ export default async function handler(req, res) {
       // we need to resolve 'Bob' to a charID to show *Bob's* weapons.
       const targetVal = options[0].options.find((o) => o.name === 'target')?.value;
       if (targetVal) {
-        // If targetVal is a Discord ID, map it. If it's a Char ID, use it.
-        charId = userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
+        // Check DM Party Map first
+        const partyMap = await getDmParty(userId);
+        // If it's in the map, use the ID. If not, assume it's a raw ID or Discord ID
+        charId = partyMap[targetVal] || userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
       }
     }
 
@@ -562,41 +568,25 @@ export default async function handler(req, res) {
       const subCmd = options[0].name;
       const args = options[0].options || [];
       const partyRef = db.collection('dm_parties').doc(userId);
+      const currentParty = await getDmParty(userId);
 
       if (subCmd === 'add') {
-        const discordUser = args.find((o) => o.name === 'discord_user')?.value;
-        const charName = args.find((o) => o.name === 'character_name')?.value;
-        const charIdInput = args.find((o) => o.name === 'character_id')?.value;
+        const key = args.find((o) => o.name === 'key').value;
+        const charId = args.find((o) => o.name === 'char_id').value;
 
-        let newMember = null;
-        if (discordUser) {
-          // We don't have the username easily here without fetching, but we store ID
-          // Just use a placeholder or try to resolve from interaction (not available)
-          newMember = { name: `Discord User ${discordUser}`, type: 'discord', value: discordUser };
-        } else if (charName && charIdInput) {
-          newMember = { name: charName, type: 'character', value: charIdInput };
-        } else {
-          return res.send({
-            type: 4,
-            data: { content: '❌ You must provide either a Discord User OR a Character Name + ID.' },
-          });
-        }
-
-        const currentParty = await getDmParty(userId);
-        currentParty.push(newMember);
-        await partyRef.set({ members: currentParty }, { merge: true });
-        return res.send({ type: 4, data: { content: `✅ Added **${newMember.name}** to your party list.` } });
+        currentParty[key] = charId;
+        await partyRef.set({ members: currentParty });
+        return res.send({ type: 4, data: { content: `✅ Added **${key}** -> \`${charId}\` to your party.` } });
       } else if (subCmd === 'remove') {
-        const valToRemove = args.find((o) => o.name === 'name').value;
-        const currentParty = await getDmParty(userId);
-        const updated = currentParty.filter((m) => m.value !== valToRemove);
-        await partyRef.set({ members: updated });
-        return res.send({ type: 4, data: { content: `✅ Removed member from party.` } });
+        const keyToRemove = args.find((o) => o.name === 'name').value;
+        delete currentParty[keyToRemove];
+        await partyRef.set({ members: currentParty });
+        return res.send({ type: 4, data: { content: `✅ Removed **${keyToRemove}** from party.` } });
       } else if (subCmd === 'list') {
-        const currentParty = await getDmParty(userId);
-        if (currentParty.length === 0) return res.send({ type: 4, data: { content: 'Your party list is empty.' } });
-        const listStr = currentParty.map((m) => `• **${m.name}** (${m.type})`).join('\n');
-        return res.send({ type: 4, data: { content: `**Your Party:**\n${listStr}` } });
+        const entries = Object.entries(currentParty);
+        if (entries.length === 0) return res.send({ type: 4, data: { content: 'Your party list is empty.' } });
+        const listStr = entries.map(([k, v]) => `• **${k}**: \`${v}\``).join('\n');
+        return res.send({ type: 4, data: { content: `**Your Party Shortcuts:**\n${listStr}` } });
       }
     }
 
@@ -606,11 +596,12 @@ export default async function handler(req, res) {
       const subCmdObj = options[0];
       name = subCmdObj.name; // e.g., 'check', 'skill', 'roll'
       options = subCmdObj.options; // These are the args (target, stat, etc.)
-
       const targetVal = options.find((o) => o.name === 'target').value;
+      const partyMap = await getDmParty(userId);
 
       await getFirebaseUserMap();
-      charId = userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
+      // Priority: Party Shortcut -> Discord ID Mapping -> Raw Input
+      charIdToUse = partyMap[targetVal] || userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
 
       if (!charId) {
         return res.send({ type: 4, data: { content: `❌ Could not resolve target to a Character ID.` } });

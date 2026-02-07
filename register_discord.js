@@ -182,12 +182,11 @@ const commands = [
     options: [
       {
         name: 'add',
-        description: 'Add member',
+        description: 'Add a shortcut',
         type: 1,
         options: [
-          { name: 'discord_user', description: 'User', type: 6 },
-          { name: 'character_name', description: 'Char Name', type: 3 },
-          { name: 'character_id', description: 'Sheet ID', type: 3 },
+          { name: 'key', description: 'The name/shortcut (e.g. "Bob")', type: 3, required: true },
+          { name: 'char_id', description: 'Character Sheet ID', type: 3, required: true },
         ],
       },
       {
