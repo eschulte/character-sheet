@@ -350,94 +350,64 @@ export default async function handler(req, res) {
 
   if (interaction.type === InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE) {
     const { name, options } = interaction.data;
-    if (name === 'combat') {
-      const userId = interaction.member?.user.id || interaction.user.id;
-      const userName = interaction.member?.user.username;
-      const charId = userMap[userId] || userMap[userName] || firebaseUserMap[userId] || firebaseUserMap[userName];
-      console.log(`User: ${userId} -> CharId: ${charId}`);
+    const focusedOption =
+      options.find((o) => o.focused === true) || options[0]?.options?.find((o) => o.focused === true); // Handle subcommands
+    if (!focusedOption) return res.send({ type: 8, data: { choices: [] } });
 
-      // Fetch data (identical to your main command fetch)
-      const snap = await db
-        .collection('characters')
-        .doc(charId)
-        .collection('snapshots')
-        .orderBy('createdAt', 'desc')
-        .limit(1)
-        .get();
-      const sheetData = snap.docs[0].data().sheetData;
-      const weapons = sheetData.weapons || [];
+    const query = focusedOption.value.toLowerCase();
 
-      const focusedOption = options.find((o) => o.focused === true);
-      const query = focusedOption.value.toLowerCase();
-
-      // Filter based on query, or return all if query is empty
-      const choices = weapons
-        .filter((w) => w.name && w.name.toLowerCase().includes(query))
-        .map((w) => ({ name: w.name, value: w.name }))
+    // 1. DM Target Autocomplete (Used in /dm and /party remove)
+    if (focusedOption.name === 'target' || (name === 'party' && focusedOption.name === 'name')) {
+      const party = await getDmParty(userId);
+      const choices = party
+        .filter((m) => m.name.toLowerCase().includes(query))
+        .map((m) => ({ name: `${m.name} (${m.type})`, value: m.value })) // Value is either CharID or UserID
         .slice(0, 25);
-
       return res.send({ type: 8, data: { choices } });
     }
-    if (name === 'equipment') {
-      const userId = interaction.member?.user.id || interaction.user.id;
-      const userName = interaction.member?.user.username;
-      const charId = userMap[userId] || userMap[userName] || firebaseUserMap[userId] || firebaseUserMap[userName];
-      console.log(`User: ${userId} -> CharId: ${charId}`);
 
-      // Note: For autocomplete, we skip the heavy cache logic to keep it snappy,
-      // or you could reuse the cache if you want. Here is the safest direct fetch for now:
-      const snap = await db
-        .collection('characters')
-        .doc(charId)
-        .collection('snapshots')
-        .orderBy('createdAt', 'desc')
-        .limit(1)
-        .get();
+    // 2. Standard Autocomplete (Needs charId)
+    // We must resolve CharID differently if we are in a /dm command
+    await getFirebaseUserMap();
+    let charId = userMap[userId] || firebaseUserMap[userId];
 
-      const sheetData = snap.docs[0].data().sheetData;
-      const equipment = sheetData.equipment_table || [];
-
-      const focusedOption = options.find((o) => o.focused === true);
-      const query = focusedOption.value.toLowerCase();
-
-      const choices = equipment
-        .filter((item) => item.name && item.name.toLowerCase().includes(query))
-        .map((item) => ({ name: item.name, value: item.name }))
-        .slice(0, 25);
-
-      return res.send({ type: 8, data: { choices } });
+    if (name === 'dm') {
+      // If autocompleting arguments for a /dm command (e.g. /dm combat target:Bob name:Sw...),
+      // we need to resolve 'Bob' to a charID to show *Bob's* weapons.
+      const targetVal = options[0].options.find((o) => o.name === 'target')?.value;
+      if (targetVal) {
+        // If targetVal is a Discord ID, map it. If it's a Char ID, use it.
+        charId = userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
+      }
     }
-    if (name === 'remaining') {
-      const userId = interaction.member?.user.id || interaction.user.id;
-      const userName = interaction.member?.user.username;
-      const charId = userMap[userId] || userMap[userName] || firebaseUserMap[userId] || firebaseUserMap[userName];
-      console.log(`User: ${userId} -> CharId: ${charId}`);
 
-      // Use the smart caching fetch logic here to get 'data'
-      // ... (Ensure 'data' is populated via your caching logic) ...
+    if (!charId) return res.send({ type: 8, data: { choices: [] } });
 
-      const resourceOptions = getAvailableResourceOptions(data);
-      const focusedOption = options.find((o) => o.focused === true);
-      const query = focusedOption.value.toLowerCase();
+    // Fetch snapshot for autocomplete
+    const snap = await db
+      .collection('characters')
+      .doc(charId)
+      .collection('snapshots')
+      .orderBy('createdAt', 'desc')
+      .limit(1)
+      .get();
+    if (snap.empty) return res.send({ type: 8, data: { choices: [] } });
+    const sheetData = snap.docs[0].data().sheetData;
 
-      const choices = resourceOptions.filter((opt) => opt.name.toLowerCase().includes(query)).slice(0, 25);
-
-      return res.send({ type: 8, data: { choices } });
+    let choices = [];
+    if (focusedOption.name === 'name' || focusedOption.name === 'weapon') {
+      // Combat/Equipment
+      const source = [...(sheetData.weapons || []), ...(sheetData.equipment_table || [])];
+      choices = source
+        .filter((i) => i.name && i.name.toLowerCase().includes(query))
+        .map((i) => ({ name: i.name, value: i.name }));
+    } else if (focusedOption.name === 'type') {
+      // Remaining
+      // ... (Use existing getAvailableResourceOptions logic) ...
+      choices = [{ name: 'Hit Dice', value: 'hit_dice' }]; // Stub
     }
-    if (name === 'tip') {
-      const comments = await getAiComments();
-      const keys = Object.keys(comments);
 
-      const focusedOption = options.find((o) => o.focused === true);
-      const query = focusedOption.value.toLowerCase();
-
-      const choices = keys
-        .filter((key) => key.toLowerCase().includes(query))
-        .map((key) => ({ name: key, value: key }))
-        .slice(0, 25);
-
-      return res.send({ type: 8, data: { choices } });
-    }
+    return res.send({ type: 8, data: { choices: choices.slice(0, 25) } });
   }
 
   if (interaction.type === InteractionType.APPLICATION_COMMAND) {
@@ -549,17 +519,82 @@ export default async function handler(req, res) {
       }
     }
 
-    // Otherwise we need character sheet data
-    const userId = interaction.member?.user.id || interaction.user.id;
-    const userName = interaction.member?.user.username;
-    const charId = userMap[userId] || userMap[userName] || firebaseUserMap[userId] || firebaseUserMap[userName];
-    console.log(`User: ${userId} -> CharId: ${charId}`);
+    if (name === 'party') {
+      const subCmd = options[0].name;
+      const args = options[0].options || [];
+      const partyRef = db.collection('dm_parties').doc(userId);
 
-    if (!charId) {
-      return res.send({
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data: { content: "❌ Your Discord ID isn't mapped to a character yet." },
-      });
+      if (subCmd === 'add') {
+        const discordUser = args.find((o) => o.name === 'discord_user')?.value;
+        const charName = args.find((o) => o.name === 'character_name')?.value;
+        const charIdInput = args.find((o) => o.name === 'character_id')?.value;
+
+        let newMember = null;
+        if (discordUser) {
+          // We don't have the username easily here without fetching, but we store ID
+          // Just use a placeholder or try to resolve from interaction (not available)
+          newMember = { name: `Discord User ${discordUser}`, type: 'discord', value: discordUser };
+        } else if (charName && charIdInput) {
+          newMember = { name: charName, type: 'character', value: charIdInput };
+        } else {
+          return res.send({
+            type: 4,
+            data: { content: '❌ You must provide either a Discord User OR a Character Name + ID.' },
+          });
+        }
+
+        const currentParty = await getDmParty(userId);
+        currentParty.push(newMember);
+        await partyRef.set({ members: currentParty }, { merge: true });
+        return res.send({ type: 4, data: { content: `✅ Added **${newMember.name}** to your party list.` } });
+      } else if (subCmd === 'remove') {
+        const valToRemove = args.find((o) => o.name === 'name').value;
+        const currentParty = await getDmParty(userId);
+        const updated = currentParty.filter((m) => m.value !== valToRemove);
+        await partyRef.set({ members: updated });
+        return res.send({ type: 4, data: { content: `✅ Removed member from party.` } });
+      } else if (subCmd === 'list') {
+        const currentParty = await getDmParty(userId);
+        if (currentParty.length === 0) return res.send({ type: 4, data: { content: 'Your party list is empty.' } });
+        const listStr = currentParty.map((m) => `• **${m.name}** (${m.type})`).join('\n');
+        return res.send({ type: 4, data: { content: `**Your Party:**\n${listStr}` } });
+      }
+    }
+
+    let charId = null;
+
+    if (name === 'dm') {
+      const subCmdObj = options[0];
+      name = subCmdObj.name; // e.g. 'roll', 'combat'
+
+      // Extract Target
+      const targetVal = subCmdObj.options.find((o) => o.name === 'target').value;
+
+      // Unwrap the options (remove 'target' so handlers don't see it? actually they ignore extras)
+      options = subCmdObj.options;
+
+      // Resolve Target ID
+      await getFirebaseUserMap();
+      // If target is a User ID (numeric), map it. If Char ID (string), use it.
+      charId = userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
+
+      if (!charId) {
+        return res.send({ type: 4, data: { content: `❌ Could not resolve target to a Character ID.` } });
+      }
+      if (!charId) {
+        return res.send({ type: 4, data: { content: '❌ Target has no linked character sheet.' } });
+      }
+      console.log(`🕵️ DM Override: Running /${name} for CharID ${charId}`);
+    } else {
+      // Standard User Lookup
+      await getFirebaseUserMap();
+      const userId = interaction.member?.user.id || interaction.user.id;
+      const userName = interaction.member?.user.username;
+      charId = userMap[userId] || userMap[userName] || firebaseUserMap[userId] || firebaseUserMap[userName];
+      if (!charId) {
+        return res.send({ type: 4, data: { content: '❌ Target has no linked character sheet.' } });
+      }
+      console.log(`User: ${userId} is using CharId: ${charId}`);
     }
 
     // Fetch character data from Firebase
