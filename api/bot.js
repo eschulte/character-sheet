@@ -394,7 +394,7 @@ export default async function handler(req, res) {
   }
 
   if (interaction.type === InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE) {
-    const { name, options } = interaction.data;
+    let { name, options } = interaction.data;
     const focusedOption =
       options.find((o) => o.focused === true) || options[0]?.options?.find((o) => o.focused === true); // Handle subcommands
     if (!focusedOption) return res.send({ type: 8, data: { choices: [] } });
@@ -456,7 +456,7 @@ export default async function handler(req, res) {
   }
 
   if (interaction.type === InteractionType.APPLICATION_COMMAND) {
-    const { name, options } = interaction.data;
+    let { name, options } = interaction.data;
 
     if (name === 'help') {
       return res.send({
