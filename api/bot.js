@@ -145,6 +145,45 @@ const classEmojiMap = {
   artificer: '⚙️',
 };
 
+const skillMap = {
+  athletics: 'val-strength-athletics',
+  acrobatics: 'val-dexterity-acrobatics',
+  sleight_of_hand: 'val-dexterity-sleight-of-hand',
+  stealth: 'val-dexterity-stealth',
+  arcana: 'val-intelligence-arcana',
+  history: 'val-intelligence-history',
+  investigation: 'val-intelligence-investigation',
+  nature: 'val-intelligence-nature',
+  religion: 'val-intelligence-religion',
+  animal_handling: 'val-wisdom-animal-handling',
+  insight: 'val-wisdom-insight',
+  medicine: 'val-wisdom-medicine',
+  perception: 'val-wisdom-perception',
+  survival: 'val-wisdom-survival',
+  deception: 'val-charisma-deception',
+  intimidation: 'val-charisma-intimidation',
+  performance: 'val-charisma-performance',
+  persuasion: 'val-charisma-persuasion',
+};
+
+const statMap = {
+  strength: 'strength-mod',
+  dexterity: 'dexterity-mod',
+  constitution: 'constitution-mod',
+  intelligence: 'intelligence-mod',
+  wisdom: 'wisdom-mod',
+  charisma: 'charisma-mod',
+};
+
+const saveMap = {
+  strength: 'save-val-strength',
+  dexterity: 'save-val-dexterity',
+  constitution: 'save-val-constitution',
+  intelligence: 'save-val-intelligence',
+  wisdom: 'save-val-wisdom',
+  charisma: 'save-val-charisma',
+};
+
 function evaluateDice(expression) {
   // 1. Tokenize: Grab only numbers and valid operators. Ignore everything else.
   //    Matches: Digits, or single characters d, +, -, *, /, (, )
@@ -565,25 +604,18 @@ export default async function handler(req, res) {
 
     if (name === 'dm') {
       const subCmdObj = options[0];
-      name = subCmdObj.name; // e.g. 'roll', 'combat'
+      name = subCmdObj.name; // e.g., 'check', 'skill', 'roll'
+      options = subCmdObj.options; // These are the args (target, stat, etc.)
 
-      // Extract Target
-      const targetVal = subCmdObj.options.find((o) => o.name === 'target').value;
+      const targetVal = options.find((o) => o.name === 'target').value;
 
-      // Unwrap the options (remove 'target' so handlers don't see it? actually they ignore extras)
-      options = subCmdObj.options;
-
-      // Resolve Target ID
       await getFirebaseUserMap();
-      // If target is a User ID (numeric), map it. If Char ID (string), use it.
       charId = userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
 
       if (!charId) {
         return res.send({ type: 4, data: { content: `❌ Could not resolve target to a Character ID.` } });
       }
-      if (!charId) {
-        return res.send({ type: 4, data: { content: '❌ Target has no linked character sheet.' } });
-      }
+
       console.log(`🕵️ DM Override: Running /${name} for CharID ${charId}`);
     } else {
       // Standard User Lookup
@@ -955,6 +987,32 @@ export default async function handler(req, res) {
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: { content: `❤️ **${data.charName}** has **${data['hp-curr']} / ${data['hp-max']}** HP.` },
       });
+    }
+
+    // --- Next three are grouped commands primarily for the DM
+    if (name === 'check') {
+      const stat = options.find((o) => o.name === 'stat').value; // e.g. 'strength'
+      const key = statMap[stat];
+      const label = stat.charAt(0).toUpperCase() + stat.slice(1) + ' Check';
+      return res.send({ type: 4, data: handleRoll(label, key) });
+    }
+
+    if (name === 'save') {
+      const stat = options.find((o) => o.name === 'stat').value; // e.g. 'dexterity'
+      const key = saveMap[stat];
+      const label = stat.charAt(0).toUpperCase() + stat.slice(1) + ' Save';
+      return res.send({ type: 4, data: handleRoll(label, key) });
+    }
+
+    if (name === 'skill') {
+      const skillName = options.find((o) => o.name === 'name').value; // e.g. 'sleight_of_hand'
+      const key = skillMap[skillName];
+      // Format label: 'sleight_of_hand' -> 'Sleight of Hand'
+      const label = skillName
+        .split('_')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+      return res.send({ type: 4, data: handleRoll(label, key) });
     }
 
     // --- ABILITY CHECKS (Raw) ---
