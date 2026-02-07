@@ -387,6 +387,7 @@ export default async function handler(req, res) {
   }
 
   const interaction = JSON.parse(rawBody.toString());
+  const userId = interaction.member?.user.id || interaction.user.id;
 
   if (interaction.type === InteractionType.PING) {
     return res.send({ type: InteractionResponseType.PONG });
@@ -400,7 +401,6 @@ export default async function handler(req, res) {
 
     const query = focusedOption.value.toLowerCase();
 
-    // 1. DM Target Autocomplete (Used in /dm and /party remove)
     if (focusedOption.name === 'target' || (name === 'party' && focusedOption.name === 'name')) {
       const partyMap = await getDmParty(userId); // Returns { "Bob": "123..." }
       const choices = Object.entries(partyMap)
@@ -594,15 +594,17 @@ export default async function handler(req, res) {
 
     if (name === 'dm') {
       const subCmdObj = options[0];
-      name = subCmdObj.name; // e.g., 'check', 'skill', 'roll'
-      options = subCmdObj.options; // These are the args (target, stat, etc.)
-      const targetVal = options.find((o) => o.name === 'target').value;
+      const subCmdOptions = subCmdObj.options;
+      const targetVal = subCmdOptions.find((o) => o.name === 'target').value;
       const partyMap = await getDmParty(userId);
 
-      await getFirebaseUserMap();
       // Priority: Party Shortcut -> Discord ID Mapping -> Raw Input
+      await getFirebaseUserMap();
       charIdToUse = partyMap[targetVal] || userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
 
+      // Update reference for the rest of the handler
+      name = subCmdObj.name;
+      options = subCmdOptions;
       if (!charId) {
         return res.send({ type: 4, data: { content: `❌ Could not resolve target to a Character ID.` } });
       }
