@@ -1054,6 +1054,11 @@
       <button class="app-btn" onclick="window.print()" style="background: #005f80">Print</button>
       <button class="app-btn" onclick="shareSheet()" style="background: #28a745">Share URL</button>
       <button class="app-btn" onclick="copyCharId()" style="background: #17a2b8">Copy ID</button>
+      <button class="app-btn" onclick="downloadJSON()" style="background: #6f42c1">Download JSON</button>
+      <button class="app-btn" onclick="document.getElementById('import-file').click()" style="background: #d63384">
+        Upload JSON
+      </button>
+      <input type="file" id="import-file" style="display: none" accept=".json" />
       <button
         class="app-btn"
         id="btn-duplicate"
@@ -3131,9 +3136,10 @@
           timeout = setTimeout(() => func.apply(this, args), wait);
         };
       }
+
       function generateUUID() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) =>
-          (c == 'x' ? (Math.random() * 16) | 0 : (((Math.random() * 16) | 0) & 0x3) | 0x8).toString(16),
+        return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+          (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16),
         );
       }
       function updatePageTitle() {
@@ -3186,6 +3192,49 @@
           alert('Error duplicating: ' + e.message);
         }
       };
+
+      window.downloadJSON = function () {
+        const data = collectData();
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${data.charName || 'character'}_5e_data.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      document.getElementById('import-file').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (!currentUser) return alert('Please login to create a new character from upload.');
+        if (!confirm('Create a NEW character from this file?')) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            const newId = generateUUID();
+            await setDoc(doc(db, 'characters', newId), {
+              ownerId: currentUser.uid,
+              lastUpdated: new Date().toISOString(),
+              sheetData: data,
+            });
+            localStorage.setItem('dnd_char_id', newId);
+            window.location.href = `${window.location.pathname}?charId=${newId}`;
+          } catch (err) {
+            console.error('Import failed', err);
+            alert('Error parsing JSON: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
+        // Reset input so same file can be selected again if needed
+        e.target.value = '';
+      });
 
       function updateDuplicateVis() {
         const btn = document.getElementById('btn-duplicate');
@@ -3485,11 +3534,13 @@
       }
 
       window.resetSheet = function () {
-        if (!hasUnsavedChanges || confirm('Create new character? Unsaved changes will be lost.')) {
-          currentCharacterId = generateUUID();
-          localStorage.setItem('dnd_char_id', currentCharacterId);
-          window.location.href = window.location.pathname;
-        }
+        if (!confirm('Create and switch to a NEW character?')) return;
+
+        // Clear the local ID so the initialization logic generates a new one
+        localStorage.removeItem('dnd_char_id');
+
+        // Redirect to the base URL (removing ?charId=...)
+        window.location.href = window.location.origin + window.location.pathname;
       };
 
       // --- TAB SCROLL AND SWITCH ---
