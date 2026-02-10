@@ -1053,6 +1053,15 @@
       <button class="app-btn" onclick="resetSheet()" style="background: #800">New</button>
       <button class="app-btn" onclick="window.print()" style="background: #005f80">Print</button>
       <button class="app-btn" onclick="shareSheet()" style="background: #28a745">Share URL</button>
+      <button class="app-btn" onclick="copyCharId()" style="background: #17a2b8">Copy ID</button>
+      <button
+        class="app-btn"
+        id="btn-duplicate"
+        onclick="duplicateCharacter()"
+        style="background: #fd7e14; display: none"
+      >
+        Duplicate Char
+      </button>
       <span id="status" style="font-size: 0.8rem; color: #aaa; margin-left: auto">Offline Mode</span>
       <button id="app-toggle-hamburger">☰</button>
     </div>
@@ -1913,6 +1922,7 @@
           authBtn.innerText = 'Login with Google';
           authBtn.onclick = window.login;
           statusEl.innerText = 'Offline Mode';
+          updateDuplicateVis();
         }
       });
 
@@ -1975,6 +1985,7 @@
           } else {
             isCloudOwner = true;
             document.getElementById('status').innerText = 'Online (New)';
+            updateDuplicateVis();
           }
         });
 
@@ -2805,6 +2816,7 @@
         } finally {
           isLoading = false;
           updateModifiers();
+          updateDuplicateVis();
         }
       }
 
@@ -3135,7 +3147,7 @@
           return;
         }
         await window.saveVersion(false);
-        const shareUrl = `${window.location.origin}${window.location.pathname}?charId=${currentCharacterId.substring(0, 8)}`;
+        const shareUrl = `${window.location.origin}${window.location.pathname}?charId=${currentCharacterId}`;
         try {
           await navigator.clipboard.writeText(shareUrl);
           alert('Link copied!');
@@ -3143,6 +3155,42 @@
           prompt('Copy:', shareUrl);
         }
       };
+
+      window.copyCharId = async function () {
+        try {
+          await navigator.clipboard.writeText(currentCharacterId);
+          alert('Character ID copied!');
+        } catch (err) {
+          prompt('Copy ID:', currentCharacterId);
+        }
+      };
+
+      window.duplicateCharacter = async function () {
+        if (!currentUser) return alert('Login required.');
+        if (!confirm('Duplicate this character to your account?')) return;
+
+        const data = collectData();
+        const newId = generateUUID();
+        const nowIso = new Date().toISOString();
+
+        try {
+          await setDoc(doc(db, 'characters', newId), {
+            ownerId: currentUser.uid,
+            lastUpdated: nowIso,
+            sheetData: data,
+          });
+          localStorage.setItem('dnd_char_id', newId);
+          window.location.href = `${window.location.pathname}?charId=${newId}`;
+        } catch (e) {
+          console.error('Duplication failed', e);
+          alert('Error duplicating: ' + e.message);
+        }
+      };
+
+      function updateDuplicateVis() {
+        const btn = document.getElementById('btn-duplicate');
+        if (btn) btn.style.display = currentUser && !isCloudOwner ? 'inline-block' : 'none';
+      }
 
       window.addWeaponRow = (item = null) => {
         const tbody = document.getElementById('weapons-body');
