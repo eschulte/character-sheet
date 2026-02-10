@@ -171,6 +171,15 @@
 
         <div class="command-grid">
           <div class="card">
+            <h3>/register <span class="tag">ID</span></h3>
+            <p>Link your Discord account to a Character Sheet ID (Server Specific).</p>
+            <div class="example">
+              <code>/register character_id:1234-abcd...</code><br />
+              <span style="color: #4caf50">Result: Linked for this server!</span>
+            </div>
+          </div>
+
+          <div class="card">
             <h3>/roll <span class="tag">Expression</span></h3>
             <p>Advanced dice parser. Supports math and complex notation.</p>
             <div class="example">
@@ -226,15 +235,6 @@
           </div>
 
           <div class="card">
-            <h3>/register <span class="tag">ID</span></h3>
-            <p>Link your Discord account to a specific Character Sheet ID.</p>
-            <div class="example">
-              <code>/register character_id:1234-abcd...</code><br />
-              <span style="color: #4caf50">Result: Linked!</span>
-            </div>
-          </div>
-
-          <div class="card">
             <h3>/help</h3>
             <p>
               Use this command in-server to quickly access this documentation page or to share the link with other
@@ -263,11 +263,12 @@
         <div class="dm-command-grid">
           <div class="card" style="border-left-color: #9b59b6">
             <h3>/party <span class="tag">Action</span></h3>
-            <p>Create simple shortcuts for Character IDs.</p>
+            <p>Manage the shared Party List for this server.</p>
             <div class="example">
-              <code>/party add key:Goblin1 char_id:k72h...</code>
+              <code>/party add key:Grog char_id:k72h...</code>
             </div>
           </div>
+
           <div class="card" style="border-left-color: #9b59b6">
             <h3>/dm <span class="tag">Command</span></h3>
             <p>Grouped DM Tools. Use <code>target</code> to run checks for others.</p>
@@ -288,8 +289,8 @@
             <a href="https://github.com/eschulte/character-sheet">GitHub Repository</a>.
           </li>
           <li>
-            <strong>Add Your Character:</strong> Use the new <code>/register</code> command! Simply copy your Character
-            ID from the URL of your sheet (e.g., <code>?charId=THIS_PART</code>) and run
+            <strong>Add Your Character:</strong> Use the new <code>/register</code> command! Use the "Copy ID" button or
+            simply copy your Character ID from the URL of your sheet (e.g., <code>?charId=THIS_PART</code>) and run
             <code>/register character_id:YOUR_ID</code> in Discord.
           </li>
         </ul>

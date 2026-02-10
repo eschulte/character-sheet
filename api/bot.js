@@ -88,8 +88,8 @@ async function getFirebaseUserMap() {
   return firebaseUserMap;
 }
 
-async function getDmParty(userId) {
-  const doc = await db.collection('dm_parties').doc(userId).get();
+async function getDmParty(id) {
+  const doc = await db.collection('dm_parties').doc(id).get();
   return doc.exists ? doc.data().members || {} : {};
 }
 
@@ -388,6 +388,12 @@ export default async function handler(req, res) {
 
   const interaction = JSON.parse(rawBody.toString());
   const userId = interaction.member?.user.id || interaction.user.id;
+  const guildId = interaction.guild_id; // Available if in a server
+
+  // The context ID is the Server ID if available, otherwise the User ID (for DMs)
+  const contextId = guildId || userId;
+  // Composite key for server-specific user registration
+  const userContextKey = guildId ? `${guildId}-${userId}` : userId;
 
   if (interaction.type === InteractionType.PING) {
     return res.send({ type: InteractionResponseType.PONG });
@@ -402,7 +408,7 @@ export default async function handler(req, res) {
     const query = focusedOption.value.toLowerCase();
 
     if (focusedOption.name === 'target' || (name === 'party' && focusedOption.name === 'name')) {
-      const partyMap = await getDmParty(userId); // Returns { "Bob": "123..." }
+      const partyMap = await getDmParty(contextId); // Fetch Server Party List
       const choices = Object.entries(partyMap)
         .filter(([key]) => key.toLowerCase().includes(query))
         .map(([key, id]) => ({ name: key, value: key }));
@@ -410,19 +416,28 @@ export default async function handler(req, res) {
     }
 
     // 2. Standard Autocomplete (Needs charId)
-    // We must resolve CharID differently if we are in a /dm command
     await getFirebaseUserMap();
-    let charId = userMap[userId] || firebaseUserMap[userId];
+
+    // Try Server-Specific Registration first, then Global Fallback
+    let charId = firebaseUserMap[userContextKey] || userMap[userId] || firebaseUserMap[userId];
 
     if (name === 'dm') {
-      // If autocompleting arguments for a /dm command (e.g. /dm combat target:Bob name:Sw...),
-      // we need to resolve 'Bob' to a charID to show *Bob's* weapons.
+      // If autocompleting arguments for a /dm command
       const targetVal = options[0].options.find((o) => o.name === 'target')?.value;
       if (targetVal) {
-        // Check DM Party Map first
-        const partyMap = await getDmParty(userId);
-        // If it's in the map, use the ID. If not, assume it's a raw ID or Discord ID
-        charId = partyMap[targetVal] || userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
+        // Check Server Party Map first
+        const partyMap = await getDmParty(contextId);
+
+        // Resolve Target: Party Alias -> Server Map -> Global Map -> Raw Value
+        // Note: For target mapping, we check if the target is a known user in this server
+        const targetUserKey = guildId ? `${guildId}-${targetVal}` : targetVal;
+
+        charId =
+          partyMap[targetVal] ||
+          firebaseUserMap[targetUserKey] ||
+          userMap[targetVal] ||
+          firebaseUserMap[targetVal] ||
+          targetVal;
       }
     }
 
@@ -533,7 +548,7 @@ export default async function handler(req, res) {
       const userId = interaction.member?.user.id || interaction.user.id;
       const userName = interaction.member?.user.username || 'User';
 
-      // Optional: Check if the character actually exists to prevent bad links
+      // Optional: Check if the character actually exists
       const charSnap = await db.collection('characters').doc(newCharId).get();
       if (!charSnap.exists) {
         return res.send({
@@ -543,19 +558,26 @@ export default async function handler(req, res) {
       }
 
       try {
-        // Write to Firebase "discord_mappings" collection
+        // Save using Composite Key (ServerID-UserID) if in a server, else just UserID
+        const storageKey = userContextKey;
+
         await db
           .collection('discord_mappings')
-          .doc(userId)
-          .set({ charId: newCharId, username: userName, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+          .doc(storageKey)
+          .set({
+            charId: newCharId,
+            username: userName,
+            guildId: guildId || 'DM',
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
 
-        // Update local cache immediately so it works instantly
-        firebaseUserMap[userId] = newCharId;
+        // Update local cache
+        firebaseUserMap[storageKey] = newCharId;
 
         return res.send({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
-            content: `✅ **Success!** Discord User \`@${userName}\` is now linked to Character ID \`${newCharId}\`.\nYou can now use commands like \`/stats\` and \`/combat\`!`,
+            content: `✅ **Success!** User \`@${userName}\` is now linked to Character ID \`${newCharId}\` for this server.`,
           },
         });
       } catch (err) {
@@ -567,8 +589,9 @@ export default async function handler(req, res) {
     if (name === 'party') {
       const subCmd = options[0].name;
       const args = options[0].options || [];
-      const partyRef = db.collection('dm_parties').doc(userId);
-      const currentParty = await getDmParty(userId);
+      // Use contextId (Guild ID) instead of User ID
+      const partyRef = db.collection('dm_parties').doc(contextId);
+      const currentParty = await getDmParty(contextId);
 
       if (subCmd === 'add') {
         const key = args.find((o) => o.name === 'key').value;
@@ -576,7 +599,10 @@ export default async function handler(req, res) {
 
         currentParty[key] = charId;
         await partyRef.set({ members: currentParty });
-        return res.send({ type: 4, data: { content: `✅ Added **${key}** -> \`${charId}\` to your party.` } });
+        return res.send({
+          type: 4,
+          data: { content: `✅ Added **${key}** -> \`${charId}\` to the Server Party List.` },
+        });
       } else if (subCmd === 'remove') {
         const keyToRemove = args.find((o) => o.name === 'name').value;
         delete currentParty[keyToRemove];
@@ -625,11 +651,19 @@ export default async function handler(req, res) {
       const subCmdObj = options[0];
       const subCmdOptions = subCmdObj.options;
       const targetVal = subCmdOptions.find((o) => o.name === 'target').value;
-      const partyMap = await getDmParty(userId);
+      const partyMap = await getDmParty(contextId);
 
-      // Priority: Party Shortcut -> Discord ID Mapping -> Raw Input
       await getFirebaseUserMap();
-      charId = partyMap[targetVal] || userMap[targetVal] || firebaseUserMap[targetVal] || targetVal;
+
+      // Resolve Target: Party Alias -> Server Map -> Global Map -> Raw Value
+      const targetUserKey = guildId ? `${guildId}-${targetVal}` : targetVal;
+
+      charId =
+        partyMap[targetVal] ||
+        firebaseUserMap[targetUserKey] ||
+        userMap[targetVal] ||
+        firebaseUserMap[targetVal] ||
+        targetVal;
 
       // Update reference for the rest of the handler
       name = subCmdObj.name;
@@ -642,11 +676,14 @@ export default async function handler(req, res) {
     } else {
       // Standard User Lookup
       await getFirebaseUserMap();
-      const userId = interaction.member?.user.id || interaction.user.id;
-      const userName = interaction.member?.user.username;
-      charId = userMap[userId] || userMap[userName] || firebaseUserMap[userId] || firebaseUserMap[userName];
+      // Try Server-Specific ID first, then fallback to legacy Global ID
+      charId = firebaseUserMap[userContextKey] || userMap[userId] || firebaseUserMap[userId];
+
       if (!charId) {
-        return res.send({ type: 4, data: { content: '❌ Target has no linked character sheet.' } });
+        return res.send({
+          type: 4,
+          data: { content: '❌ You are not linked to a character sheet in this server. Use `/register`.' },
+        });
       }
       console.log(`User: ${userId} is using CharId: ${charId}`);
     }
