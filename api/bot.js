@@ -613,7 +613,7 @@ export default async function handler(req, res) {
         if (entries.length === 0) return res.send({ type: 4, data: { content: 'Your party list is empty.' } });
         const tableRows = [];
         tableRows.push(`${'KEY'.padEnd(12)} | ${'ID (6)'.padEnd(8)} | ${'CHARACTER NAME'}`);
-        tableRows.push(`${'-'.repeat(12)}-|- ${'-'.repeat(8)}-|-${'-'.repeat(20)}`);
+        tableRows.push(`${'-'.repeat(12)}-|-${'-'.repeat(8)}-|-${'-'.repeat(20)}`);
 
         for (const [key, charId] of entries) {
           let charName = 'Unknown/Error';
