@@ -301,6 +301,14 @@
         flex-direction: column;
         gap: 15px;
       }
+      .save-val-input {
+        min-width: 35px; /* Enough for "+10" */
+        width: 40px;
+        text-align: center;
+        flex-shrink: 0; /* Prevents mobile from squishing it */
+        padding: 2px;
+        box-sizing: border-box;
+      }
       .save-val-input,
       .ability-mod {
         color: var(--text-color);
@@ -388,9 +396,13 @@
       .skill-row {
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 8px;
         margin-bottom: 5px;
         border-bottom: 1px solid #eee;
+      }
+      .skill-row input[type='checkbox'] {
+        flex-shrink: 0;
+        margin: 0;
       }
       .prof-bubble {
         width: 12px;
@@ -858,6 +870,11 @@
         display: flex;
       }
 
+      @media screen and (min-width: 1024px) {
+        .save-val-input {
+          width: 35px;
+        }
+      }
       @media screen and (max-width: 768px) {
         #main-nav {
           padding: 5px;
@@ -887,6 +904,10 @@
         }
         #app-controls.expanded .app-btn {
           display: inline-block;
+        }
+        .app-btn:hover {
+          filter: brightness(1.2);
+          transition: 0.2s;
         }
         .dropdown-content {
           position: relative !important;
@@ -949,26 +970,6 @@
           font-size: 1.5rem;
         }
       }
-      @media print {
-        #app-controls {
-          display: none !important;
-        }
-        body {
-          background: white;
-          padding: 0;
-          display: block;
-        }
-        .sheet-container {
-          width: 100%;
-          max-width: 100%;
-          box-shadow: none;
-          padding: 0;
-          margin: 0;
-        }
-        textarea {
-          border: 1px solid #ccc;
-        }
-      }
       @media (hover: hover) {
         input[type='number']:hover::-webkit-outer-spin-button,
         input[type='number']:hover::-webkit-inner-spin-button {
@@ -978,7 +979,6 @@
           -moz-appearance: number-input;
         }
       }
-
       /* TOOLTIP CSS */
       #ai-tooltip {
         position: fixed;
@@ -1019,6 +1019,141 @@
       [data-tip] {
         outline: none;
       }
+
+      @media print {
+        #app-controls,
+        #main-nav,
+        #ai-tooltip,
+        .remove-btn,
+        .tab-btn,
+        button,
+        .ghost-mirror,
+        #portrait-url-container,
+        #status,
+        .move-btn,
+        .drag-handle,
+        .sub-tab-bar,
+        .ability-visual-container::before,
+        .ability-visual-container::after {
+          display: none !important;
+        }
+
+        #scribing-overlay {
+          display: none !important;
+        }
+
+        @page {
+          margin: 0.5cm;
+          size: auto; /* Uses printer's default paper size */
+        }
+
+        body,
+        .sheet-container,
+        .tab-content,
+        .panel,
+        .ability-score,
+        .ability-mod,
+        .inner-section,
+        .rect-box,
+        .shield-box {
+          background: white !important;
+          background-color: white !important;
+          color: black !important;
+          box-shadow: none !important;
+          border-color: #000 !important;
+          -webkit-print-color-adjust: economy !important;
+          print-color-adjust: economy !important;
+        }
+
+        #tabs-wrapper {
+          overflow: visible !important;
+          display: block !important;
+        }
+        .tab-content {
+          display: block !important;
+          page-break-after: always;
+          min-height: auto !important;
+        }
+        .tab-content.hidden-class-feature {
+          display: none !important;
+        }
+
+        #tabs-wrapper {
+          overflow: visible !important;
+          display: block !important;
+        }
+
+        .tab-content {
+          display: block !important; /* Force all tabs to show at once */
+          page-break-after: always; /* Start Spells/Items on new pages */
+          min-height: auto !important;
+          padding-top: 0 !important;
+          border: none !important;
+        }
+
+        /* Prevent weird gaps from the 'sticky' top offset logic */
+        .tab-content::before {
+          display: none;
+        }
+
+        .hidden-class-feature {
+          display: none !important;
+        }
+
+        .ability-visual-container::before {
+          display: none !important; /* Changed from opacity: 0.2 */
+        }
+
+        input,
+        textarea,
+        select {
+          border: none !important;
+          border-bottom: 1px solid #ccc !important;
+          background: transparent !important;
+          font-family: 'Georgia', serif !important;
+          color: black !important;
+          resize: none; /* Hides resize handle */
+          overflow: visible;
+        }
+
+        /* Expand textareas to fit content so scrollbars don't print */
+        textarea {
+          height: auto !important;
+          white-space: pre-wrap;
+        }
+
+        .panel,
+        .ability-box,
+        table,
+        tr,
+        .inner-section {
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+
+        .ability-visual-container::before,
+        .ability-visual-container::after,
+        .ornamental-border,
+        .vines-decoration,
+        [class*='filigree'] {
+          display: none !important;
+          content: none !important;
+          background-image: none !important;
+        }
+
+        .ability-mod,
+        .ability-score,
+        .shield-box,
+        .rect-box,
+        .panel {
+          border-color: #000 !important;
+          box-shadow: none !important;
+        }
+
+        #portrait-placeholder {
+          display: none !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -1046,16 +1181,16 @@
         </div>
       </div>
       <button class="app-btn" id="toggle-tips" onclick="toggleTips()" style="background: #222">Tips: ON</button>
-      <button class="app-btn" onclick="shortRest()" data-tip="Short Rest" style="background: #6b46c1">
+      <button class="app-btn" onclick="shortRest()" data-tip="Short Rest" style="background: #8e3a3a">
         Short Rest
       </button>
-      <button class="app-btn" onclick="longRest()" data-tip="Long Rest" style="background: #2d3748">Long Rest</button>
-      <button class="app-btn" onclick="resetSheet()" style="background: #800">New</button>
-      <button class="app-btn" onclick="window.print()" style="background: #005f80">Print</button>
-      <button class="app-btn" onclick="shareSheet()" style="background: #28a745">Share URL</button>
-      <button class="app-btn" onclick="copyCharId()" style="background: #17a2b8">Copy ID</button>
-      <button class="app-btn" onclick="downloadJSON()" style="background: #6f42c1">Download JSON</button>
-      <button class="app-btn" onclick="document.getElementById('import-file').click()" style="background: #d63384">
+      <button class="app-btn" onclick="longRest()" data-tip="Long Rest" style="background: #a64d4d">Long Rest</button>
+      <button class="app-btn" onclick="resetSheet()" style="background: #b3744a">New</button>
+      <button class="app-btn" onclick="window.print()" style="background: #9e8c4a">Print</button>
+      <button class="app-btn" onclick="shareSheet()" style="background: #5d825d">Share URL</button>
+      <button class="app-btn" onclick="copyCharId()" style="background: #4a7a8c">Copy ID</button>
+      <button class="app-btn" onclick="downloadJSON()" style="background: #5a5a8c">Download JSON</button>
+      <button class="app-btn" onclick="document.getElementById('import-file').click()" style="background: #7a5a8c">
         Upload JSON
       </button>
       <input type="file" id="import-file" style="display: none" accept=".json" />
@@ -3946,6 +4081,13 @@
           // Force an immediate save without debounce
           window.saveVersion(false);
         }
+      });
+
+      window.addEventListener('beforeprint', () => {
+        // Auto-expand textareas for print
+        document.querySelectorAll('textarea').forEach((el) => {
+          el.style.height = el.scrollHeight + 'px';
+        });
       });
     </script>
   </body>
