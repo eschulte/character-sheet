@@ -1341,6 +1341,36 @@ window.duplicateCharacter = async function () {
   }
 };
 
+window.printCard = function () {
+  // 1. Get the current character ID from the URL or local storage
+  const urlParams = new URLSearchParams(window.location.search);
+  const charId = urlParams.get('charId') || localStorage.getItem('dnd_char_id');
+
+  if (!charId) {
+    alert('No character loaded to print!');
+    return;
+  }
+
+  // 2. Create a hidden iframe
+  let printFrame = document.getElementById('print-iframe');
+  if (!printFrame) {
+    printFrame = document.createElement('iframe');
+    printFrame.id = 'print-iframe';
+    printFrame.style.display = 'none';
+    document.body.appendChild(printFrame);
+  }
+
+  printFrame.src = `card.html?charId=${charId}`;
+
+  printFrame.onload = function () {
+    // Short delay to ensure Firebase data inside the iframe is populated
+    setTimeout(() => {
+      printFrame.contentWindow.focus();
+      printFrame.contentWindow.print();
+    }, 1000); // 1 second buffer for data fetching
+  };
+};
+
 window.downloadJSON = function () {
   const data = collectData();
   const jsonStr = JSON.stringify(data, null, 2);
