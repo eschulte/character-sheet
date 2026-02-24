@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D&D 5e Printable Folio - Master Merge</title>
+    <style>
+      :root {
+        --bg-color: #fdf6e3; /* Original Parchment */
+        --text-color: #2b2b2b;
+        --border-color: #5c4b3f;
+        --faint-line: #e6dfcf;
+        --input-bg: rgba(0, 0, 0, 0.03); /* Off-white for text areas */
+      }
+
+      /* --- PAGE & PRINT SETUP --- */
+      @page { size: letter portrait; margin: 0; }
+      body {
+        margin: 0; padding: 0;
+        font-family: 'Georgia', 'Times New Roman', serif;
+        background-color: #333;
+        display: flex; flex-direction: column; align-items: center;
+      }
+
+      .print-page {
+        width: 8.5in; height: 11in;
+        background-color: var(--bg-color);
+        display: flex; flex-direction: column;
+        padding: 0.4in; /* Safe zone for printer hardware margins */
+        box-sizing: border-box;
+      }
+
+      .sheet-half {
+        width: 100%;
+        height: 4.9in; /* Prevents spilling onto second page */
+        display: flex; flex-direction: column; gap: 8px;
+        overflow: hidden;
+        margin-bottom: 0.2in;
+      }
+
+      .spells-half { border-top: 1px dashed var(--border-color); padding-top: 0.15in; }
+
+      @media print {
+        body { background: white; }
+        .no-print { display: none !important; }
+        .print-page { box-shadow: none; }
+      }
+
+      /* --- HEADER --- */
+      .header-section {
+        display: grid; grid-template-columns: 1fr 2.5fr; gap: 10px;
+        border-bottom: 2px solid var(--border-color); padding-bottom: 4px;
+      }
+      .name-box {
+        border: 2px solid var(--border-color); font-size: 1.1rem;
+        font-weight: bold; display: flex; align-items: center; padding: 5px;
+        text-transform: uppercase; background: var(--input-bg);
+      }
+      .detail-field {
+        font-size: 0.55rem; text-transform: uppercase; color: #777;
+        border-bottom: 1px solid var(--faint-line); position: relative; height: 26px;
+      }
+      .detail-val {
+        position: absolute; bottom: 2px; left: 0;
+        font-size: 0.75rem; font-weight: bold; color: var(--text-color);
+      }
+
+      /* --- BODY GRID --- */
+      .body-section { display: grid; grid-template-columns: 1.2fr 1.3fr 1fr; gap: 12px; flex-grow: 1; min-height: 0;}
+      .col { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+      .section-title { font-size: 0.6rem; font-weight: bold; border-bottom: 1px solid var(--border-color); color: var(--border-color); text-transform: uppercase; margin-bottom: 2px;}
+
+      /* Abilities & Skills */
+.stats-skills-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+/* Ensure the abilities grid doesn't take up the whole width */
+.abilities-grid {
+  flex: 0 0 85px; /* Adjust this width as needed */
+  display: grid;
+  grid-template-columns: 1fr; /* Stack abilities in 1 column now */
+  gap: 3px;
+}
+
+#skills-list {
+  flex: 1; /* Let skills take up the remaining space */
+}
+      .ability-box { border: 1px solid var(--border-color); text-align: center; background: var(--input-bg); border-radius: 4px; }
+      .ab-name { font-size: 0.45rem; background: rgba(0,0,0,0.05); border-bottom: 1px solid #ccc; font-weight: bold; }
+      .ab-mod { font-size: 0.9rem; font-weight: bold; padding: 1px 0; }
+      .ab-footer { display: flex; justify-content: space-around; font-size: 0.5rem; border-top: 1px solid #ccc; }
+
+      .skill-item { display: flex; justify-content: space-between; border-bottom: 1px dotted var(--faint-line); font-size: 0.58rem; }
+      .skill-item span:last-child { font-weight: bold; }
+
+      /* Expanded HP Heart UI */
+      .hp-heart-container { position: relative; width: 68px; height: 62px; margin: 0 auto; flex-shrink: 0; }
+      .hp-heart-container svg { width: 100%; height: 100%; color: var(--border-color); }
+      .hp-text {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -45%);
+        text-align: center; width: 100%; line-height: 1;
+      }
+
+      /* Death Saves */
+      .death-saves-box { border: 1px solid var(--border-color); padding: 3px; background: var(--input-bg); font-size: 0.55rem; display: flex; justify-content: space-around; border-radius: 4px; }
+      .ds-bubbles { display: flex; gap: 2px; align-items: center;}
+      .prof-bubble { width: 9px; height: 9px; border: 1px solid black; border-radius: 50%; appearance: none; margin: 0; pointer-events: none; }
+      .prof-bubble:checked { background: black; }
+
+      /* Tables & Traits */
+      table { width: 100%; border-collapse: collapse; font-size: 0.6rem; }
+      th { text-align: left; border-bottom: 1px solid var(--border-color); color: #555; font-size: 0.5rem; text-transform: uppercase;}
+      td { border-bottom: 1px dotted var(--faint-line); padding: 1px 2px; background: var(--input-bg); vertical-align: top; }
+      .traits-area { font-size: 0.58rem; line-height: 1.2; background: var(--input-bg); flex-grow: 1; overflow: hidden; padding: 3px; border-radius: 4px; border: 1px solid transparent; }
+
+      /* Coins */
+      .coin-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin-top: auto; }
+      .coin-box { border: 1px solid var(--border-color); text-align: center; font-size: 0.5rem; font-weight: bold; background: var(--input-bg); padding: 1px; }
+
+      /* Spells */
+      .spell-stat-val { font-size: 0.95rem; font-weight: bold; }
+      .spell-slots-grid { 
+        display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; 
+        font-size: 0.5rem; background: var(--input-bg); border: 1px solid var(--faint-line); text-align: center; padding: 3px; border-radius: 4px;
+      }
+      .diamond-check { appearance: none; width: 6px; height: 6px; border: 1px solid black; transform: rotate(45deg); margin: 1px; display: inline-block; }
+      .diamond-check:checked { background: black; }
+    </style>
+  </head>
+  <body>
+
+    <div class="no-print" style="padding: 15px; background: #222; width: 100%; display: flex; justify-content: center;">
+        <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer; background: var(--border-color); color: white; border: none; border-radius: 4px;">🖨️ Print Folder Folio</button>
+    </div>
+
+    <div class="print-page">
+      <div class="sheet-half">
+        <div class="header-section">
+          <div class="name-box" id="hdr-name">NAME</div>
+          <div class="details-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:4px 8px;">
+              <div class="detail-field">Class<div class="detail-val" id="hdr-class"></div></div>
+              <div class="detail-field">Subclass<div class="detail-val" id="hdr-subclass"></div></div>
+              <div class="detail-field">Level<div class="detail-val" id="hdr-level"></div></div>
+              <div class="detail-field">Species<div class="detail-val" id="hdr-species"></div></div>
+              <div class="detail-field">Background<div class="detail-val" id="hdr-bg"></div></div>
+              <div class="detail-field">XP<div class="detail-val" id="hdr-xp"></div></div>
+          </div>
+        </div>
+
+        <div class="body-section">
+          <div class="col">
+            <div class="stats-skills-wrapper">
+            <div class="abilities-grid" id="abilities-grid"></div>
+            <div id="skills-list"></div>
+            </div>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 5px; margin-top: 2px;">
+                <div class="hp-heart-container">
+                    <svg viewBox="0 0 100 100"><path d="M50,85 C50,85 10,55 10,30 C10,15 25,5 40,15 C50,25 50,25 50,25 C50,25 50,25 60,15 C75,5 90,15 90,30 C90,55 50,85 50,85 Z" fill="white" stroke="currentColor" stroke-width="3"/></svg>
+                    <div class="hp-text">
+                        <div style="font-size:0.4rem; color: #666;">HP</div>
+                        <div id="val-hp-curr" style="font-size:0.95rem; font-weight:bold;">0</div>
+                        <div id="val-hp-max" style="font-size:0.55rem; border-top:1px solid #555; width: 60%; margin: 0 auto;">0</div>
+                    </div>
+                </div>
+                <div style="flex-grow: 1;">
+                    <div class="detail-field" style="height:22px;">AC <span id="val-ac" class="detail-val" style="bottom: 0;"></span></div>
+                    <div class="detail-field" style="height:22px;">Init <span id="val-init" class="detail-val" style="bottom: 0;"></span></div>
+                    <div class="detail-field" style="height:22px;">Prof <span id="val-prof" class="detail-val" style="bottom: 0;"></span></div>
+                </div>
+            </div>
+
+            <div class="death-saves-box">
+                <span style="font-weight:bold; font-size: 0.45rem; line-height: 1;">DEATH<br>SAVES</span>
+                <div class="ds-bubbles">S: <input type="checkbox" class="prof-bubble" id="ds-s-1"><input type="checkbox" class="prof-bubble" id="ds-s-2"><input type="checkbox" class="prof-bubble" id="ds-s-3"></div>
+                <div class="ds-bubbles">F: <input type="checkbox" class="prof-bubble" id="ds-f-1"><input type="checkbox" class="prof-bubble" id="ds-f-2"><input type="checkbox" class="prof-bubble" id="ds-f-3"></div>
+            </div>
+            
+            <div id="class-features-ui" class="traits-area" style="max-height: 55px; display: none; border: 1px solid var(--faint-line);"></div>
+          </div>
+
+          <div class="col">
+            <div class="section-title">Combat Actions</div>
+            <table>
+                <thead><tr><th>Action</th><th style="width:25px;">Atk</th><th>Dmg/Notes</th></tr></thead>
+                <tbody id="weapons-body"></tbody>
+            </table>
+            <div class="section-title" style="margin-top: 5px;">Traits & Features</div>
+            <div class="traits-area" id="traits-area"></div>
+          </div>
+
+          <div class="col">
+            <div class="section-title">Equipment (Main)</div>
+            <table style="flex-grow: 1;">
+                <thead><tr><th style="width:12px;">#</th><th>Item</th><th style="width:18px;">Lb</th></tr></thead>
+                <tbody id="equipment-body"></tbody>
+            </table>
+            <div class="coin-row">
+                <div class="coin-box">CP<br><span id="coin-cp"></span></div>
+                <div class="coin-box">SP<br><span id="coin-sp"></span></div>
+                <div class="coin-box">EP<br><span id="coin-ep"></span></div>
+                <div class="coin-box">GP<br><span id="coin-gp"></span></div>
+                <div class="coin-box">PP<br><span id="coin-pp"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sheet-half spells-half">
+        <div class="section-title" style="font-size: 0.75rem; border: none; text-align: center;">Spellbook & Reference</div>
+        <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 5px;">
+            <div><div class="section-title" style="border:none;">Ability</div><div class="spell-stat-val" id="spell-ability-txt">-</div></div>
+            <div><div class="section-title" style="border:none;">Save DC</div><div class="spell-stat-val" id="spell-dc-txt">10</div></div>
+            <div><div class="section-title" style="border:none;">Attack</div><div class="spell-stat-val" id="spell-atk-txt">+0</div></div>
+            <div><div class="section-title" style="border:none;">Passive Perc.</div><div class="spell-stat-val" id="pass-perc-txt">10</div></div>
+        </div>
+        
+        <div class="spell-slots-grid" id="spells-slots-ui"></div>
+        
+        <div style="flex-grow: 1; overflow: hidden; margin-top: 6px;">
+            <table>
+                <thead><tr><th style="width:22px;">Lvl</th><th>Spell Name</th><th style="text-align:right">C / R / M</th></tr></thead>
+                <tbody id="spells-body"></tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+      import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+      const firebaseConfig = {
+        apiKey: 'AIzaSyAMfAkyUevv3BDKSO3yBjRra3jZ_uV5OlA',
+        authDomain: 'dnd-character-sheet-5e.firebaseapp.com',
+        projectId: 'dnd-character-sheet-5e',
+        storageBucket: 'dnd-character-sheet-5e.firebasestorage.app',
+        messagingSenderId: '554732035132',
+        appId: '1:554732035132:web:ed89be7af2ceea147a7739',
+      };
+      
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      const STATS = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+      const SKILLS = {
+        'Acrobatics': 'dexterity', 'Animal Handling': 'wisdom', 'Arcana': 'intelligence', 'Athletics': 'strength', 
+        'Deception': 'charisma', 'History': 'intelligence', 'Insight': 'wisdom', 'Intimidation': 'charisma', 
+        'Investigation': 'intelligence', 'Medicine': 'wisdom', 'Nature': 'intelligence', 'Perception': 'wisdom',
+        'Performance': 'charisma', 'Persuasion': 'charisma', 'Religion': 'intelligence', 'Sleight of Hand': 'dexterity', 
+        'Stealth': 'dexterity', 'Survival': 'wisdom'
+      };
+
+      async function loadData() {
+        const charId = localStorage.getItem('dnd_char_id') || new URLSearchParams(window.location.search).get('charId');
+        if (!charId) return;
+        const docSnap = await getDoc(doc(db, 'characters', charId));
+        if (docSnap.exists()) populateFolio(docSnap.data().sheetData);
+      }
+
+      function populateFolio(data) {
+        // Header
+        document.getElementById('hdr-name').innerText = data.charName || 'Unnamed';
+        document.getElementById('hdr-class').innerText = data.class || '';
+        document.getElementById('hdr-subclass').innerText = data.subclass || '';
+        document.getElementById('hdr-level').innerText = data.level || '';
+        document.getElementById('hdr-species').innerText = data.species || '';
+        document.getElementById('hdr-bg').innerText = data.background || '';
+        document.getElementById('hdr-xp').innerText = data.xp || '';
+
+        const profBonus = parseInt(data['prof-bonus']) || 2;
+        document.getElementById('val-prof').innerText = `+${profBonus}`;
+        document.getElementById('val-ac').innerText = data.ac || '10';
+        document.getElementById('val-hp-curr').innerText = data['hp-curr'] || '0';
+        document.getElementById('val-hp-max').innerText = data['hp-max'] || '0';
+        document.getElementById('val-init').innerText = data.initiative || '+0';
+
+        // Stats & Skills Logic
+        let abHtml = '';
+        let mods = {};
+        STATS.forEach(s => {
+            const score = parseInt(data[`${s}-score`]) || 10;
+            const mod = Math.floor((score-10)/2);
+            mods[s] = mod;
+            abHtml += `<div class="ability-box"><div class="ab-name">${s.slice(0,3).toUpperCase()}</div><div class="ab-mod">${mod >= 0 ? '+' : ''}${mod}</div><div class="ab-footer"><span>${score}</span></div></div>`;
+        });
+        document.getElementById('abilities-grid').innerHTML = abHtml;
+
+        document.getElementById('skills-list').innerHTML = Object.keys(SKILLS).map(s => {
+            const stat = SKILLS[s];
+            const skillKeyId = s.toLowerCase().replace(/ /g, '');
+            const isProf = data[`prof-${stat}-${skillKeyId}`];
+            const bonus = mods[stat] + (isProf ? profBonus : 0);
+            return `<div class="skill-item"><span>${isProf?'●':'○'} ${s}</span><span>${bonus>=0?'+':''}${bonus}</span></div>`;
+        }).join('');
+
+        // Death Saves
+        for(let i=1; i<=3; i++) {
+            document.getElementById(`ds-s-${i}`).checked = data[`ds-s-${i}`] || false;
+            document.getElementById(`ds-f-${i}`).checked = data[`ds-f-${i}`] || false;
+        }
+
+        // Weapons
+        document.getElementById('weapons-body').innerHTML = (data.weapons || []).slice(0,7).map(w => 
+            w.name ? `<tr><td><strong>${w.name}</strong></td><td>${w.atk}</td><td>${w.dmg} <span style="font-size:0.5rem; color:#666;">${w.notes||''}</span></td></tr>` : '<tr><td>&nbsp;</td><td></td><td></td></tr>'
+        ).join('');
+
+        // Equipment (Filter to Tab 1)
+        const primaryEquip = data.sub_tabs?.equipment?.[0]?.content || [];
+        document.getElementById('equipment-body').innerHTML = primaryEquip.slice(0,14).map(e => 
+            e.name ? `<tr><td>${e.qty||1}</td><td>${e.name}</td><td>${e.lbs||0}</td></tr>` : '<tr><td>&nbsp;</td><td></td><td></td></tr>'
+        ).join('');
+        
+        ['cp','sp','ep','gp','pp'].forEach(c => document.getElementById(`coin-${c}`).innerText = data[c] || '0');
+
+        // Traits
+        let trHtml = '';
+        const addTrait = (t, c) => { if(c) trHtml += `<p><strong>${t}:</strong> ${c.replace(/\n/g, '<br>')}</p>`; };
+        addTrait("Class", data['class-features']);
+        addTrait("Species", data['species-traits']);
+        addTrait("Feats", data['feats']);
+        document.getElementById('traits-area').innerHTML = trHtml;
+
+        // Class Specific UI
+        setupClassSpecifics(data.class, data.level);
+
+        // Spells
+        document.getElementById('spell-ability-txt').innerText = (data['spell-ability'] || 'None').toUpperCase();
+        document.getElementById('spell-dc-txt').innerText = data['spell-save-dc'] || '10';
+        document.getElementById('spell-atk-txt').innerText = data['spell-atk'] || '+0';
+        document.getElementById('pass-perc-txt').innerText = data['pass-perc'] || '10';
+
+        // Spell Slots
+        let slHtml = '';
+        for (let i = 1; i <= 9; i++) {
+            slHtml += `<div>L${i}<br>`;
+            for(let j=0; j<4; j++) { // Visual capacity
+                const checked = data.spellSlots && data.spellSlots[`slot-${i}-${j}`] ? 'checked' : '';
+                slHtml += `<input type="checkbox" class="diamond-check" ${checked}>`;
+            }
+            slHtml += `</div>`;
+        }
+        document.getElementById('spells-slots-ui').innerHTML = slHtml;
+
+        document.getElementById('spells-body').innerHTML = (data.spells || []).slice(0,22).map(s => 
+            s.name ? `<tr><td>${s.lvl}</td><td>${s.name}</td><td style="text-align:right">${s.conc?'C':''} ${s.rit?'R':''} ${s.mat?'M':''}</td></tr>` : ''
+        ).join('');
+      }
+
+      function setupClassSpecifics(classNameInput, levelInput) {
+          const container = document.getElementById('class-features-ui');
+          if (!classNameInput) return;
+          const cls = classNameInput.toLowerCase();
+          let html = '';
+          if (cls.includes('barbarian')) html += `<div><strong>Rages:</strong> ● ● ● ● ○ ○</div>`;
+          if (cls.includes('bard')) html += `<div><strong>Inspirations:</strong> ● ● ● ○ ○</div>`;
+          if (cls.includes('monk')) html += `<div><strong>Ki Points:</strong> ____ / ${levelInput}</div>`;
+          if (cls.includes('sorcerer')) html += `<div><strong>Sorcery Pts:</strong> ____ / ${levelInput}</div>`;
+          if (cls.includes('fighter')) html += `<div><strong>Action Surge:</strong> □ <strong>Second Wind:</strong> □</div>`;
+          
+          if (html !== '') {
+              container.innerHTML = `<span style="font-weight:bold; font-size:0.5rem; color:#5c4b3f; border-bottom:1px solid #ccc; display:block;">RESOURCES</span>` + html;
+              container.style.display = 'block';
+          }
+      }
+
+      loadData();
+    </script>
+  </body>
+</html>
