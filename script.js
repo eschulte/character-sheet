@@ -1341,35 +1341,19 @@ window.duplicateCharacter = async function () {
   }
 };
 
-window.printCard = function () {
-  // 1. Get the current character ID from the URL or local storage
-  const urlParams = new URLSearchParams(window.location.search);
-  const charId = urlParams.get('charId') || localStorage.getItem('dnd_char_id');
-
-  if (!charId) {
-    alert('No character loaded to print!');
-    return;
+function updatePrintLink(charId) {
+  const printLink = document.getElementById('print-link');
+  if (printLink && charId) {
+    printLink.href = `card.html?charId=${charId}`;
+    printLink.style.opacity = '1';
+    printLink.style.pointerEvents = 'auto';
+  } else if (printLink) {
+    // Disable the link if no ID exists yet
+    printLink.href = '#';
+    printLink.style.opacity = '0.5';
+    printLink.style.pointerEvents = 'none';
   }
-
-  // 2. Create a hidden iframe
-  let printFrame = document.getElementById('print-iframe');
-  if (!printFrame) {
-    printFrame = document.createElement('iframe');
-    printFrame.id = 'print-iframe';
-    printFrame.style.display = 'none';
-    document.body.appendChild(printFrame);
-  }
-
-  printFrame.src = `card.html?charId=${charId}`;
-
-  printFrame.onload = function () {
-    // Short delay to ensure Firebase data inside the iframe is populated
-    setTimeout(() => {
-      printFrame.contentWindow.focus();
-      printFrame.contentWindow.print();
-    }, 1000); // 1 second buffer for data fetching
-  };
-};
+}
 
 window.downloadJSON = function () {
   const data = collectData();
@@ -2107,6 +2091,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const sharedId = urlParams.get('charId');
   if (sharedId) await loadSharedCharacter(sharedId);
+  if (sharedId) updatePrintLink(sharedId);
   if (!sharedId) isAppReady = true;
 });
 
@@ -2131,4 +2116,21 @@ window.addEventListener('beforeprint', () => {
   document.querySelectorAll('textarea').forEach((el) => {
     el.style.height = el.scrollHeight + 'px';
   });
+});
+
+window.addEventListener('beforeprint', (event) => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const charId = urlParams.get('charId');
+
+  if (charId) {
+    // We use a small timeout to let the browser's initial print thread 'breathe'
+    // then we trigger a confirm.
+    const wantFolio = confirm('Would you like to print the optimized Folder Folio instead of this page?');
+
+    if (wantFolio) {
+      window.location.href = `card.html?charId=${charId}`;
+      // Attempt to stop the current print dialog.
+      event.preventDefault();
+    }
+  }
 });

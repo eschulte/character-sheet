@@ -1019,141 +1019,6 @@
       [data-tip] {
         outline: none;
       }
-
-      @media print {
-        #app-controls,
-        #main-nav,
-        #ai-tooltip,
-        .remove-btn,
-        .tab-btn,
-        button,
-        .ghost-mirror,
-        #portrait-url-container,
-        #status,
-        .move-btn,
-        .drag-handle,
-        .sub-tab-bar,
-        .ability-visual-container::before,
-        .ability-visual-container::after {
-          display: none !important;
-        }
-
-        #scribing-overlay {
-          display: none !important;
-        }
-
-        @page {
-          margin: 0.5cm;
-          size: auto; /* Uses printer's default paper size */
-        }
-
-        body,
-        .sheet-container,
-        .tab-content,
-        .panel,
-        .ability-score,
-        .ability-mod,
-        .inner-section,
-        .rect-box,
-        .shield-box {
-          background: white !important;
-          background-color: white !important;
-          color: black !important;
-          box-shadow: none !important;
-          border-color: #000 !important;
-          -webkit-print-color-adjust: economy !important;
-          print-color-adjust: economy !important;
-        }
-
-        #tabs-wrapper {
-          overflow: visible !important;
-          display: block !important;
-        }
-        .tab-content {
-          display: block !important;
-          page-break-after: always;
-          min-height: auto !important;
-        }
-        .tab-content.hidden-class-feature {
-          display: none !important;
-        }
-
-        #tabs-wrapper {
-          overflow: visible !important;
-          display: block !important;
-        }
-
-        .tab-content {
-          display: block !important; /* Force all tabs to show at once */
-          page-break-after: always; /* Start Spells/Items on new pages */
-          min-height: auto !important;
-          padding-top: 0 !important;
-          border: none !important;
-        }
-
-        /* Prevent weird gaps from the 'sticky' top offset logic */
-        .tab-content::before {
-          display: none;
-        }
-
-        .hidden-class-feature {
-          display: none !important;
-        }
-
-        .ability-visual-container::before {
-          display: none !important; /* Changed from opacity: 0.2 */
-        }
-
-        input,
-        textarea,
-        select {
-          border: none !important;
-          border-bottom: 1px solid #ccc !important;
-          background: transparent !important;
-          font-family: 'Georgia', serif !important;
-          color: black !important;
-          resize: none; /* Hides resize handle */
-          overflow: visible;
-        }
-
-        /* Expand textareas to fit content so scrollbars don't print */
-        textarea {
-          height: auto !important;
-          white-space: pre-wrap;
-        }
-
-        .panel,
-        .ability-box,
-        table,
-        tr,
-        .inner-section {
-          break-inside: avoid;
-          page-break-inside: avoid;
-        }
-
-        .ability-visual-container::before,
-        .ability-visual-container::after,
-        .ornamental-border,
-        .vines-decoration,
-        [class*='filigree'] {
-          display: none !important;
-          content: none !important;
-          background-image: none !important;
-        }
-
-        .ability-mod,
-        .ability-score,
-        .shield-box,
-        .rect-box,
-        .panel {
-          border-color: #000 !important;
-          box-shadow: none !important;
-        }
-
-        #portrait-placeholder {
-          display: none !important;
-        }
-      }
     </style>
   </head>
   <body>
@@ -1186,7 +1051,16 @@
       </button>
       <button class="app-btn" onclick="longRest()" data-tip="Long Rest" style="background: #a64d4d">Long Rest</button>
       <button class="app-btn" onclick="resetSheet()" style="background: #b3744a">New</button>
-      <button class="app-btn" onclick="printCard()" style="background: #9e8c4a">Print</button>
+      <button class="app-btn" style="background: #9e8c4a">
+        <a
+          id="print-link"
+          target="_blank"
+          href="card.html"
+          style="color: white; text-decoration-line: none"
+          title="Print a card view perfect for folding and using to run your game without a screen."
+          >Print Card</a
+        >
+      </button>
       <button class="app-btn" onclick="shareSheet()" style="background: #5d825d">Share URL</button>
       <button class="app-btn" onclick="copyCharId()" style="background: #4a7a8c">Copy ID</button>
       <button class="app-btn" onclick="downloadJSON()" style="background: #5a5a8c">Download JSON</button>
