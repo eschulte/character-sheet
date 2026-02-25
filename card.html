@@ -53,20 +53,49 @@
         padding-top: 0.15in;
       }
 
+      @media screen {
+        body {
+          padding: 40px 0;
+          gap: 40px;
+          background-color: #333;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .print-page {
+          margin-bottom: 40px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+          border-radius: 4px;
+          flex-direction: column !important;
+        }
+        .spells-half {
+          transform: none !important;
+        }
+      }
+
       @media print {
         body {
           background: white;
+          padding: 0;
+          margin: 0;
         }
         .no-print {
           display: none !important;
         }
         .print-page {
+          page-break-after: always;
           box-shadow: none;
           display: flex;
           flex-direction: column-reverse;
           justify-content: space-between;
           padding: 0.4in;
         }
+
+        .outside-page {
+          display: flex;
+          flex-direction: column-reverse; /* Put Spells at the top of the paper */
+        }
+
         .spells-half {
           transform: rotate(180deg);
           border-top: none !important; /* Remove dashed line from paper edge */
@@ -75,7 +104,12 @@
           padding-top: 0;
         }
 
-        .main-half {
+        .inside-page {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .stats-half {
           margin-top: 0.2in;
           border-top: 1px dashed var(--border-color); /* Dash at the fold */
         }
@@ -118,6 +152,22 @@
         font-size: 0.75rem;
         font-weight: bold;
         color: var(--text-color);
+      }
+      .para-field {
+        font-size: 0.55rem;
+        text-transform: uppercase;
+        color: #777;
+        border-bottom: 1px solid var(--faint-line);
+        position: relative;
+        height: 104px;
+      }
+      .para-val {
+        font-size: 0.5rrem;
+        position: absolute;
+        top: 12px;
+        text-transform: none;
+        color: var(--text-color);
+        height: none;
       }
 
       /* --- BODY GRID --- */
@@ -359,8 +409,8 @@
       </button>
     </div>
 
-    <div class="print-page">
-      <div class="sheet-half main-half">
+    <div class="print-page outside-page">
+      <div class="sheet-half stats-half">
         <div class="header-section">
           <div class="name-box" id="hdr-name">NAME</div>
           <div class="details-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 8px">
@@ -550,6 +600,49 @@
       </div>
     </div>
 
+    <div class="print-page inside-page">
+      <div class="sheet-half notes-half" style="border-bottom: 1px dashed var(--border-color); height: 5.1in">
+        <div class="section-title">Character Notes & Adventure Log</div>
+        <div
+          class="traits-area"
+          id="val-notes-large"
+          style="height: 100%; font-size: 0.65rem; white-space: pre-wrap"
+        ></div>
+      </div>
+
+      <div class="sheet-half bio-class-half" style="padding-top: 0.2in">
+        <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 15px; height: 100%">
+          <div class="col" style="border-right: 1px dotted var(--faint-line); padding-right: 10px">
+            <div class="section-title">Background & Bio</div>
+            <div class="detail-field">
+              Alignment
+              <div class="detail-val" id="val-alignment"></div>
+            </div>
+            <div class="para-field">
+              Personality
+              <div class="para-val"><span id="val-personality"></span></div>
+            </div>
+
+            <div class="section-title" style="margin-top: 10px">Physical Traits</div>
+            <div style="font-size: 0.6rem; line-height: 1.6">
+              <strong>Age:</strong> <span id="val-age"></span><br />
+              <strong>Height:</strong> <span id="val-height"></span><br />
+              <strong>Weight:</strong> <span id="val-weight"></span><br />
+              <strong>Eyes:</strong> <span id="val-eyes"></span><br />
+              <strong>Skin:</strong> <span id="val-skin"></span><br />
+              <strong>Hair:</strong> <span id="val-hair"></span><br />
+              <strong>Appearance:</strong> <span id="val-appearance"></span>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="section-title" id="class-resource-title">Class Resources</div>
+            <div id="class-specific-inside" style="font-size: 0.6rem"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
       import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -611,6 +704,15 @@
         document.getElementById('val-pass-perc').innerText = data.pass_perc || '10';
         document.getElementById('val-ac').innerText = data.ac || '10';
         document.getElementById('val-hp-max').innerText = data['hp-max'] || '0';
+        document.getElementById('val-age').innerText = data['age'] || '';
+        document.getElementById('val-height').innerText = data['height'] || '';
+        document.getElementById('val-weight').innerText = data['weight'] || '';
+        document.getElementById('val-eyes').innerText = data['eyes'] || '';
+        document.getElementById('val-skin').innerText = data['skin'] || '';
+        document.getElementById('val-hair').innerText = data['hair'] || '';
+        document.getElementById('val-appearance').innerText = data['appearance'] || '';
+        document.getElementById('val-personality').innerText = data['personality'] || '';
+        document.getElementById('val-alignment').innerText = data['alignment'] || '';
 
         // Stats & Skills Logic
         let abHtml = '';
