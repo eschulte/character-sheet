@@ -34,13 +34,13 @@
         background-color: var(--bg-color);
         display: flex;
         flex-direction: column;
-        padding: 0.4in; /* Safe zone for printer hardware margins */
+        padding: 0.4in;
         box-sizing: border-box;
       }
 
       .sheet-half {
         width: 100%;
-        height: 4.9in; /* Prevents spilling onto second page */
+        max-height: 4.85in;
         display: flex;
         flex-direction: column;
         gap: 8px;
@@ -78,40 +78,81 @@
           background: white;
           padding: 0;
           margin: 0;
+          overflow: hidden;
+          gap: 0;
         }
         .no-print {
           display: none !important;
         }
-        .print-page {
+        .print-page:first-of-type {
           page-break-after: always;
-          box-shadow: none;
-          display: flex;
           flex-direction: column-reverse;
+        }
+        .print-page {
+          box-shadow: none !important;
+          display: flex;
           justify-content: space-between;
-          padding: 0.4in;
+          padding: 0.4in !important;
+          margin: 0 !important;
+          page-break-after: avoid;
+          page-break-inside: avoid;
+          overflow: hidden;
+          height: 11in !important;
         }
 
         .outside-page {
           display: flex;
-          flex-direction: column-reverse; /* Put Spells at the top of the paper */
+          flex-direction: column-reverse;
+          page-break-after: always !important;
         }
 
         .spells-half {
           transform: rotate(180deg);
-          border-top: none !important; /* Remove dashed line from paper edge */
-          border-bottom: 1px dashed var(--border-color); /* Move dashed line to the fold */
-          padding-bottom: 0.15in;
-          padding-top: 0;
-        }
+          border-top: none !important;
 
-        .inside-page {
           display: flex;
           flex-direction: column;
+          justify-content: flex-end !important;
+          margin-top: 2in !important;
+          padding-top: 0 !important;
+          padding-bottom: 0 !important;
+        }
+
+        #spells-body {
+          width: 100%;
+          margin-top: 0 !important;
+          margin-bottom: auto;
+          borden-collapse: collapse;
+        }
+
+        .section-title {
+          margin-top: 0 !important;
         }
 
         .stats-half {
           margin-top: 0.2in;
           border-top: 1px dashed var(--border-color); /* Dash at the fold */
+        }
+
+        .bio-class-half {
+          padding-top: 0 !important;
+          margin-top: -10px !important;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start !important;
+          overflow: hidden;
+          max-height: 4in;
+        }
+
+        .inside-page {
+          display: flex !important;
+          flex-direction: column !important;
+          margin-top: -0.2in !important;
+          padding-top: 0.1in !important;
+          justify-content: flex-start !important;
+          page-break-after: avoid !important;
+          max-height: 10in !important;
+          overflow: hidden !important;
         }
 
         .print-page:last-child .sheet-half {
@@ -560,11 +601,9 @@
         </div>
       </div>
 
-      <div class="sheet-half spells-half">
-        <div class="section-title" style="font-size: 0.75rem; border: none; text-align: center">
-          Spellbook & Reference
-        </div>
-        <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 5px">
+      <div class="sheet-half spells-half" id="spell-offset">
+        <div class="section-title">Spellbook & Reference</div>
+        <div style="display: flex; text-align: center; margin-bottom: 5px">
           <div>
             <div class="section-title" style="border: none">Ability</div>
             <div class="spell-stat-val" id="spell-ability-txt">-</div>
@@ -610,7 +649,7 @@
         ></div>
       </div>
 
-      <div class="sheet-half bio-class-half" style="padding-top: 0.2in">
+      <div class="sheet-half bio-class-half" style="padding-top: 0; margin-top: 0">
         <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 15px; height: 100%">
           <div class="col" style="border-right: 1px dotted var(--faint-line); padding-right: 10px">
             <div class="section-title">Background & Bio</div>
