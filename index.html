@@ -1087,6 +1087,9 @@
       <button class="tab-btn class-specific class-artificer hidden-class-feature" onclick="switchTab('items-page')">
         Item Plans
       </button>
+      <button class="tab-btn class-specific class-sorcerer hidden-class-feature" onclick="switchTab('metamagic-page')">
+        Metamagic
+      </button>
       <button class="tab-btn class-specific class-druid hidden-class-feature" onclick="switchTab('wild-shape-page')">
         Wild Shape
       </button>
@@ -1488,9 +1491,10 @@
                 </div>
                 <div style="margin-bottom: 5px; border-bottom: 1px solid #ddd; padding-bottom: 5px">
                   <span class="label-sm" style="display: inline; margin-right: 10px">Weapon:</span>
-                  <label><input type="checkbox" id="prof-weapon-simple" /> Simple</label>
-                  &nbsp;
-                  <label><input type="checkbox" id="prof-weapon-martial" /> Martial</label>
+                  <label><input type="checkbox" id="prof-weapon-simple-melee" /> Melee</label> &nbsp;
+                  <label><input type="checkbox" id="prof-weapon-martial-melee" /> Martial Melee</label> &nbsp;
+                  <label><input type="checkbox" id="prof-weapon-simple-ranged" /> Ranged</label> &nbsp;
+                  <label><input type="checkbox" id="prof-weapon-martial-ranged" /> Martial Ranged</label>
                 </div>
                 <div class="prof-grid">
                   <div>
@@ -1721,6 +1725,27 @@
                 <tbody id="magic-items-body"></tbody>
               </table>
               <button onclick="addMagicItemRow()" style="width: 100%">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="metamagic-page" class="tab-content" data-label="Metamagic">
+        <div class="sheet-container">
+          <div class="inner-section">
+            <div class="panel">
+              <span class="box-title">Metamagic Options</span>
+              <table class="weapons-table">
+                <thead>
+                  <tr>
+                    <th style="width: 25%">Name</th>
+                    <th style="width: 15%">Cost (SP)</th>
+                    <th style="width: 60%">Description / Notes</th>
+                    <th class="action-cell"></th>
+                  </tr>
+                </thead>
+                <tbody id="metamagic-body"></tbody>
+              </table>
+              <button onclick="addMetaMagicRow()" style="width: 100%; margin-top: 10px">+</button>
             </div>
           </div>
         </div>

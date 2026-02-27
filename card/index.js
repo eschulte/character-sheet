@@ -201,6 +201,21 @@ function setupClassSpecifics(data) {
   }
   if (cls.includes('sorcerer')) {
     uiHtml += `<div><strong>Sorcery Pts:</strong> <div style="line-height: 1.1; margin-top: 2px;">${drawEmptyBoxes(data['sorc-max'] || level)}</div></div>`;
+
+    if (data.metamagic && data.metamagic.length > 0) {
+      insideHtml += `<div class="section-title">Meta Magic Options</div>`;
+      insideHtml += `<table><thead><tr><th style="width: 25%;">Option</th><th style="width: 15%;">Cost</th><th>Effect</th></tr></thead><tbody>`;
+      data.metamagic.forEach((mm) => {
+        if (mm.name) {
+          insideHtml += `<tr>
+          <td><strong>${mm.name}</strong></td>
+          <td style="text-align:center;">${mm.cost || '-'}</td>
+          <td>${mm.desc || ''}</td>
+        </tr>`;
+        }
+      });
+      insideHtml += `</tbody></table><br>`;
+    }
   }
   if (cls.includes('fighter')) {
     uiHtml += `<div><strong>Second Wind / Action Surge:</strong> ${drawEmptyBoxes(2)}</div>`;

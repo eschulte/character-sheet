@@ -125,8 +125,12 @@ window.loadMyCharacter = async function () {
     window.resetSheet();
     return;
   }
-  currentCharacterId = select.value;
-  localStorage.setItem('dnd_char_id', currentCharacterId);
+  isAppReady = false;
+  if (hasUnsavedChanges) {
+    document.getElementById('status').innerText = 'Saving before switch...';
+    await window.saveVersion(false);
+  }
+  localStorage.setItem('dnd_char_id', select.value);
   window.location.href = `${window.location.pathname}?charId=${select.value}`;
 };
 
@@ -1135,6 +1139,10 @@ function populateData(data) {
         window.addWeaponRow(r);
       });
     }
+    if (data.metamagic) {
+      document.getElementById('metamagic-body').innerHTML = '';
+      data.metamagic.forEach((mm) => window.addMetaMagicRow(mm));
+    }
     if (data.wild_shapes) {
       document.getElementById('wild-shape-body').innerHTML = '';
       data.wild_shapes.forEach((r) => window.addWildShapeRow(r));
@@ -1327,6 +1335,12 @@ window.duplicateCharacter = async function () {
   if (!currentUser) return alert('Login required.');
   if (!confirm('Duplicate this character to your account?')) return;
 
+  isAppReady = false;
+  if (hasUnsavedChanges) {
+    document.getElementById('status').innerText = 'Saving before duplicating...';
+    await window.saveVersion(false);
+  }
+
   const data = collectData();
   const newId = generateUUID();
   const nowIso = new Date().toISOString();
@@ -1375,6 +1389,12 @@ document.getElementById('import-file').addEventListener('change', async (e) => {
 
   if (!currentUser) return alert('Please login to create a new character from upload.');
   if (!confirm('Create a NEW character from this file?')) return;
+
+  isAppReady = false;
+  if (hasUnsavedChanges) {
+    document.getElementById('status').innerText = 'Saving before import...';
+    await window.saveVersion(false);
+  }
 
   const reader = new FileReader();
   reader.onload = async (event) => {
@@ -1443,6 +1463,25 @@ window.addWeaponRow = (item = null) => {
   // Update Ghost attachments (Indices shifted by 1 due to new column)
   attachGhost(inputs[0]); // Name
   attachGhost(inputs[4]); // Notes (Was previously index 3)
+};
+
+window.addMetaMagicRow = (data = {}) => {
+  const tbody = document.getElementById('metamagic-body');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" class="mm-name" value="${data.name || ''}" placeholder="Twin Spell"></td>
+    <td><input type="text" class="mm-cost" value="${data.cost || ''}" placeholder="1 SP"></td>
+    <td><input type="text" class="mm-desc" value="${data.desc || ''}" placeholder="Target second creature..."></td>
+    <td class="action-cell">
+        <button class="move-btn" onclick="moveRowToTab(this, 'people')" title="Move to another tab">➡</button>
+        <button class="drag-handle" title="Drag to reorder">☰</button>
+        <button onclick="this.parentElement.parentElement.remove(); updateWeight();" class="remove-btn">-</button>
+    </td>
+  `;
+  tbody.appendChild(tr);
+
+  // Re-bind change listeners for auto-save
+  tr.querySelectorAll('input').forEach((i) => i.addEventListener('change', () => saveVersion()));
 };
 
 window.addWildShapeRow = (item = null) => {
@@ -1695,20 +1734,29 @@ function updateWeight() {
   handleInput({ target: document.body }); // Trigger auto-save
 }
 
-window.resetSheet = function () {
+window.resetSheet = async function () {
   if (!confirm('Create and switch to a NEW character?')) return;
-
-  // Clear the local ID so the initialization logic generates a new one
+  isAppReady = false;
+  if (hasUnsavedChanges) {
+    document.getElementById('status').innerText = 'Saving before switch...';
+    await window.saveVersion(false);
+  }
   localStorage.removeItem('dnd_char_id');
-
-  // Redirect to the base URL (removing ?charId=...)
   window.location.href = window.location.origin + window.location.pathname;
 };
 
 // --- TAB SCROLL AND SWITCH ---
 const tabsWrapper = document.getElementById('tabs-wrapper');
 const tabButtons = document.querySelectorAll('.tab-btn');
-const tabIds = ['main-page', 'spells-page', 'items-page', 'equip-page'];
+const tabIds = [
+  'main-page',
+  'spells-page',
+  'items-page',
+  'metamagic-page',
+  'wild-shape-page',
+  'invocations-page',
+  'equip-page',
+];
 
 window.switchTab = function (tabId) {
   // Click-to-tab logic
