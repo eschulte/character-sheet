@@ -1049,6 +1049,10 @@ function collectData() {
       notes: inputs[3].value, // Text input
     };
   });
+  data.metamagic = Array.from(document.querySelectorAll('#metamagic-body tr')).map((tr) => {
+    const inputs = tr.querySelectorAll('input');
+    return { name: inputs[0].value, cost: inputs[1].value, desc: inputs[2].value };
+  });
   data['equipment_table'] = [];
   document.querySelectorAll('#equipment-body tr').forEach((tr) => {
     const inputs = tr.querySelectorAll('input');
@@ -1358,7 +1362,7 @@ window.duplicateCharacter = async function () {
 function updatePrintLink(charId) {
   const printLink = document.getElementById('print-link');
   if (printLink && charId) {
-    printLink.href = `card.html?charId=${charId}`;
+    printLink.href = `card?charId=${charId}`;
     printLink.style.opacity = '1';
     printLink.style.pointerEvents = 'auto';
   } else if (printLink) {
@@ -2176,7 +2180,7 @@ window.addEventListener('beforeprint', (event) => {
     const wantFolio = confirm('Would you like to print the optimized Folder Folio instead of this page?');
 
     if (wantFolio) {
-      window.location.href = `card.html?charId=${charId}`;
+      window.location.href = `card?charId=${charId}`;
       // Attempt to stop the current print dialog.
       event.preventDefault();
     }

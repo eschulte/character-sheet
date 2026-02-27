@@ -202,6 +202,8 @@ function setupClassSpecifics(data) {
   if (cls.includes('sorcerer')) {
     uiHtml += `<div><strong>Sorcery Pts:</strong> <div style="line-height: 1.1; margin-top: 2px;">${drawEmptyBoxes(data['sorc-max'] || level)}</div></div>`;
 
+    console.log('SORCERER');
+
     if (data.metamagic && data.metamagic.length > 0) {
       insideHtml += `<div class="section-title">Meta Magic Options</div>`;
       insideHtml += `<table><thead><tr><th style="width: 25%;">Option</th><th style="width: 15%;">Cost</th><th>Effect</th></tr></thead><tbody>`;
