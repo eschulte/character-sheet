@@ -373,7 +373,10 @@ const classEmojiMap = {
 
 window.updateClassFeatures = function () {
   const clsInput = document.getElementById('class').value || '';
-  const clsNormal = clsInput.toLowerCase();
+  const subclassInput = document.getElementById('subclass')?.value || '';
+  // Combine both fields so we can catch things like "Arcane Trickster" or "Eldritch Knight"
+  const clsNormal = (clsInput + ' ' + subclassInput).toLowerCase();
+
   const variableBadges = document.querySelectorAll('.variable-class-badge');
   const allSpecifics = document.querySelectorAll('.class-specific');
 
@@ -384,12 +387,10 @@ window.updateClassFeatures = function () {
   });
 
   // 2. GLOBAL BADGES: Set the icons based on the Class Input text
-  // We do this by checking which keys in our emoji map exist in the input string
   Object.keys(classEmojiMap).forEach((className) => {
     if (clsNormal.includes(className.toLowerCase())) {
       variableBadges.forEach((badge) => {
         badge.textContent += classEmojiMap[className];
-        // Set the tip to the last matched class (or you can append them)
         badge.setAttribute('data-tip', className.charAt(0).toUpperCase() + className.slice(1));
       });
     }
@@ -413,6 +414,22 @@ window.updateClassFeatures = function () {
       el.classList.add('hidden-class-feature');
     }
   });
+
+  // 4. SPELLCASTER VISIBILITY: Show/Hide the Spells tab entirely
+  const isCaster = /(bard|cleric|druid|sorcerer|wizard|warlock|paladin|ranger|artificer|eldritch|trickster)/i.test(
+    clsNormal,
+  );
+  const spellBtn = document.querySelector('button[onclick="switchTab(\'spells-page\')"]');
+  const spellPage = document.getElementById('spells-page');
+
+  if (spellBtn) {
+    if (isCaster) spellBtn.classList.remove('hidden-class-feature');
+    else spellBtn.classList.add('hidden-class-feature');
+  }
+  if (spellPage) {
+    if (isCaster) spellPage.classList.remove('hidden-class-feature');
+    else spellPage.classList.add('hidden-class-feature');
+  }
 };
 
 const CLASS_PROGRESSION = {
@@ -471,7 +488,9 @@ const CLASS_PROGRESSION = {
 
 function updateClassScaling() {
   const level = parseInt(document.getElementById('level')?.value) || 1;
-  const className = document.getElementById('class')?.value.toLowerCase() || '';
+  const classInput = document.getElementById('class')?.value.toLowerCase() || '';
+  const subclassInput = document.getElementById('subclass')?.value.toLowerCase() || '';
+  const className = classInput + ' ' + subclassInput;
 
   // Determine caster type
   let casterType = null;
@@ -1259,11 +1278,11 @@ function handleInput(e) {
   const targetId = e?.target?.id || '';
   const targetType = e?.target?.type || '';
 
-  if (targetId === 'class') {
+  if (targetId === 'class' || targetId === 'subclass') {
     window.updateClassFeatures();
   }
 
-  if (targetId === 'class' || targetId === 'level') {
+  if (targetId === 'class' || targetId === 'subclass' || targetId === 'level') {
     updateClassScaling();
   }
 
