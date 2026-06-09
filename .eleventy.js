@@ -1,4 +1,4 @@
-module.exports = function (eleventyConfig) {
+export default function (eleventyConfig) {
   eleventyConfig.setServerPassthroughCopyBehavior('passthrough');
 
   eleventyConfig.addPassthroughCopy({ 'index.js': 'index.js' });
@@ -15,4 +15,4 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ 'icon.png': 'icon.png' });
 
   return { htmlTemplateEngine: false, templateFormats: ['html', 'md'], passthroughFileCopy: true };
-};
+}

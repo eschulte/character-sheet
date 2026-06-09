@@ -218,14 +218,16 @@ window.saveVersion = async function (isManualSnapshot = false) {
   const todayStr = now.toLocaleDateString();
   const className = document.getElementById('class').value.trim();
   const level = document.getElementById('level').value.trim();
+  const parsedClasses = parseCharacterClasses();
+  const hasClassLevels = parsedClasses.classes.length > 0 && parsedClasses.classes.some((entry) => entry.level > 0);
 
   // VALIDATION: Prevent saving if core identification is missing
-  if (!className || !level) {
+  if (!className || (!level && !hasClassLevels)) {
     const statusEl = document.getElementById('status');
     if (statusEl) statusEl.innerText = 'Error: Class and Level are required to save.';
 
     if (isManualSnapshot) {
-      alert("Cannot save: Please ensure both 'Class' and 'Level' are filled out.");
+      alert("Cannot save: Please enter a class and level, such as 'Fighter / Wizard' with '2 / 3'.");
     }
     return; // Stop the save process
   }
@@ -380,13 +382,113 @@ const classEmojiMap = {
   sorcerer: '🔮',
   warlock: '👁️',
   artificer: '⚙️',
+  wizard: '🪄',
 };
 
-window.updateClassFeatures = function () {
-  const clsInput = document.getElementById('class').value || '';
+const KNOWN_CLASSES = Object.keys(classEmojiMap);
+const FULL_CASTER_CLASSES = ['bard', 'cleric', 'druid', 'sorcerer', 'wizard'];
+const HALF_CASTER_CLASSES = ['paladin', 'ranger', 'artificer'];
+
+function normalizeClassToken(value) {
+  return (value || '').trim().toLowerCase();
+}
+
+function normalizeClassText(value) {
+  return normalizeClassToken(value)
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function extractKnownClass(value) {
+  const normalized = normalizeClassText(value);
+  return KNOWN_CLASSES.find((className) => normalized.split(' ').includes(className)) || '';
+}
+
+function getClassMentions(value) {
+  const tokens = normalizeClassText(value).split(' ').filter(Boolean);
+  const mentions = [];
+
+  tokens.forEach((token, index) => {
+    if (KNOWN_CLASSES.includes(token) && !mentions.some((entry) => entry.name === token)) {
+      mentions.push({ name: token, tokenIndex: index, level: 0 });
+    }
+  });
+
+  return mentions;
+}
+
+function getLevelParts(value) {
+  return normalizeClassText(value)
+    .split(' ')
+    .map((part) => parseInt(part, 10))
+    .filter((part) => Number.isFinite(part) && part > 0);
+}
+
+function getInlineClassLevels(value) {
+  const tokens = normalizeClassText(value).split(' ').filter(Boolean);
+  const classes = [];
+
+  tokens.forEach((token, index) => {
+    if (!KNOWN_CLASSES.includes(token) || classes.some((entry) => entry.name === token)) return;
+
+    const nextTokenLevel = parseInt(tokens[index + 1], 10);
+    classes.push({
+      name: token,
+      tokenIndex: index,
+      level: Number.isFinite(nextTokenLevel) && nextTokenLevel > 0 ? nextTokenLevel : 0,
+    });
+  });
+
+  return classes;
+}
+
+function parseCharacterClasses() {
+  const classInput = document.getElementById('class')?.value || '';
   const subclassInput = document.getElementById('subclass')?.value || '';
-  // Combine both fields so we can catch things like "Arcane Trickster" or "Eldritch Knight"
-  const clsNormal = (clsInput + ' ' + subclassInput).toLowerCase();
+  const levelInput = document.getElementById('level')?.value || '';
+  const combinedText = `${classInput} ${subclassInput}`;
+  const fallbackTotalLevel = parseInt(levelInput, 10) || 1;
+  const normalizedCombinedText = normalizeClassText(combinedText);
+  const levelParts = getLevelParts(levelInput);
+  let classes = getInlineClassLevels(classInput);
+
+  if (!classes.some((entry) => entry.level > 0)) {
+    classes = getClassMentions(classInput);
+  }
+
+  classes = classes
+    .map((entry, index) => ({
+      name: extractKnownClass(entry.name) || normalizeClassToken(entry.name),
+      level: entry.level || (levelParts.length === classes.length ? levelParts[index] : 0),
+    }))
+    .filter((entry) => entry.name);
+
+  if (classes.length === 0 && classInput.trim()) {
+    classes = [{ name: normalizeClassText(classInput), level: fallbackTotalLevel }];
+  }
+
+  if (classes.length === 1 && !classes[0].level) {
+    classes[0].level = fallbackTotalLevel;
+  }
+
+  return {
+    classes,
+    totalLevel: classes.reduce((sum, entry) => sum + (entry.level || 0), 0) || fallbackTotalLevel,
+    text: `${normalizedCombinedText} ${normalizeClassText(levelInput)}`.trim(),
+  };
+}
+
+function getClassLevel(className) {
+  const parsed = parseCharacterClasses();
+  const found = parsed.classes.find((entry) => entry.name === className);
+  if (found) return found.level || 0;
+  return parsed.text.includes(className) ? parsed.totalLevel : 0;
+}
+
+window.updateClassFeatures = function () {
+  const parsedClasses = parseCharacterClasses();
+  const clsNormal = parsedClasses.text;
 
   const variableBadges = document.querySelectorAll('.variable-class-badge');
   const allSpecifics = document.querySelectorAll('.class-specific');
@@ -399,7 +501,10 @@ window.updateClassFeatures = function () {
 
   // 2. GLOBAL BADGES: Set the icons based on the Class Input text
   Object.keys(classEmojiMap).forEach((className) => {
-    if (clsNormal.includes(className.toLowerCase())) {
+    if (
+      parsedClasses.classes.some((entry) => entry.name === className) ||
+      clsNormal.includes(className.toLowerCase())
+    ) {
       variableBadges.forEach((badge) => {
         badge.textContent += classEmojiMap[className];
         badge.setAttribute('data-tip', className.charAt(0).toUpperCase() + className.slice(1));
@@ -413,7 +518,7 @@ window.updateClassFeatures = function () {
     el.classList.forEach((c) => {
       if (c.startsWith('class-') && c !== 'class-specific') {
         const className = c.replace('class-', '');
-        if (clsNormal.includes(className)) {
+        if (parsedClasses.classes.some((entry) => entry.name === className) || clsNormal.includes(className)) {
           isMatch = true;
         }
       }
@@ -497,21 +602,57 @@ const CLASS_PROGRESSION = {
   infusions: { 2: 2, 6: 3, 10: 4, 14: 5, 18: 6 },
 };
 
+function getProgressionValue(table, level, fallback = 0) {
+  return (
+    Object.entries(table)
+      .map(([lvl, value]) => [parseInt(lvl, 10), value])
+      .sort((a, b) => b[0] - a[0])
+      .find(([lvl]) => level >= lvl)?.[1] || fallback
+  );
+}
+
+function getSpellSlotsForCharacter(parsed) {
+  const hasWarlockOnly = parsed.classes.length === 1 && parsed.classes[0].name === 'warlock';
+  const warlockLevel = parsed.classes.find((entry) => entry.name === 'warlock')?.level || 0;
+
+  if (hasWarlockOnly) {
+    const pactSlotCount = getProgressionValue(CLASS_PROGRESSION.warlock.slots, warlockLevel, 0);
+    const pactSlotLevel = getProgressionValue(CLASS_PROGRESSION.warlock.level, warlockLevel, 0);
+    const pactSlots = Array(9).fill(0);
+    if (pactSlotLevel > 0) pactSlots[pactSlotLevel - 1] = pactSlotCount;
+    return pactSlots;
+  }
+
+  const effectiveCasterLevel = parsed.classes.reduce((total, entry) => {
+    if (FULL_CASTER_CLASSES.includes(entry.name)) return total + entry.level;
+    if (HALF_CASTER_CLASSES.includes(entry.name)) {
+      const roundedLevel = entry.name === 'artificer' ? Math.ceil(entry.level / 2) : Math.floor(entry.level / 2);
+      return total + roundedLevel;
+    }
+    return total;
+  }, 0);
+
+  const spellcasterText = parsed.text;
+  const thirdCasterLevel = /(eldritch knight|arcane trickster)/.test(spellcasterText)
+    ? Math.floor(parsed.totalLevel / 3)
+    : 0;
+  const multiclassCasterLevel = Math.max(1, Math.min(20, effectiveCasterLevel + thirdCasterLevel));
+  const standardSlots =
+    effectiveCasterLevel || thirdCasterLevel ? CLASS_PROGRESSION.fullCaster[multiclassCasterLevel] : null;
+  const slots = standardSlots ? [...standardSlots] : Array(9).fill(0);
+
+  if (warlockLevel > 0) {
+    const pactSlotCount = getProgressionValue(CLASS_PROGRESSION.warlock.slots, warlockLevel, 0);
+    const pactSlotLevel = getProgressionValue(CLASS_PROGRESSION.warlock.level, warlockLevel, 0);
+    if (pactSlotLevel > 0) slots[pactSlotLevel - 1] = Math.max(slots[pactSlotLevel - 1] || 0, pactSlotCount);
+  }
+
+  return slots;
+}
+
 function updateClassScaling() {
-  const level = parseInt(document.getElementById('level')?.value) || 1;
-  const classInput = document.getElementById('class')?.value.toLowerCase() || '';
-  const subclassInput = document.getElementById('subclass')?.value.toLowerCase() || '';
-  const className = classInput + ' ' + subclassInput;
-
-  // Determine caster type
-  let casterType = null;
-  if (/(wizard|cleric|druid|sorcerer|bard)/.test(className)) casterType = 'fullCaster';
-  else if (/(paladin|ranger|artificer)/.test(className)) casterType = 'halfCaster';
-  else if (className.includes('warlock')) casterType = 'warlock';
-
-  // 1. Handle Spell Slots
-  const prog = casterType ? CLASS_PROGRESSION[casterType] : null;
-  const slots = prog && prog[level] ? prog[level] : [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const parsed = parseCharacterClasses();
+  const slots = getSpellSlotsForCharacter(parsed);
   for (let i = 1; i <= 9; i++) {
     const container = document.getElementById(`spell-level-${i}-slots`);
     if (!container) continue;
@@ -529,18 +670,29 @@ function updateClassScaling() {
     });
   }
 
-  if (className === 'barbarian') {
+  const barbarianLevel = getClassLevel('barbarian');
+  if (barbarianLevel) {
     const rageLabel = document.querySelector('[data-tip="Rage"]');
-    const maxRage =
-      Object.entries(CLASS_PROGRESSION.rage)
-        .reverse()
-        .find(([lvl]) => level >= lvl)?.[1] || 2;
+    const maxRage = getProgressionValue(CLASS_PROGRESSION.rage, barbarianLevel, 2);
     if (rageLabel) rageLabel.textContent = `Rages (${maxRage === 99 ? '∞' : maxRage})`;
   }
 
-  if (className === 'monk') {
+  const monkLevel = getClassLevel('monk');
+  if (monkLevel) {
     const kiInput = document.getElementById('ki-max');
-    if (kiInput) kiInput.value = level; // 1 per level
+    if (kiInput) kiInput.value = monkLevel; // 1 per monk level
+  }
+
+  const sorcererLevel = getClassLevel('sorcerer');
+  if (sorcererLevel) {
+    const sorcMax = document.getElementById('sorc-max');
+    if (sorcMax) sorcMax.value = sorcererLevel;
+  }
+
+  const artificerLevel = getClassLevel('artificer');
+  if (artificerLevel) {
+    const infusionMax = document.getElementById('infusion-max');
+    if (infusionMax) infusionMax.value = getProgressionValue(CLASS_PROGRESSION.infusions, artificerLevel, 0);
   }
 }
 window.updateClassScaling = updateClassScaling;
@@ -2184,7 +2336,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 window.addEventListener('beforeunload', (e) => {
   const className = document.getElementById('class')?.value.trim();
   const level = document.getElementById('level')?.value.trim();
-  const cannotSave = !currentUser || !isCloudOwner || !className || !level || !navigator.onLine;
+  const parsedClasses = parseCharacterClasses();
+  const hasClassLevels = parsedClasses.classes.length > 0 && parsedClasses.classes.some((entry) => entry.level > 0);
+  const cannotSave = !currentUser || !isCloudOwner || !className || (!level && !hasClassLevels) || !navigator.onLine;
 
   if (hasUnsavedChanges) {
     if (cannotSave) {

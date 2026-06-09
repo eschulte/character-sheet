@@ -281,7 +281,7 @@
       }
       .main-header {
         display: grid;
-        grid-template-columns: 2.5fr 1fr 1fr 1fr;
+        grid-template-columns: minmax(210px, 1.8fr) minmax(260px, 1.9fr) minmax(85px, 0.65fr) minmax(115px, 0.8fr);
         gap: 20px;
         border-bottom: 2px solid var(--border-color);
         padding-bottom: 20px;
@@ -1134,15 +1134,25 @@
             </div>
             <div class="header-section">
               <div class="class-input-wrapper">
-                <input type="text" id="class" /><span class="label-sm" data-tip="Class" tabindex="0">Class</span>
-                <input type="text" id="subclass" /><span class="label-sm" data-tip="Subclass" tabindex="0"
+                <input type="text" id="class" placeholder="Artificer / Wizard" /><span
+                  class="label-sm"
+                  data-tip="Class"
+                  tabindex="0"
+                  >Class(es)</span
+                >
+                <input type="text" id="subclass" placeholder="Armorer / Bladesinger" /><span
+                  class="label-sm"
+                  data-tip="Subclass"
+                  tabindex="0"
                   >Subclass</span
                 >
                 <span class="class-badge variable-class-badge"></span>
               </div>
             </div>
             <div class="header-section">
-              <input type="text" id="level" /><span class="label-sm" data-tip="Level" tabindex="0">Level</span>
+              <input type="text" id="level" placeholder="2 / 3" /><span class="label-sm" data-tip="Level" tabindex="0"
+                >Level(s)</span
+              >
               <input type="text" id="xp" /><span class="label-sm" data-tip="XP" tabindex="0">XP</span>
             </div>
             <div class="header-section">
