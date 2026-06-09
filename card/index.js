@@ -76,6 +76,7 @@ function populateFolio(data) {
   document.getElementById('val-appearance').innerText = data['appearance'] || '';
   document.getElementById('val-personality').innerText = data['personality'] || '';
   document.getElementById('val-alignment').innerText = data['alignment'] || '';
+  document.getElementById('val-languages-large').innerText = data.languages || '';
 
   // Stats & Skills Logic
   let abHtml = '';
@@ -106,21 +107,9 @@ function populateFolio(data) {
 
   // Weapons
   document.getElementById('weapons-body').innerHTML = (data.weapons || [])
-    .slice(0, 7)
     .map((w) =>
       w.name
         ? `<tr><td><strong>${w.name}</strong></td><td>${w.atk}</td><td>${w.dmg} <span style="font-size:0.5rem; color:#666;">${w.notes || ''}</span></td></tr>`
-        : '<tr><td>&nbsp;</td><td></td><td></td></tr>',
-    )
-    .join('');
-
-  // Equipment (Filter to Tab 1)
-  const primaryEquip = data.sub_tabs?.equipment?.[0]?.content || [];
-  document.getElementById('equipment-body').innerHTML = primaryEquip
-    .slice(0, 14)
-    .map((e) =>
-      e.name
-        ? `<tr><td>${e.qty || 1}</td><td>${e.name}</td><td>${e.lbs || 0}</td></tr>`
         : '<tr><td>&nbsp;</td><td></td><td></td></tr>',
     )
     .join('');
@@ -173,6 +162,7 @@ function setupClassSpecifics(data) {
   const classNameInput = data.class || '';
   const cls = classNameInput.toLowerCase();
   const level = parseInt(data.level) || 1;
+  const primaryEquip = data.sub_tabs?.equipment?.[0]?.content || [];
 
   const uiContainer = document.getElementById('class-features-ui');
   const insideContainer = document.getElementById('class-specific-inside');
@@ -257,6 +247,18 @@ function setupClassSpecifics(data) {
     data.magic_items.slice(0, 8).forEach((item) => {
       if (item.name) {
         insideHtml += `<tr><td>${item.created ? '☑' : '☐'}</td><td><strong>${item.name}</strong></td><td style="text-align:center;">${item.attunement ? 'Y' : '-'}</td><td>${item.notes || ''}</td></tr>`;
+      }
+    });
+    insideHtml += `</tbody></table><br>`;
+  }
+
+  // Equipment: Main carrying list, moved here to free up the front-page combat column.
+  if (primaryEquip.length > 0) {
+    insideHtml += `<div class="section-title">Equipment (Main: <span style="font-style:italic;text-transform:none;font-size:tiny;">first 15 items only</span>)</div>`;
+    insideHtml += `<table><thead><tr><th style="width:20px;">#</th><th>Item</th><th style="width:26px;">Lb</th></tr></thead><tbody>`;
+    primaryEquip.slice(0, 15).forEach((item) => {
+      if (item.name) {
+        insideHtml += `<tr><td>${item.qty || 1}</td><td><strong>${item.name}</strong></td><td>${item.lbs || 0}</td></tr>`;
       }
     });
     insideHtml += `</tbody></table><br>`;
