@@ -641,10 +641,13 @@ function getSpellSlotsForCharacter(parsed) {
     return total;
   }, 0);
 
-  const spellcasterText = parsed.text;
-  const thirdCasterLevel = /(eldritch knight|arcane trickster)/.test(spellcasterText)
-    ? Math.floor(parsed.totalLevel / 3)
-    : 0;
+  const hasEldritchKnight = /\beldritch knight\b/.test(parsed.text);
+  const hasArcaneTrickster = /\barcane trickster\b/.test(parsed.text);
+  const thirdCasterLevel = parsed.classes.reduce((total, entry) => {
+    if (entry.name === 'fighter' && hasEldritchKnight) return total + Math.floor(entry.level / 3);
+    if (entry.name === 'rogue' && hasArcaneTrickster) return total + Math.floor(entry.level / 3);
+    return total;
+  }, 0);
   const multiclassCasterLevel = Math.max(1, Math.min(20, effectiveCasterLevel + thirdCasterLevel));
   const standardSlots =
     effectiveCasterLevel || thirdCasterLevel ? CLASS_PROGRESSION.fullCaster[multiclassCasterLevel] : null;
