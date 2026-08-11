@@ -12,6 +12,9 @@ import {
   orderBy,
   getDocs,
   limit,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import {
   getAuth,
@@ -43,6 +46,8 @@ const provider = new GoogleAuthProvider();
 let currentUser = null;
 let currentCharacterId = localStorage.getItem('dnd_char_id') || generateUUID();
 let isCloudOwner = true;
+let isCloudEditor = true;
+let currentEditorIds = [];
 let isLoading = false;
 let hasUnsavedChanges = false;
 let isAppReady = false;
@@ -110,10 +115,15 @@ async function updateMyCharactersList() {
   if (!currentUser) return;
   const select = document.getElementById('charSelect');
   try {
-    const q = query(collection(db, 'characters'), where('ownerId', '==', currentUser.uid));
-    const snap = await getDocs(q);
+    const [ownedSnap, editableSnap] = await Promise.all([
+      getDocs(query(collection(db, 'characters'), where('ownerId', '==', currentUser.uid))),
+      getDocs(query(collection(db, 'characters'), where('editorIds', 'array-contains', currentUser.uid))),
+    ]);
+    const characters = new Map();
+    ownedSnap.forEach((docSnap) => characters.set(docSnap.id, docSnap));
+    editableSnap.forEach((docSnap) => characters.set(docSnap.id, docSnap));
     select.innerHTML = '<option value="">My Characters...</option>';
-    snap.forEach((docSnap) => {
+    characters.forEach((docSnap) => {
       const d = docSnap.data();
       const opt = document.createElement('option');
       opt.value = docSnap.id;
@@ -153,7 +163,14 @@ function setupRealtimeListener() {
     if (docSnap.exists()) {
       const data = docSnap.data();
       isCloudOwner = currentUser.uid === data.ownerId;
-      document.getElementById('status').innerText = isCloudOwner ? 'Online (Owner)' : 'Online (Read Only)';
+      currentEditorIds = Array.isArray(data.editorIds) ? data.editorIds : [];
+      isCloudEditor = isCloudOwner || currentEditorIds.includes(currentUser.uid);
+      document.getElementById('status').innerText = isCloudOwner
+        ? 'Online (Owner)'
+        : isCloudEditor
+          ? 'Online (Editor)'
+          : 'Online (Read Only)';
+      updateEditorManagementVis();
 
       // Convert ISO string back to number for comparison logic
       const cloudTime = data.lastUpdated ? new Date(data.lastUpdated).getTime() : 0;
@@ -168,8 +185,11 @@ function setupRealtimeListener() {
       }
     } else {
       isCloudOwner = true;
+      isCloudEditor = true;
+      currentEditorIds = [];
       document.getElementById('status').innerText = 'Online (New)';
       updateDuplicateVis();
+      updateEditorManagementVis();
     }
   });
 
@@ -211,37 +231,26 @@ function loadHeadData(data, timestamp) {
 
 window.saveVersion = async function (isManualSnapshot = false) {
   if (!currentUser) return alert('Login required.');
-  if (!isCloudOwner) return alert('You can only save characters you own.');
+  if (!isCloudEditor) return alert('You can only save characters you own or edit.');
   const data = collectData();
   const now = new Date();
   const nowIso = now.toISOString();
   const todayStr = now.toLocaleDateString();
-  const className = document.getElementById('class').value.trim();
-  const level = document.getElementById('level').value.trim();
-  const parsedClasses = parseCharacterClasses();
-  const hasClassLevels = parsedClasses.classes.length > 0 && parsedClasses.classes.some((entry) => entry.level > 0);
-
-  // VALIDATION: Prevent saving if core identification is missing
-  if (!className || (!level && !hasClassLevels)) {
-    const statusEl = document.getElementById('status');
-    if (statusEl) statusEl.innerText = 'Error: Class and Level are required to save.';
-
-    if (isManualSnapshot) {
-      alert("Cannot save: Please enter a class and level, such as 'Fighter / Wizard' with '2 / 3'.");
-    }
-    return; // Stop the save process
-  }
 
   const charRef = doc(db, 'characters', currentCharacterId);
   try {
     // 1. Always update the main document (Head)
-    await setDoc(charRef, { ownerId: currentUser.uid, lastUpdated: nowIso, sheetData: data }, { merge: true });
+    await setDoc(
+      charRef,
+      { ...(isCloudOwner ? { ownerId: currentUser.uid } : {}), lastUpdated: nowIso, sheetData: data },
+      { merge: true },
+    );
 
     hasUnsavedChanges = false;
 
     const statusEl = document.getElementById('status');
     if (statusEl) {
-      statusEl.innerText = isCloudOwner ? 'Online (Saved)' : 'Online (Read Only)';
+      statusEl.innerText = isCloudOwner ? 'Online (Saved)' : 'Online (Editor Saved)';
       statusEl.style.color = '#aaa'; // Reset color
     }
 
@@ -1146,16 +1155,19 @@ async function loadSharedCharacter(sharedId) {
     if (targetData) {
       currentCharacterId = finalId;
       localStorage.setItem('dnd_char_id', currentCharacterId);
+      currentEditorIds = Array.isArray(targetData.editorIds) ? targetData.editorIds : [];
       populateData(targetData.sheetData);
       if (targetData.sheetData['portrait-url']) updatePortraitFromURL(targetData.sheetData['portrait-url']);
 
-      if (currentUser && targetData.ownerId === currentUser.uid) {
-        isCloudOwner = true;
+      if (currentUser && (targetData.ownerId === currentUser.uid || targetData.editorIds?.includes(currentUser.uid))) {
+        isCloudOwner = targetData.ownerId === currentUser.uid;
+        isCloudEditor = true;
         setupRealtimeListener();
-        document.getElementById('status').innerText = 'Online (Owner)';
+        document.getElementById('status').innerText = isCloudOwner ? 'Online (Owner)' : 'Online (Editor)';
       } else {
         // If not owner, just stop here. No listener = No "Access Control" error.
         isCloudOwner = false;
+        isCloudEditor = false;
         document.getElementById('status').innerText = 'Read Only Mode';
       }
     } else {
@@ -1167,6 +1179,7 @@ async function loadSharedCharacter(sharedId) {
     isLoading = false;
     updateModifiers();
     updateDuplicateVis();
+    updateEditorManagementVis();
   }
 }
 
@@ -1608,6 +1621,45 @@ function updateDuplicateVis() {
   const btn = document.getElementById('btn-duplicate');
   if (btn) btn.style.display = currentUser && !isCloudOwner ? 'inline-block' : 'none';
 }
+
+function updateEditorManagementVis() {
+  const btn = document.getElementById('btn-manage-editors');
+  if (btn) btn.style.display = currentUser && isCloudOwner ? 'inline-block' : 'none';
+}
+
+window.copyUserId = async function () {
+  if (!currentUser) return alert('Login required.');
+  try {
+    await navigator.clipboard.writeText(currentUser.uid);
+    alert('Your user ID copied! Share it with a character owner to be added as an editor.');
+  } catch (err) {
+    console.warn('Unable to copy user ID to clipboard', err);
+    prompt('Copy your user ID:', currentUser.uid);
+  }
+};
+
+window.manageEditors = async function () {
+  if (!currentUser || !isCloudOwner) return alert('Only the character owner can manage editors.');
+
+  const input = prompt('Enter an editor\'s user ID. Enter an existing editor ID to remove it.');
+  const editorId = input?.trim();
+  if (!editorId) return;
+  if (editorId === currentUser.uid) return alert('The owner already has edit access.');
+
+  const isExistingEditor = currentEditorIds.includes(editorId);
+  const action = isExistingEditor ? 'remove' : 'add';
+  if (!confirm(`${action === 'add' ? 'Add' : 'Remove'} this editor?`)) return;
+
+  try {
+    await updateDoc(doc(db, 'characters', currentCharacterId), {
+      editorIds: action === 'add' ? arrayUnion(editorId) : arrayRemove(editorId),
+    });
+    alert(`Editor ${action === 'add' ? 'added' : 'removed'}.`);
+  } catch (e) {
+    console.error('Editor update failed', e);
+    alert('Error updating editors: ' + e.message);
+  }
+};
 
 window.addWeaponRow = (item = null) => {
   const tbody = document.getElementById('weapons-body');
@@ -2334,11 +2386,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 window.addEventListener('beforeunload', (e) => {
-  const className = document.getElementById('class')?.value.trim();
-  const level = document.getElementById('level')?.value.trim();
-  const parsedClasses = parseCharacterClasses();
-  const hasClassLevels = parsedClasses.classes.length > 0 && parsedClasses.classes.some((entry) => entry.level > 0);
-  const cannotSave = !currentUser || !isCloudOwner || !className || (!level && !hasClassLevels) || !navigator.onLine;
+  const cannotSave = !currentUser || !isCloudEditor || !navigator.onLine;
 
   if (hasUnsavedChanges) {
     if (cannotSave) {
