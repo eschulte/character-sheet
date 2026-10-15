@@ -1644,7 +1644,7 @@ window.copyUserId = async function () {
 window.manageEditors = async function () {
   if (!currentUser || !isCloudOwner) return alert('Only the character owner can manage editors.');
 
-  const input = prompt('Enter an editor\'s user ID. Enter an existing editor ID to remove it.');
+  const input = prompt("Enter an editor's user ID. Enter an existing editor ID to remove it.");
   const editorId = input?.trim();
   if (!editorId) return;
   if (editorId === currentUser.uid) return alert('The owner already has edit access.');

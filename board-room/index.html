@@ -1,134 +1,1597 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Board Room</title>
-  <style>
-    :root { color-scheme: dark; font: 14px system-ui, sans-serif; background:#121923; color:#edf2f7; }
-    * { box-sizing:border-box } body { margin:0; min-width:320px } button,input,select { font:inherit }
-    header { padding:12px 16px; border-bottom:1px solid #344155; display:flex; justify-content:space-between; gap:12px; align-items:center }
-    h1 { font-size:1.1rem; margin:0 } .app { max-width:1440px; margin:auto; padding:16px }
-    .toolbar,.audio-controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:10px; background:#202b38; border:1px solid #344155 }
-    .toolbar { border-radius:8px 8px 0 0 } button { border:1px solid #536477; background:#334155; color:#fff; padding:6px 9px; border-radius:4px; cursor:pointer }
-    button:hover,button.active { background:#526b86 } button.active { outline:2px solid #f6c453 } label { display:flex; align-items:center; gap:4px; font-size:.82rem }
-    input,select { min-height:29px; max-width:125px; border:1px solid #536477; border-radius:3px; background:#17212e; color:#fff; padding:3px }
-    input[type=color] { padding:1px; width:38px } #viewport { height:calc(100vh - 195px); min-height:440px; position:relative; overflow:hidden; background:#aab8c8; border:2px solid #344155; touch-action:none }
-    #canvas { display:block; width:100%; height:100%; user-select:none } .hint { color:#a9b7c5; margin:9px 0; font-size:.85rem }
-    .editor { position:absolute; z-index:2; width:230px; padding:8px; display:grid; gap:6px; background:#17212e; border:1px solid #64748b; border-radius:5px; box-shadow:0 8px 18px #0009 }
-    .editor input { max-width:none; width:100% }.editor .row{display:flex;gap:5px}.diagnostic{color:#a9b7c5;font-size:.78rem;margin-left:auto}
-    .room-panel{margin-top:14px;border:1px solid #344155;background:#17212e;border-radius:8px;overflow:hidden}.room-panel h2{font-size:1rem;margin:0;padding:10px;background:#202b38}.room-join{padding:10px}.room-stage{height:250px;position:relative;overflow:hidden;background:radial-gradient(circle at center,#30465e,#17212e);touch-action:none}.person{position:absolute;width:78px;height:46px;transform:translate(-50%,-50%);border:2px solid #93c5fd;border-radius:23px;background:#1d4f78;color:#fff;display:grid;place-items:center;font-size:.76rem;text-align:center;cursor:grab;user-select:none}.person.self{border-color:#f6c453;background:#755b21}.room-status{font-size:.82rem;color:#a9b7c5;padding:0 10px 10px}
-    .workspace-tabs{display:flex;gap:8px;margin:0 0 10px}.workspace-tabs button{min-width:110px}.workspace-tabs button.active{background:#526b86;outline:2px solid #f6c453}.workspace-tab{display:none}.workspace-tab.active{display:block}
-    @media(max-width:700px){ .app{padding:8px} #viewport{height:calc(100vh - 250px)} .diagnostic{width:100%;margin-left:0} }
-  </style>
-</head>
-<body>
-  <header><h1>Board Room</h1><span id="diagnostic">Board ready</span></header>
-  <main class="app">
-    <nav class="workspace-tabs" aria-label="Workspace tabs"><button id="tab-board" class="active">Board</button><button id="tab-room">Room</button></nav>
-    <section id="board-tab" class="workspace-tab active" aria-label="Drawing board">
-    <section class="toolbar" aria-label="Board tools">
-      <button data-tool="select" class="active">Select</button><button data-tool="shape">Shape ▾</button><button data-tool="text">Text</button><button data-tool="emoji">Emoji</button><button data-tool="line">Line</button><button data-tool="draw">Draw</button><button id="delete">Delete</button>
-      <label>Shape ▾ <select id="shape"><option value="rectangle">Rectangle</option><option value="rounded-rectangle">Rounded rectangle</option><option value="ellipse">Ellipse / circle</option><option value="octagon">Octagon</option></select></label>
-      <label>Fill <input id="fill" type="color" value="#dbeafe"></label><label>Opacity <input id="opacity" type="range" min="0" max="1" step="0.05" value="1" title="Fill opacity"></label><label>Stroke <input id="stroke" type="color" value="#1e3a5f"></label>
-      <label>Content <input id="content" placeholder="Label or emoji" maxlength="80" aria-label="Shape label or emoji"></label>
-      <label>Line <input id="line-color" type="color" value="#dc2626"></label><label>Width <input id="line-width" type="number" min="1" max="20" value="3"></label>
-      <label>Preset <select id="preset"><option value="">Choose saved shape…</option></select></label><label><input id="preset-name" placeholder="Preset name" maxlength="40"></label><button id="save-preset" type="button">Save preset</button><button id="add-preset" type="button">Add preset</button>
-      <label>Background <select id="background"><option value="square-grid">Square grid</option><option value="hex-grid">Hex grid</option><option value="picture">Picture</option></select></label><label>Grid <input id="grid" type="number" min="10" max="200" value="50"></label>
-      <button id="pick-picture">Choose picture</button><input id="picture" type="file" accept="image/*" hidden>
-    </section>
-    <div id="viewport"><svg id="canvas" role="application" aria-label="Tactical map and diagram board"></svg></div>
-    <p class="hint">Select objects with a click, then drag to move or use the controls to edit them. Double-click text or shapes to edit. Text and emoji float freely; Draw makes paint-like room borders. Drag blank space to pan; wheel zooms.</p>
-    </section>
-    <section id="room-tab" class="workspace-tab" aria-label="Physical audio room">
-    <section class="room-panel" aria-label="Physical audio room"><h2>Physical room</h2><div class="room-join"><label>Room <input id="room-id" value="test-room" maxlength="64"></label> <label>Name <input id="participant-name" value="Guest" maxlength="30"></label> <button id="join-room">Join audio room</button> <button id="leave-room" disabled>Leave</button></div><div id="room-stage" class="room-stage" aria-label="Drag participants to change spatial audio"></div><div id="room-status" class="room-status">Not connected. Joining starts microphone capture and WebRTC signaling.</div></section>
-    <section class="audio-controls" aria-label="Local audio controls">
-      <button id="microphone">Enable microphone</button><button id="mic-mute">Mute microphone</button><label>Base volume <input id="base-volume" type="range" min="0" max="1" value="1" step="0.01"></label><button id="output-mute">Mute output</button><label>Output <input id="output-volume" type="range" min="0" max="1" value="1" step="0.01"></label><span class="diagnostic" id="audio-diagnostic">Audio not started</span>
-    </section>
-    </section>
-  </main>
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, doc, setDoc, addDoc, deleteDoc, onSnapshot, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-const firebaseConfig={apiKey:'AIzaSyAMfAkyUevv3BDKSO3yBjRra3jZ_uV5OlA',authDomain:'dnd-character-sheet-5e.firebaseapp.com',projectId:'dnd-character-sheet-5e',storageBucket:'dnd-character-sheet-5e.firebasestorage.app',messagingSenderId:'554732035132',appId:'1:554732035132:web:ed89be7af2ceea147a7739'};
-const firestore=getFirestore(initializeApp(firebaseConfig));
-/* Board state and room/audio state are intentionally separate. Board x/y NEVER control audio. */
-const NS='http://www.w3.org/2000/svg', $=id=>document.getElementById(id), uid=()=>crypto.randomUUID?.()||`${Date.now()}-${Math.random()}`;
-const boardState={ metadata:{background:{mode:'square-grid',gridSize:50,picture:{assetId:null,url:null}}}, objects:new Map() };
-const roomState={participants:new Map()}; // Reserved only for physical-room x/y, baseVolume and audio.
-let selected=null, tool='select', view={x:0,y:0,scale:1}, action=null, localPictureUrl=null;
-// A browser-tab session id is intentional until Firebase Auth supplies a durable participant identity.
-const clientId=uid(), channel=new BroadcastChannel('board-room-v1'); let sequence=0;
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Board Room</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font:
+          14px system-ui,
+          sans-serif;
+        background: #121923;
+        color: #edf2f7;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-width: 320px;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #344155;
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+      }
+      h1 {
+        font-size: 1.1rem;
+        margin: 0;
+      }
+      .app {
+        max-width: 1440px;
+        margin: auto;
+        padding: 16px;
+      }
+      .toolbar,
+      .audio-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        padding: 10px;
+        background: #202b38;
+        border: 1px solid #344155;
+      }
+      .toolbar {
+        border-radius: 8px 8px 0 0;
+      }
+      button {
+        border: 1px solid #536477;
+        background: #334155;
+        color: #fff;
+        padding: 6px 9px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover,
+      button.active {
+        background: #526b86;
+      }
+      button.active {
+        outline: 2px solid #f6c453;
+      }
+      label {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.82rem;
+      }
+      input,
+      select {
+        min-height: 29px;
+        max-width: 125px;
+        border: 1px solid #536477;
+        border-radius: 3px;
+        background: #17212e;
+        color: #fff;
+        padding: 3px;
+      }
+      input[type='color'] {
+        padding: 1px;
+        width: 38px;
+      }
+      #viewport {
+        height: calc(100vh - 195px);
+        min-height: 440px;
+        position: relative;
+        overflow: hidden;
+        background: #aab8c8;
+        border: 2px solid #344155;
+        touch-action: none;
+      }
+      #canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        user-select: none;
+      }
+      .hint {
+        color: #a9b7c5;
+        margin: 9px 0;
+        font-size: 0.85rem;
+      }
+      .editor {
+        position: absolute;
+        z-index: 2;
+        width: 230px;
+        padding: 8px;
+        display: grid;
+        gap: 6px;
+        background: #17212e;
+        border: 1px solid #64748b;
+        border-radius: 5px;
+        box-shadow: 0 8px 18px #0009;
+      }
+      .editor input {
+        max-width: none;
+        width: 100%;
+      }
+      .editor .row {
+        display: flex;
+        gap: 5px;
+      }
+      .diagnostic {
+        color: #a9b7c5;
+        font-size: 0.78rem;
+        margin-left: auto;
+      }
+      #diagnostic {
+        max-width: 55vw;
+        overflow-wrap: anywhere;
+        text-align: right;
+      }
+      .room-panel {
+        margin-top: 14px;
+        border: 1px solid #344155;
+        background: #17212e;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .room-panel h2 {
+        font-size: 1rem;
+        margin: 0;
+        padding: 10px;
+        background: #202b38;
+      }
+      .room-join {
+        padding: 10px;
+      }
+      .room-stage {
+        height: 250px;
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(circle at center, #30465e, #17212e);
+        touch-action: none;
+      }
+      .person {
+        position: absolute;
+        width: 78px;
+        height: 46px;
+        transform: translate(-50%, -50%);
+        border: 2px solid #93c5fd;
+        border-radius: 23px;
+        background: #1d4f78;
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 0.76rem;
+        text-align: center;
+        cursor: grab;
+        user-select: none;
+      }
+      .person.self {
+        border-color: #f6c453;
+        background: #755b21;
+      }
+      .room-status {
+        font-size: 0.82rem;
+        color: #a9b7c5;
+        padding: 0 10px 10px;
+      }
+      .construction {
+        margin: 14px 0;
+        padding: 18px;
+        text-align: center;
+        border: 2px dashed #f6c453;
+        border-radius: 8px;
+        background: #3a2f1b;
+        color: #fde68a;
+        font-size: 1rem;
+      }
+      .construction .cone {
+        font-size: 3rem;
+        display: block;
+      }
+      .workspace-tabs {
+        display: flex;
+        gap: 8px;
+        margin: 0 0 10px;
+      }
+      .workspace-tabs button {
+        min-width: 110px;
+      }
+      .workspace-tabs button.active {
+        background: #526b86;
+        outline: 2px solid #f6c453;
+      }
+      .workspace-tab {
+        display: none;
+      }
+      .workspace-tab.active {
+        display: block;
+      }
+      .board-help {
+        padding: 8px 10px;
+        margin: 10px 0;
+        color: #cbd5e1;
+        background: #17212e;
+        border: 1px solid #344155;
+        border-radius: 5px;
+      }
+      .board-help p {
+        margin: 6px 0;
+        font-size: 0.84rem;
+      }
+      @media (max-width: 700px) {
+        .app {
+          padding: 8px;
+        }
+        #viewport {
+          height: calc(100vh - 250px);
+        }
+        .diagnostic {
+          width: 100%;
+          margin-left: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Board Room</h1>
+      <span id="diagnostic">Board ready</span>
+    </header>
+    <main class="app">
+      <nav class="workspace-tabs" aria-label="Workspace tabs">
+        <button id="tab-board" class="active">Board</button><button id="tab-room">Room</button>
+      </nav>
+      <section id="board-tab" class="workspace-tab active" aria-label="Drawing board">
+        <section class="toolbar" aria-label="Board tools">
+          <button data-tool="select" class="active">Select</button><button data-tool="shape">Shape ▾</button
+          ><button data-tool="text">Text</button><button data-tool="emoji">Emoji</button
+          ><button data-tool="line">Line</button><button data-tool="draw">Draw</button
+          ><button id="delete">Delete</button><button id="save-board">Save board</button
+          ><button id="share-board">Copy share link</button>
+          <label
+            >Shape ▾
+            <select id="shape">
+              <option value="rectangle">Rectangle</option>
+              <option value="rounded-rectangle">Rounded rectangle</option>
+              <option value="ellipse">Ellipse / circle</option>
+              <option value="octagon">Octagon</option>
+            </select></label
+          >
+          <label>Fill <input id="fill" type="color" value="#dbeafe" /></label
+          ><label
+            >Opacity
+            <input id="opacity" type="range" min="0" max="1" step="0.05" value="1" title="Fill opacity" /></label
+          ><label>Stroke <input id="stroke" type="color" value="#1e3a5f" /></label>
+          <label
+            >Content
+            <input id="content" placeholder="Label or emoji" maxlength="80" aria-label="Shape label or emoji" /></label
+          ><label>Font <input id="font-size" type="number" min="8" max="96" value="18" title="Text size" /></label>
+          <label>Line <input id="line-color" type="color" value="#dc2626" /></label
+          ><label>Width <input id="line-width" type="number" min="1" max="20" value="3" /></label>
+          <label
+            >Preset
+            <select id="preset">
+              <option value="">Choose saved shape…</option>
+            </select></label
+          ><label><input id="preset-name" placeholder="Preset name" maxlength="40" /></label
+          ><button id="save-preset" type="button">Save preset</button
+          ><button id="add-preset" type="button">Add preset</button>
+          <label
+            >Background
+            <select id="background">
+              <option value="square-grid">Square grid</option>
+              <option value="hex-grid">Hex grid</option>
+              <option value="picture">Picture</option>
+            </select></label
+          ><label>Grid <input id="grid" type="number" min="10" max="200" value="50" /></label>
+          <button id="pick-picture">Choose picture</button><input id="picture" type="file" accept="image/*" hidden />
+        </section>
+        <details class="board-help" open>
+          <summary>Save and share this board</summary>
+          <p>
+            Use <b>Save board</b> to store the current map. Then use <b>Copy share link</b> and send the link to
+            collaborators; opening it loads the same board. Changes are live while everyone has the board open.
+          </p>
+          <p>
+            Click blank space to place a shared ripple marker. Double-click a shape or text to edit it, or select it and
+            edit Content / Font above. Copy and paste duplicate the selected object with a small offset.
+          </p>
+        </details>
+        <div id="viewport"><svg id="canvas" role="application" aria-label="Tactical map and diagram board"></svg></div>
+        <p class="hint">
+          Select objects with a click, then drag to move or use the controls to edit them. Double-click text or shapes
+          to edit. Text and emoji float freely; Draw makes paint-like room borders. Drag blank space to pan; wheel
+          zooms.
+        </p>
+      </section>
+      <section id="room-tab" class="workspace-tab" aria-label="Physical audio room">
+        <div class="construction" role="status">
+          <span class="cone">🚧</span>Room tools are under construction. Audio/spatial room controls are temporarily
+          unavailable.
+        </div>
+        <section class="room-panel" aria-label="Physical audio room">
+          <h2>Physical room</h2>
+          <div class="room-join">
+            <label>Room <input id="room-id" value="test-room" maxlength="64" /></label>
+            <label>Name <input id="participant-name" value="Guest" maxlength="30" /></label>
+            <button id="join-room">Join audio room</button> <button id="leave-room" disabled>Leave</button>
+          </div>
+          <div id="room-stage" class="room-stage" aria-label="Drag participants to change spatial audio"></div>
+          <div id="room-status" class="room-status">
+            Not connected. Joining starts microphone capture and WebRTC signaling.
+          </div>
+        </section>
+        <section class="audio-controls" aria-label="Local audio controls">
+          <button id="microphone">Enable microphone</button><button id="mic-mute">Mute microphone</button
+          ><label>Base volume <input id="base-volume" type="range" min="0" max="1" value="1" step="0.01" /></label
+          ><button id="output-mute">Mute output</button
+          ><label>Output <input id="output-volume" type="range" min="0" max="1" value="1" step="0.01" /></label
+          ><span class="diagnostic" id="audio-diagnostic">Audio not started</span>
+        </section>
+      </section>
+    </main>
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+      import {
+        getFirestore,
+        collection,
+        doc,
+        setDoc,
+        addDoc,
+        deleteDoc,
+        getDoc,
+        onSnapshot,
+        query,
+        where,
+      } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+      const firebaseConfig = {
+        apiKey: 'AIzaSyAMfAkyUevv3BDKSO3yBjRra3jZ_uV5OlA',
+        authDomain: 'dnd-character-sheet-5e.firebaseapp.com',
+        projectId: 'dnd-character-sheet-5e',
+        storageBucket: 'dnd-character-sheet-5e.firebasestorage.app',
+        messagingSenderId: '554732035132',
+        appId: '1:554732035132:web:ed89be7af2ceea147a7739',
+      };
+      const firestore = getFirestore(initializeApp(firebaseConfig));
+      /* Board state and room/audio state are intentionally separate. Board x/y NEVER control audio. */
+      const NS = 'http://www.w3.org/2000/svg',
+        $ = (id) => document.getElementById(id),
+        uid = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`;
+      const boardState = {
+        metadata: { background: { mode: 'square-grid', gridSize: 50, picture: { assetId: null, url: null } } },
+        objects: new Map(),
+      };
+      const roomState = { participants: new Map() }; // Reserved only for physical-room x/y, baseVolume and audio.
+      let selected = null,
+        tool = 'select',
+        view = { x: 0, y: 0, scale: 1 },
+        action = null,
+        localPictureUrl = null,
+        clipboardShape = null;
+      const pings = new Map();
+      let pingFrame = 0;
+      function animatePings() {
+        if (!pings.size) {
+          pingFrame = 0;
+          return;
+        }
+        render();
+        pingFrame = requestAnimationFrame(animatePings);
+      }
+      // A browser-tab session id is intentional until Firebase Auth supplies a durable participant identity.
+      const clientId = uid(),
+        channel = new BroadcastChannel('board-room-v1');
+      let sequence = 0;
 
-// Isolated transport adapter: replace send/onmessage with a WebRTC DataChannel; no renderer changes required.
-const sync={
-  send(operation){ channel.postMessage(operation); window.boardRoomBroadcast?.({kind:'board-op',operation}); },
-  emit(type,objectId,patch){ const op={protocol:'board-room-v1',channel:'board',opId:uid(),clientId,sequence:++sequence,type,objectId,patch,timestamp:Date.now()}; applyOperation(op); sync.send(op); },
-  receive(operation){ if(operation?.protocol==='board-room-v1'&&operation.clientId!==clientId) applyOperation(operation); }
-};
-channel.onmessage=e=>sync.receive(e.data); window.boardRoomSync=sync;
-function applyOperation(op){
-  if(op.type==='metadata') Object.assign(boardState.metadata.background,op.patch);
-  else if(op.type==='create') boardState.objects.set(op.objectId,op.patch);
-  else if(op.type==='update'&&boardState.objects.has(op.objectId)) Object.assign(boardState.objects.get(op.objectId),op.patch,{version:(boardState.objects.get(op.objectId).version||0)+1,updatedAt:op.timestamp,updatedBy:op.clientId});
-  else if(op.type==='delete') boardState.objects.delete(op.objectId);
-  render();
-}
-function el(name,attrs={}){const n=document.createElementNS(NS,name);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));return n}
-const svg=$('canvas'); function point(e){const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left-view.x)/view.scale,y:(e.clientY-r.top-view.y)/view.scale}}
-function background(defs){ const b=boardState.metadata.background, size=Math.max(10,+b.gridSize||50); if(b.mode==='picture'&&b.picture.url){const p=el('pattern',{id:'bg',width:1,height:1,patternUnits:'objectBoundingBox'}),im=el('image',{href:b.picture.url,width:'100%',height:'100%',preserveAspectRatio:'xMidYMid slice'});p.append(im);return defs.append(p),el('rect',{x:-10000,y:-10000,width:20000,height:20000,fill:'url(#bg)'})} const p=el('pattern',{id:'bg',width:size,height:size,patternUnits:'userSpaceOnUse'}); if(b.mode==='hex-grid'||b.mode==='octagonal-grid'){const r=size/2,h=Math.sqrt(3)*r,w=3*r; p.setAttribute('width',w);p.setAttribute('height',h);const hex=(cx,cy)=>el('path',{d:`M ${cx-r} ${cy} L ${cx-r/2} ${cy-h/2} L ${cx+r/2} ${cy-h/2} L ${cx+r} ${cy} L ${cx+r/2} ${cy+h/2} L ${cx-r/2} ${cy+h/2} Z`,fill:'none',stroke:'#7c8ca0','stroke-width':1});p.append(hex(r,h/2),hex(2.5*r,0),hex(2.5*r,h))} else p.append(el('path',{d:`M ${size} 0 L 0 0 0 ${size}`,fill:'none',stroke:'#7c8ca0','stroke-width':1}));defs.append(p);return [el('rect',{x:-10000,y:-10000,width:20000,height:20000,fill:'#e5edf5'}),el('rect',{x:-10000,y:-10000,width:20000,height:20000,fill:'url(#bg)'})] }
-function render(){svg.replaceChildren();const defs=el('defs'),arrow=el('marker',{id:'arrow',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:6,markerHeight:6,orient:'auto-start-reverse'});arrow.append(el('path',{d:'M 0 0 L 10 5 L 0 10 z',fill:'#111827'}));defs.append(arrow);svg.append(defs);const layer=el('g',{transform:`translate(${view.x} ${view.y}) scale(${view.scale})`}),bg=background(defs);layer.append(...(Array.isArray(bg)?bg:[bg]));svg.append(layer); [...boardState.objects.values()].sort((a,b)=>(a.zIndex||0)-(b.zIndex||0)).forEach(o=>{drawObject(layer,o);if(o.opacity!=null&&layer.lastElementChild)layer.lastElementChild.setAttribute('opacity',o.opacity)});if(action?.kind==='create'&&action.current){const s=action.start,e=action.current;drawObject(layer,{id:'preview',type:'shape-text',x:Math.min(s.x,e.x),y:Math.min(s.y,e.y),width:Math.max(1,Math.abs(e.x-s.x)),height:Math.max(1,Math.abs(e.y-s.y)),...settings(),opacity:.45})}if(action?.kind==='draw'&&action.points?.length>1)drawObject(layer,{id:'preview',type:'draw',path:action.points.map((p,i)=>`${i?'L':'M'} ${p.x} ${p.y}`).join(' '),stroke:$('line-color').value,strokeWidth:+$('line-width').value||3});}
-function drawObject(layer,o){const g=el('g',{'data-id':o.id,transform:o.rotation?`rotate(${o.rotation} ${o.x+o.width/2} ${o.y+o.height/2})`:''}); if(o.type==='line'){g.append(el('line',{x1:o.x1,y1:o.y1,x2:o.x2,y2:o.y2,stroke:o.stroke,'stroke-width':o.strokeWidth,'marker-end':o.arrowEnd?'url(#arrow)':''})); if(selected===o.id){[ [o.x1,o.y1,'start'],[o.x2,o.y2,'end']].forEach(([x,y,h])=>g.append(el('circle',{cx:x,cy:y,r:7,fill:'#fff',stroke:'#2563eb','stroke-width':2,'data-handle':h})));} layer.append(g);return} if(o.type==='draw'){g.append(el('path',{d:o.path,fill:'none',stroke:o.stroke,'stroke-width':o.strokeWidth,'stroke-linecap':'round','stroke-linejoin':'round'}));if(selected===o.id)g.append(el('path',{d:o.path,fill:'none',stroke:'#2563eb','stroke-width':o.strokeWidth+5,opacity:.45,'pointer-events':'none'}));layer.append(g);return}
- const attrs={fill:o.fill,stroke:o.stroke,'stroke-width':o.strokeWidth}; if(o.shape==='ellipse')g.append(el('ellipse',{cx:o.x+o.width/2,cy:o.y+o.height/2,rx:o.width/2,ry:o.height/2,...attrs})); else if(o.shape==='octagon'){const inset=Math.min(o.width,o.height)*.22,points=[[o.x+inset,o.y],[o.x+o.width-inset,o.y],[o.x+o.width,o.y+inset],[o.x+o.width,o.y+o.height-inset],[o.x+o.width-inset,o.y+o.height],[o.x+inset,o.y+o.height],[o.x,o.y+o.height-inset],[o.x,o.y+inset]].map(p=>p.join(',')).join(' ');g.append(el('polygon',{points,...attrs}))} else g.append(el('rect',{x:o.x,y:o.y,width:o.width,height:o.height,rx:o.shape==='rounded-rectangle'?14:0,...attrs}));
- const content=[o.emoji,o.text].filter(Boolean).join(o.emoji&&o.text?'\n':''); if(content){const t=el('text',{x:o.x+o.width/2,y:o.y+o.height/2,'text-anchor':o.textAlignment||'middle','dominant-baseline':'middle','font-size':o.textSize||18,fill:'#111827','pointer-events':'none'});content.split('\n').forEach((line,i)=>{const s=el('tspan',{x:o.x+o.width/2,dy:i?`${(o.textSize||18)*1.15}`:i===0&&content.includes('\n')?`${-(o.textSize||18)*.55}`:0});s.textContent=line;t.append(s)});g.append(t)} if(selected===o.id)g.append(el('rect',{x:o.x-4,y:o.y-4,width:o.width+8,height:o.height+8,fill:'none',stroke:'#2563eb','stroke-width':2,'stroke-dasharray':'5 3','pointer-events':'none'}),el('rect',{x:o.x+o.width-5,y:o.y+o.height-5,width:10,height:10,fill:'#fff',stroke:'#2563eb','data-handle':'resize'})); layer.append(g);}
-function settings(){return{shape:$('shape').value,fill:$('fill').value,opacity:+$('opacity').value,stroke:$('stroke').value,strokeWidth:2,text:$('content').value.trim(),emoji:'',textSize:18,textAlignment:'middle',rotation:0,zIndex:Date.now(),version:1,updatedAt:Date.now(),updatedBy:clientId}}
-function createShape(start,end,content=$('content').value){const id=uid(),x=Math.min(start.x,end.x),y=Math.min(start.y,end.y),o={id,type:'shape-text',x,y,width:Math.max(34,Math.abs(end.x-start.x)),height:Math.max(34,Math.abs(end.y-start.y)),...settings(),text:content.trim()};sync.emit('create',id,o);selected=id;return o}
-function createText(p,emoji=false){const id=uid(),o={id,type:'free-text',x:p.x,y:p.y,width:Math.max(40,($('content').value.length||1)*12),height:34,...settings(),text:emoji?'':$('content').value.trim()||'😊',emoji:emoji?($('content').value.trim()||'😊'):'',fill:'none',stroke:'none'};sync.emit('create',id,o);selected=id;return o}
-function createDrawing(points){if(points.length<2)return;const id=uid(),o={id,type:'draw',path:points.map((p,i)=>`${i?'L':'M'} ${p.x} ${p.y}`).join(' '),stroke:$('line-color').value,strokeWidth:+$('line-width').value||3,zIndex:Date.now(),version:1,updatedAt:Date.now(),updatedBy:clientId};sync.emit('create',id,o);selected=id;return o}
-function createLine(a,b){const id=uid(),o={id,type:'line',x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:$('line-color').value,strokeWidth:+$('line-width').value||3,arrowStart:false,arrowEnd:true,zIndex:Date.now(),version:1,updatedAt:Date.now(),updatedBy:clientId};sync.emit('create',id,o);selected=id;return o}
-function objectFromTarget(t){return t.closest?.('[data-id]')?.dataset.id||null}
-svg.addEventListener('pointerdown',e=>{const p=point(e);let id=objectFromTarget(e.target);const hit=[...boardState.objects.values()].find(o=>o.type==='free-text'&&p.x>=o.x&&p.x<=o.x+o.width&&p.y>=o.y&&p.y<=o.y+o.height);if(!id&&hit)id=hit.id;const handle=e.target.dataset?.handle; svg.setPointerCapture(e.pointerId); if(id){selected=id;const o=boardState.objects.get(id);action=handle?{kind:handle==='resize'?'resize':'endpoint',id,handle,start:p,original:{...o}}:{kind:o.type==='draw'?'select':'move',id,start:p,original:{...o}};render()} else if(tool==='shape'){action={kind:'create',start:p}} else if(tool==='text'||tool==='emoji'){const o=createText(p,tool==='emoji');openEditor(o,e.clientX,e.clientY)} else if(tool==='draw'){action={kind:'draw',points:[p]}} else if(tool==='line')action={kind:'line',start:p}; else {selected=null;action={kind:'pan',start:{x:e.clientX,y:e.clientY},original:{...view}};render()} });
-svg.addEventListener('pointermove',e=>{if(!action)return;const p=point(e);if(action.kind==='pan'){view.x=action.original.x+e.clientX-action.start.x;view.y=action.original.y+e.clientY-action.start.y;render();return}if(action.kind==='create'){action.current=p;render();return}if(action.kind==='line'||action.kind==='select')return;if(action.kind==='draw'){action.points.push(p);render();return}const o=action.original,dx=p.x-action.start.x,dy=p.y-action.start.y;let patch;if(action.kind==='move')patch=o.type==='line'?{x1:o.x1+dx,y1:o.y1+dy,x2:o.x2+dx,y2:o.y2+dy}:{x:o.x+dx,y:o.y+dy};else if(action.kind==='resize')patch={width:Math.max(24,o.width+dx),height:Math.max(24,o.height+dy)};else patch=action.handle==='start'?{x1:p.x,y1:p.y}:{x2:p.x,y2:p.y};Object.assign(boardState.objects.get(action.id),patch);render()});
-svg.addEventListener('pointerup',e=>{if(!action)return;const p=point(e),a=action;action=null;if(a.kind==='create'){const o=createShape(a.start,p);openEditor(o,e.clientX,e.clientY)}else if(a.kind==='line')createLine(a.start,p);else if(a.kind==='draw')createDrawing(a.points);else if(a.kind!=='pan'&&a.kind!=='select'&&a.id){const o=boardState.objects.get(a.id);sync.emit('update',a.id,a.kind==='move'? (o.type==='line'?{x1:o.x1,y1:o.y1,x2:o.x2,y2:o.y2}:{x:o.x,y:o.y}):a.kind==='resize'?{width:o.width,height:o.height}:a.handle==='start'?{x1:o.x1,y1:o.y1}:{x2:o.x2,y2:o.y2})}render()});
-svg.addEventListener('dblclick',e=>{const id=objectFromTarget(e.target),o=boardState.objects.get(id);if(o&&(o.type==='shape-text'||o.type==='free-text'))openEditor(o,e.clientX,e.clientY)});svg.addEventListener('wheel',e=>{e.preventDefault();const r=svg.getBoundingClientRect(),factor=e.deltaY<0?1.12:.89,next=Math.max(.25,Math.min(3,view.scale*factor));view.x=r.width/2-(r.width/2-view.x)*(next/view.scale);view.y=r.height/2-(r.height/2-view.y)*(next/view.scale);view.scale=next;render()},{passive:false});
-function openEditor(o,x,y){document.querySelector('.editor')?.remove();const box=document.createElement('form');box.className='editor';box.style.left=`${Math.min(x-$('viewport').getBoundingClientRect().left, $('viewport').clientWidth-240)}px`;box.style.top=`${Math.min(y-$('viewport').getBoundingClientRect().top, $('viewport').clientHeight-135)}px`;box.innerHTML=`<label>Content<input name="content" value="${escapeHtml(o.text||o.emoji)}" autofocus></label><div class="row"><button>Save</button><button type="button">Cancel</button></div>`;$('viewport').append(box);box.elements.content.focus();box.addEventListener('submit',e=>{e.preventDefault();sync.emit('update',o.id,{text:box.elements.content.value,emoji:''});box.remove()});box.querySelector('[type=button]').onclick=()=>box.remove()}
-function escapeHtml(s=''){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
-document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{tool=b.dataset.tool;document.querySelectorAll('[data-tool]').forEach(x=>x.classList.toggle('active',x===b))});$('delete').onclick=()=>{if(selected){sync.emit('delete',selected,{});selected=null}};document.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&selected&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){$('delete').click();e.preventDefault()}});
-function updateSelectedStyle(patch){const o=selected&&boardState.objects.get(selected);if(!o)return;Object.assign(o,patch);sync.emit('update',o.id,patch);render()}
-$('fill').oninput=e=>updateSelectedStyle({fill:e.target.value});$('opacity').oninput=e=>updateSelectedStyle({opacity:+e.target.value});$('stroke').oninput=e=>updateSelectedStyle({stroke:e.target.value});$('shape').onchange=e=>updateSelectedStyle({shape:e.target.value});$('line-color').oninput=e=>updateSelectedStyle({stroke:e.target.value});$('line-width').oninput=e=>updateSelectedStyle({strokeWidth:+e.target.value||1});
-$('content').oninput=e=>updateSelectedStyle({text:e.target.value,emoji:''});
-const presetKey='board-room-presets-v1';let presets=JSON.parse(localStorage.getItem(presetKey)||'[]');function refreshPresets(){const s=$('preset');s.innerHTML='<option value="">Choose saved shape…</option>'+presets.map((p,i)=>`<option value="${i}">${escapeHtml(p.name)}</option>`).join('')}function presetSettings(){const o=selected&&boardState.objects.get(selected);return{shape:$('shape').value,fill:$('fill').value,opacity:+$('opacity').value,stroke:$('stroke').value,strokeWidth:+$('line-width').value||2,text:$('content').value.trim(),width:o?.width||120,height:o?.height||80}}refreshPresets();$('save-preset').onclick=()=>{const name=$('preset-name').value.trim();if(!name)return;presets=presets.filter(p=>p.name!==name);presets.push({name,...presetSettings()});localStorage.setItem(presetKey,JSON.stringify(presets));$('preset-name').value='';refreshPresets();$('preset').value=String(presets.length-1)};$('add-preset').onclick=()=>{const p=presets[+$('preset').value];if(!p)return;const r=svg.getBoundingClientRect(),center=point({clientX:r.left+r.width/2,clientY:r.top+r.height/2}),o={id:uid(),type:'shape-text',x:center.x-p.width/2,y:center.y-p.height/2,width:p.width,height:p.height,shape:p.shape,fill:p.fill,opacity:p.opacity??1,stroke:p.stroke,strokeWidth:p.strokeWidth||2,text:p.text||'',emoji:'',textSize:18,textAlignment:'middle',zIndex:Date.now(),version:1,updatedAt:Date.now(),updatedBy:clientId};sync.emit('create',o.id,o);selected=o.id};
-$('background').onchange=e=>sync.emit('metadata',null,{mode:e.target.value});$('grid').onchange=e=>sync.emit('metadata',null,{gridSize:+e.target.value||50});$('pick-picture').onclick=()=>$('picture').click();$('picture').onchange=e=>{const file=e.target.files[0];if(!file)return;if(localPictureUrl)URL.revokeObjectURL(localPictureUrl);localPictureUrl=URL.createObjectURL(file);/* Asset reference only; replace this local adapter with Firebase Storage later. */sync.emit('metadata',null,{mode:'picture',picture:{assetId:`local:${file.name}:${file.size}`,url:localPictureUrl}});$('background').value='picture'};
+      // Isolated transport adapter: replace send/onmessage with a WebRTC DataChannel; no renderer changes required.
+      const sync = {
+        send(operation) {
+          channel.postMessage(operation);
+          window.boardRoomBroadcast?.({ kind: 'board-op', operation });
+        },
+        emit(type, objectId, patch) {
+          const op = {
+            protocol: 'board-room-v1',
+            channel: 'board',
+            opId: uid(),
+            clientId,
+            sequence: ++sequence,
+            type,
+            objectId,
+            patch,
+            timestamp: Date.now(),
+          };
+          applyOperation(op);
+          sync.send(op);
+        },
+        receive(operation) {
+          if (operation?.protocol === 'board-room-v1' && operation.clientId !== clientId) applyOperation(operation);
+        },
+      };
+      channel.onmessage = (e) => sync.receive(e.data);
+      window.boardRoomSync = sync;
+      function applyOperation(op) {
+        if (op.type === 'metadata') Object.assign(boardState.metadata.background, op.patch);
+        else if (op.type === 'create') boardState.objects.set(op.objectId, op.patch);
+        else if (op.type === 'update' && boardState.objects.has(op.objectId))
+          Object.assign(boardState.objects.get(op.objectId), op.patch, {
+            version: (boardState.objects.get(op.objectId).version || 0) + 1,
+            updatedAt: op.timestamp,
+            updatedBy: op.clientId,
+          });
+        else if (op.type === 'delete') boardState.objects.delete(op.objectId);
+        else if (op.type === 'ping') {
+          pings.set(op.opId, { ...op.patch, at: Date.now() });
+          if (!pingFrame) animatePings();
+          setTimeout(() => {
+            pings.delete(op.opId);
+            render();
+          }, 1800);
+        }
+        render();
+      }
+      function el(name, attrs = {}) {
+        const n = document.createElementNS(NS, name);
+        Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+        return n;
+      }
+      const svg = $('canvas');
+      function point(e) {
+        const r = svg.getBoundingClientRect();
+        return { x: (e.clientX - r.left - view.x) / view.scale, y: (e.clientY - r.top - view.y) / view.scale };
+      }
+      function background(defs) {
+        const b = boardState.metadata.background,
+          size = Math.max(10, +b.gridSize || 50);
+        if (b.mode === 'picture' && b.picture.url) {
+          const p = el('pattern', { id: 'bg', width: 1, height: 1, patternUnits: 'objectBoundingBox' }),
+            im = el('image', {
+              href: b.picture.url,
+              width: '100%',
+              height: '100%',
+              preserveAspectRatio: 'xMidYMid slice',
+            });
+          p.append(im);
+          return (defs.append(p), el('rect', { x: -10000, y: -10000, width: 20000, height: 20000, fill: 'url(#bg)' }));
+        }
+        const p = el('pattern', { id: 'bg', width: size, height: size, patternUnits: 'userSpaceOnUse' });
+        if (b.mode === 'hex-grid' || b.mode === 'octagonal-grid') {
+          const r = size / 2,
+            h = Math.sqrt(3) * r,
+            w = 3 * r;
+          p.setAttribute('width', w);
+          p.setAttribute('height', h);
+          const hex = (cx, cy) =>
+            el('path', {
+              d: `M ${cx - r} ${cy} L ${cx - r / 2} ${cy - h / 2} L ${cx + r / 2} ${cy - h / 2} L ${cx + r} ${cy} L ${cx + r / 2} ${cy + h / 2} L ${cx - r / 2} ${cy + h / 2} Z`,
+              fill: 'none',
+              stroke: '#7c8ca0',
+              'stroke-width': 1,
+            });
+          p.append(hex(r, h / 2), hex(2.5 * r, 0), hex(2.5 * r, h));
+        } else
+          p.append(
+            el('path', { d: `M ${size} 0 L 0 0 0 ${size}`, fill: 'none', stroke: '#7c8ca0', 'stroke-width': 1 }),
+          );
+        defs.append(p);
+        return [
+          el('rect', { x: -10000, y: -10000, width: 20000, height: 20000, fill: '#e5edf5' }),
+          el('rect', { x: -10000, y: -10000, width: 20000, height: 20000, fill: 'url(#bg)' }),
+        ];
+      }
+      function render() {
+        svg.replaceChildren();
+        const defs = el('defs'),
+          arrow = el('marker', {
+            id: 'arrow',
+            viewBox: '0 0 10 10',
+            refX: 9,
+            refY: 5,
+            markerWidth: 6,
+            markerHeight: 6,
+            orient: 'auto-start-reverse',
+          });
+        arrow.append(el('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: '#111827' }));
+        defs.append(arrow);
+        svg.append(defs);
+        const layer = el('g', { transform: `translate(${view.x} ${view.y}) scale(${view.scale})` }),
+          bg = background(defs);
+        layer.append(...(Array.isArray(bg) ? bg : [bg]));
+        svg.append(layer);
+        [...boardState.objects.values()]
+          .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
+          .forEach((o) => {
+            drawObject(layer, o);
+            if (o.opacity != null && layer.lastElementChild) layer.lastElementChild.setAttribute('opacity', o.opacity);
+          });
+        pings.forEach((p) => {
+          const age = Math.max(0, Date.now() - p.at),
+            radius = 10 + age * 0.12,
+            alpha = Math.max(0, 1 - age / 1800);
+          layer.append(
+            el('circle', {
+              cx: p.x,
+              cy: p.y,
+              r: radius,
+              fill: 'none',
+              stroke: '#f6c453',
+              'stroke-width': 3,
+              opacity: alpha,
+            }),
+            el('circle', { cx: p.x, cy: p.y, r: 4, fill: '#f6c453', opacity: alpha }),
+          );
+        });
+        if (action?.kind === 'create' && action.current) {
+          const s = action.start,
+            e = action.current;
+          drawObject(layer, {
+            id: 'preview',
+            type: 'shape-text',
+            x: Math.min(s.x, e.x),
+            y: Math.min(s.y, e.y),
+            width: Math.max(1, Math.abs(e.x - s.x)),
+            height: Math.max(1, Math.abs(e.y - s.y)),
+            ...settings(),
+            opacity: 0.45,
+          });
+        }
+        if (action?.kind === 'draw' && action.points?.length > 1)
+          drawObject(layer, {
+            id: 'preview',
+            type: 'draw',
+            path: action.points.map((p, i) => `${i ? 'L' : 'M'} ${p.x} ${p.y}`).join(' '),
+            stroke: $('line-color').value,
+            strokeWidth: +$('line-width').value || 3,
+          });
+      }
+      function drawObject(layer, o) {
+        const g = el('g', {
+          'data-id': o.id,
+          transform: o.rotation ? `rotate(${o.rotation} ${o.x + o.width / 2} ${o.y + o.height / 2})` : '',
+        });
+        if (o.type === 'line') {
+          g.append(
+            el('line', {
+              x1: o.x1,
+              y1: o.y1,
+              x2: o.x2,
+              y2: o.y2,
+              stroke: o.stroke,
+              'stroke-width': o.strokeWidth,
+              'marker-end': o.arrowEnd ? 'url(#arrow)' : '',
+            }),
+          );
+          if (selected === o.id) {
+            [
+              [o.x1, o.y1, 'start'],
+              [o.x2, o.y2, 'end'],
+            ].forEach(([x, y, h]) =>
+              g.append(
+                el('circle', {
+                  cx: x,
+                  cy: y,
+                  r: 7,
+                  fill: '#fff',
+                  stroke: '#2563eb',
+                  'stroke-width': 2,
+                  'data-handle': h,
+                }),
+              ),
+            );
+          }
+          layer.append(g);
+          return;
+        }
+        if (o.type === 'draw') {
+          g.append(
+            el('path', {
+              d: o.path,
+              fill: 'none',
+              stroke: o.stroke,
+              'stroke-width': o.strokeWidth,
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+            }),
+          );
+          if (selected === o.id)
+            g.append(
+              el('path', {
+                d: o.path,
+                fill: 'none',
+                stroke: '#2563eb',
+                'stroke-width': o.strokeWidth + 5,
+                opacity: 0.45,
+                'pointer-events': 'none',
+              }),
+            );
+          layer.append(g);
+          return;
+        }
+        const attrs = { fill: o.fill, stroke: o.stroke, 'stroke-width': o.strokeWidth };
+        if (o.shape === 'ellipse')
+          g.append(
+            el('ellipse', {
+              cx: o.x + o.width / 2,
+              cy: o.y + o.height / 2,
+              rx: o.width / 2,
+              ry: o.height / 2,
+              ...attrs,
+            }),
+          );
+        else if (o.shape === 'octagon') {
+          const inset = Math.min(o.width, o.height) * 0.22,
+            points = [
+              [o.x + inset, o.y],
+              [o.x + o.width - inset, o.y],
+              [o.x + o.width, o.y + inset],
+              [o.x + o.width, o.y + o.height - inset],
+              [o.x + o.width - inset, o.y + o.height],
+              [o.x + inset, o.y + o.height],
+              [o.x, o.y + o.height - inset],
+              [o.x, o.y + inset],
+            ]
+              .map((p) => p.join(','))
+              .join(' ');
+          g.append(el('polygon', { points, ...attrs }));
+        } else
+          g.append(
+            el('rect', {
+              x: o.x,
+              y: o.y,
+              width: o.width,
+              height: o.height,
+              rx: o.shape === 'rounded-rectangle' ? 14 : 0,
+              ...attrs,
+            }),
+          );
+        const content = [o.emoji, o.text].filter(Boolean).join(o.emoji && o.text ? '\n' : '');
+        if (content) {
+          const t = el('text', {
+            x: o.x + o.width / 2,
+            y: o.y + o.height / 2,
+            'text-anchor': o.textAlignment || 'middle',
+            'dominant-baseline': 'middle',
+            'font-size': o.textSize || 18,
+            fill: '#111827',
+            'pointer-events': 'none',
+          });
+          content.split('\n').forEach((line, i) => {
+            const s = el('tspan', {
+              x: o.x + o.width / 2,
+              dy: i
+                ? `${(o.textSize || 18) * 1.15}`
+                : i === 0 && content.includes('\n')
+                  ? `${-(o.textSize || 18) * 0.55}`
+                  : 0,
+            });
+            s.textContent = line;
+            t.append(s);
+          });
+          g.append(t);
+        }
+        if (selected === o.id)
+          g.append(
+            el('rect', {
+              x: o.x - 4,
+              y: o.y - 4,
+              width: o.width + 8,
+              height: o.height + 8,
+              fill: 'none',
+              stroke: '#2563eb',
+              'stroke-width': 2,
+              'stroke-dasharray': '5 3',
+              'pointer-events': 'none',
+            }),
+            el('rect', {
+              x: o.x + o.width - 5,
+              y: o.y + o.height - 5,
+              width: 10,
+              height: 10,
+              fill: '#fff',
+              stroke: '#2563eb',
+              'data-handle': 'resize',
+            }),
+          );
+        layer.append(g);
+      }
+      function settings() {
+        return {
+          shape: $('shape').value,
+          fill: $('fill').value,
+          opacity: +$('opacity').value,
+          stroke: $('stroke').value,
+          strokeWidth: 2,
+          text: $('content').value.trim(),
+          emoji: '',
+          textSize: 18,
+          textAlignment: 'middle',
+          rotation: 0,
+          zIndex: Date.now(),
+          version: 1,
+          updatedAt: Date.now(),
+          updatedBy: clientId,
+        };
+      }
+      function createShape(start, end, content = $('content').value) {
+        const id = uid(),
+          x = Math.min(start.x, end.x),
+          y = Math.min(start.y, end.y),
+          o = {
+            id,
+            type: 'shape-text',
+            x,
+            y,
+            width: Math.max(34, Math.abs(end.x - start.x)),
+            height: Math.max(34, Math.abs(end.y - start.y)),
+            ...settings(),
+            text: content.trim(),
+          };
+        sync.emit('create', id, o);
+        selected = id;
+        return o;
+      }
+      function createText(p, emoji = false) {
+        const id = uid(),
+          o = {
+            id,
+            type: 'free-text',
+            x: p.x,
+            y: p.y,
+            width: Math.max(40, ($('content').value.length || 1) * 12),
+            height: 34,
+            ...settings(),
+            text: emoji ? '' : $('content').value.trim() || '😊',
+            emoji: emoji ? $('content').value.trim() || '😊' : '',
+            fill: 'none',
+            stroke: 'none',
+          };
+        sync.emit('create', id, o);
+        selected = id;
+        return o;
+      }
+      function createDrawing(points) {
+        if (points.length < 2) return;
+        const id = uid(),
+          o = {
+            id,
+            type: 'draw',
+            path: points.map((p, i) => `${i ? 'L' : 'M'} ${p.x} ${p.y}`).join(' '),
+            stroke: $('line-color').value,
+            strokeWidth: +$('line-width').value || 3,
+            zIndex: Date.now(),
+            version: 1,
+            updatedAt: Date.now(),
+            updatedBy: clientId,
+          };
+        sync.emit('create', id, o);
+        selected = id;
+        return o;
+      }
+      function createLine(a, b) {
+        const id = uid(),
+          o = {
+            id,
+            type: 'line',
+            x1: a.x,
+            y1: a.y,
+            x2: b.x,
+            y2: b.y,
+            stroke: $('line-color').value,
+            strokeWidth: +$('line-width').value || 3,
+            arrowStart: false,
+            arrowEnd: true,
+            zIndex: Date.now(),
+            version: 1,
+            updatedAt: Date.now(),
+            updatedBy: clientId,
+          };
+        sync.emit('create', id, o);
+        selected = id;
+        return o;
+      }
+      function objectFromTarget(t) {
+        return t.closest?.('[data-id]')?.dataset.id || null;
+      }
+      svg.addEventListener('pointerdown', (e) => {
+        const p = point(e);
+        let id = objectFromTarget(e.target);
+        const hit = [...boardState.objects.values()].find(
+          (o) => o.type === 'free-text' && p.x >= o.x && p.x <= o.x + o.width && p.y >= o.y && p.y <= o.y + o.height,
+        );
+        if (!id && hit) id = hit.id;
+        const handle = e.target.dataset?.handle;
+        svg.setPointerCapture(e.pointerId);
+        if (id) {
+          selected = id;
+          const o = boardState.objects.get(id);
+          $('content').value = o.text || o.emoji || '';
+          $('font-size').value = o.textSize || 18;
+          action = handle
+            ? { kind: handle === 'resize' ? 'resize' : 'endpoint', id, handle, start: p, original: { ...o } }
+            : { kind: o.type === 'draw' ? 'select' : 'move', id, start: p, original: { ...o } };
+          render();
+        } else if (tool === 'shape') {
+          action = { kind: 'create', start: p };
+        } else if (tool === 'text' || tool === 'emoji') {
+          const o = createText(p, tool === 'emoji');
+          openEditor(o, e.clientX, e.clientY);
+        } else if (tool === 'draw') {
+          action = { kind: 'draw', points: [p] };
+        } else if (tool === 'line') action = { kind: 'line', start: p };
+        else {
+          selected = null;
+          action = { kind: 'pan', start: { x: e.clientX, y: e.clientY }, original: { ...view } };
+          render();
+        }
+      });
+      svg.addEventListener('pointermove', (e) => {
+        if (!action) return;
+        const p = point(e);
+        if (action.kind === 'pan') {
+          view.x = action.original.x + e.clientX - action.start.x;
+          view.y = action.original.y + e.clientY - action.start.y;
+          render();
+          return;
+        }
+        if (action.kind === 'create') {
+          action.current = p;
+          render();
+          return;
+        }
+        if (action.kind === 'line' || action.kind === 'select') return;
+        if (action.kind === 'draw') {
+          action.points.push(p);
+          render();
+          return;
+        }
+        const o = action.original,
+          dx = p.x - action.start.x,
+          dy = p.y - action.start.y;
+        let patch;
+        if (action.kind === 'move')
+          patch =
+            o.type === 'line'
+              ? { x1: o.x1 + dx, y1: o.y1 + dy, x2: o.x2 + dx, y2: o.y2 + dy }
+              : { x: o.x + dx, y: o.y + dy };
+        else if (action.kind === 'resize')
+          patch = { width: Math.max(24, o.width + dx), height: Math.max(24, o.height + dy) };
+        else patch = action.handle === 'start' ? { x1: p.x, y1: p.y } : { x2: p.x, y2: p.y };
+        Object.assign(boardState.objects.get(action.id), patch);
+        render();
+      });
+      svg.addEventListener('pointerup', (e) => {
+        if (!action) return;
+        const p = point(e),
+          a = action;
+        action = null;
+        if (a.kind === 'create') {
+          const o = createShape(a.start, p);
+          openEditor(o, e.clientX, e.clientY);
+        } else if (a.kind === 'line') createLine(a.start, p);
+        else if (a.kind === 'draw') createDrawing(a.points);
+        else if (a.kind === 'pan' && tool === 'select' && Math.hypot(e.clientX - a.start.x, e.clientY - a.start.y) < 5)
+          sync.emit('ping', null, { x: p.x, y: p.y });
+        else if (a.kind !== 'pan' && a.kind !== 'select' && a.id) {
+          const o = boardState.objects.get(a.id);
+          sync.emit(
+            'update',
+            a.id,
+            a.kind === 'move'
+              ? o.type === 'line'
+                ? { x1: o.x1, y1: o.y1, x2: o.x2, y2: o.y2 }
+                : { x: o.x, y: o.y }
+              : a.kind === 'resize'
+                ? { width: o.width, height: o.height }
+                : a.handle === 'start'
+                  ? { x1: o.x1, y1: o.y1 }
+                  : { x2: o.x2, y2: o.y2 },
+          );
+        }
+        render();
+      });
+      svg.addEventListener('dblclick', (e) => {
+        const p = point(e);
+        let id = objectFromTarget(e.target);
+        if (!id)
+          id = [...boardState.objects.values()].find(
+            (o) =>
+              (o.type === 'shape-text' || o.type === 'free-text') &&
+              p.x >= o.x &&
+              p.x <= o.x + o.width &&
+              p.y >= o.y &&
+              p.y <= o.y + o.height,
+          )?.id;
+        const o = boardState.objects.get(id);
+        if (o && (o.type === 'shape-text' || o.type === 'free-text')) openEditor(o, e.clientX, e.clientY);
+      });
+      svg.addEventListener(
+        'wheel',
+        (e) => {
+          e.preventDefault();
+          const r = svg.getBoundingClientRect(),
+            factor = e.deltaY < 0 ? 1.12 : 0.89,
+            next = Math.max(0.25, Math.min(3, view.scale * factor));
+          view.x = r.width / 2 - (r.width / 2 - view.x) * (next / view.scale);
+          view.y = r.height / 2 - (r.height / 2 - view.y) * (next / view.scale);
+          view.scale = next;
+          render();
+        },
+        { passive: false },
+      );
+      function openEditor(o, x, y) {
+        document.querySelector('.editor')?.remove();
+        const box = document.createElement('form');
+        box.className = 'editor';
+        box.style.left = `${Math.min(x - $('viewport').getBoundingClientRect().left, $('viewport').clientWidth - 240)}px`;
+        box.style.top = `${Math.min(y - $('viewport').getBoundingClientRect().top, $('viewport').clientHeight - 135)}px`;
+        box.innerHTML = `<label>Content<input name="content" value="${escapeHtml(o.text || o.emoji)}" autofocus></label><div class="row"><button>Save</button><button type="button">Cancel</button></div>`;
+        $('viewport').append(box);
+        box.elements.content.focus();
+        box.addEventListener('submit', (e) => {
+          e.preventDefault();
+          sync.emit('update', o.id, { text: box.elements.content.value, emoji: '' });
+          box.remove();
+        });
+        box.querySelector('[type=button]').onclick = () => box.remove();
+      }
+      function escapeHtml(s = '') {
+        return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+      }
+      document.querySelectorAll('[data-tool]').forEach(
+        (b) =>
+          (b.onclick = () => {
+            tool = b.dataset.tool;
+            document.querySelectorAll('[data-tool]').forEach((x) => x.classList.toggle('active', x === b));
+          }),
+      );
+      $('delete').onclick = () => {
+        if (selected) {
+          sync.emit('delete', selected, {});
+          selected = null;
+        }
+      };
+      document.addEventListener('keydown', (e) => {
+        const editing = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'c' && !editing && selected) {
+          const o = boardState.objects.get(selected);
+          if (o) {
+            clipboardShape = JSON.parse(JSON.stringify(o));
+            e.preventDefault();
+          }
+        } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'v' && !editing && clipboardShape) {
+          const o = JSON.parse(JSON.stringify(clipboardShape));
+          o.id = uid();
+          if (o.x != null) o.x += 20;
+          if (o.y != null) o.y += 20;
+          if (o.x1 != null) {
+            o.x1 += 20;
+            o.x2 += 20;
+            o.y1 += 20;
+            o.y2 += 20;
+          }
+          o.zIndex = Date.now();
+          sync.emit('create', o.id, o);
+          selected = o.id;
+          e.preventDefault();
+        } else if ((e.key === 'Delete' || e.key === 'Backspace') && selected && !editing) {
+          $('delete').click();
+          e.preventDefault();
+        }
+      });
+      function updateSelectedStyle(patch) {
+        const o = selected && boardState.objects.get(selected);
+        if (!o) return;
+        Object.assign(o, patch);
+        sync.emit('update', o.id, patch);
+        render();
+      }
+      $('fill').oninput = (e) => updateSelectedStyle({ fill: e.target.value });
+      $('opacity').oninput = (e) => updateSelectedStyle({ opacity: +e.target.value });
+      $('stroke').oninput = (e) => updateSelectedStyle({ stroke: e.target.value });
+      $('shape').onchange = (e) => updateSelectedStyle({ shape: e.target.value });
+      $('line-color').oninput = (e) => updateSelectedStyle({ stroke: e.target.value });
+      $('line-width').oninput = (e) => updateSelectedStyle({ strokeWidth: +e.target.value || 1 });
+      $('content').oninput = (e) => updateSelectedStyle({ text: e.target.value, emoji: '' });
+      $('font-size').oninput = (e) =>
+        updateSelectedStyle({ textSize: Math.max(8, Math.min(96, +e.target.value || 18)) });
+      const presetKey = 'board-room-presets-v1';
+      let presets = JSON.parse(localStorage.getItem(presetKey) || '[]');
+      function refreshPresets() {
+        const s = $('preset');
+        s.innerHTML =
+          '<option value="">Choose saved shape…</option>' +
+          presets.map((p, i) => `<option value="${i}">${escapeHtml(p.name)}</option>`).join('');
+      }
+      function presetSettings() {
+        const o = selected && boardState.objects.get(selected);
+        return {
+          shape: $('shape').value,
+          fill: $('fill').value,
+          opacity: +$('opacity').value,
+          stroke: $('stroke').value,
+          strokeWidth: +$('line-width').value || 2,
+          text: $('content').value.trim(),
+          textSize: +$('font-size').value || 18,
+          width: o?.width || 120,
+          height: o?.height || 80,
+        };
+      }
+      refreshPresets();
+      $('save-preset').onclick = () => {
+        const name = $('preset-name').value.trim();
+        if (!name) return;
+        presets = presets.filter((p) => p.name !== name);
+        presets.push({ name, ...presetSettings() });
+        localStorage.setItem(presetKey, JSON.stringify(presets));
+        $('preset-name').value = '';
+        refreshPresets();
+        $('preset').value = String(presets.length - 1);
+      };
+      $('add-preset').onclick = () => {
+        const p = presets[+$('preset').value];
+        if (!p) return;
+        const r = svg.getBoundingClientRect(),
+          center = point({ clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 }),
+          o = {
+            id: uid(),
+            type: 'shape-text',
+            x: center.x - p.width / 2,
+            y: center.y - p.height / 2,
+            width: p.width,
+            height: p.height,
+            shape: p.shape,
+            fill: p.fill,
+            opacity: p.opacity ?? 1,
+            stroke: p.stroke,
+            strokeWidth: p.strokeWidth || 2,
+            text: p.text || '',
+            emoji: '',
+            textSize: p.textSize || 18,
+            textAlignment: 'middle',
+            zIndex: Date.now(),
+            version: 1,
+            updatedAt: Date.now(),
+            updatedBy: clientId,
+          };
+        sync.emit('create', o.id, o);
+        selected = o.id;
+      };
+      $('background').onchange = (e) => sync.emit('metadata', null, { mode: e.target.value });
+      $('grid').onchange = (e) => sync.emit('metadata', null, { gridSize: +e.target.value || 50 });
+      $('pick-picture').onclick = () => $('picture').click();
+      $('picture').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (localPictureUrl) URL.revokeObjectURL(localPictureUrl);
+        localPictureUrl = URL.createObjectURL(file);
+        /* Asset reference only; replace this local adapter with Firebase Storage later. */ sync.emit(
+          'metadata',
+          null,
+          { mode: 'picture', picture: { assetId: `local:${file.name}:${file.size}`, url: localPictureUrl } },
+        );
+        $('background').value = 'picture';
+      };
+      const boardIdFromUrl = new URLSearchParams(location.search).get('board'),
+        boardId = boardIdFromUrl || uid().slice(0, 12);
+      console.info('[Board Room] Initialized', {
+        boardId,
+        boardIdFromUrl,
+        origin: location.origin,
+        href: location.href,
+        firestoreProject: firebaseConfig.projectId,
+      });
+      function boardPayload() {
+        return { metadata: boardState.metadata, objects: [...boardState.objects.values()], updatedAt: Date.now() };
+      }
+      function reportBoardStatus(message, details) {
+        $('diagnostic').textContent = message;
+        if (details) console.info('[Board Room]', message, details);
+        else console.info('[Board Room]', message);
+      }
+      function errorDetails(e) {
+        return {
+          name: e?.name || 'Error',
+          code: e?.code || null,
+          message: e?.message || String(e),
+          stack: e?.stack || null,
+        };
+      }
+      async function saveBoard() {
+        const payload = boardPayload(),
+          localKey = `board-${boardId}`;
+        console.info('[Board Room] Save started', {
+          boardId,
+          objectCount: payload.objects.length,
+          objectIds: payload.objects.map((o) => o.id),
+          project: firebaseConfig.projectId,
+        });
+        try {
+          await setDoc(doc(firestore, 'boardBoards', boardId), payload, { merge: true });
+          reportBoardStatus(`Saved to Firestore · board ${boardId} · ${payload.objects.length} objects`, {
+            boardId,
+            objectCount: payload.objects.length,
+          });
+        } catch (e) {
+          console.error('[Board Room] Firestore save failed; saving locally instead', { boardId, ...errorDetails(e) });
+          try {
+            localStorage.setItem(localKey, JSON.stringify(payload));
+            reportBoardStatus(`Saved locally only · board ${boardId} · ${payload.objects.length} objects`, {
+              boardId,
+              objectCount: payload.objects.length,
+              error: errorDetails(e),
+            });
+          } catch (localError) {
+            console.error('[Board Room] Local save also failed', {
+              boardId,
+              firestoreError: errorDetails(e),
+              localError: errorDetails(localError),
+            });
+            reportBoardStatus(
+              `Save failed · ${e?.code || e?.name || 'Firestore'}; local storage also failed · see console`,
+              { firestoreError: errorDetails(e), localError: errorDetails(localError) },
+            );
+          }
+        }
+      }
+      async function loadBoard() {
+        const localKey = `board-${boardId}`;
+        reportBoardStatus(`Loading board ${boardId}…`, {
+          boardId,
+          boardIdFromUrl,
+          origin: location.origin,
+          project: firebaseConfig.projectId,
+        });
+        try {
+          console.info('[Board Room] Firestore load started', { boardId, project: firebaseConfig.projectId });
+          const snap = await getDoc(doc(firestore, 'boardBoards', boardId));
+          if (snap.exists()) {
+            const data = snap.data();
+            Object.assign(boardState.metadata, data.metadata || {});
+            boardState.objects.clear();
+            (data.objects || []).forEach((o) => boardState.objects.set(o.id, o));
+            render();
+            reportBoardStatus(`Loaded from Firestore · board ${boardId} · ${boardState.objects.size} objects`, {
+              boardId,
+              source: 'firestore',
+              objectCount: boardState.objects.size,
+              updatedAt: data.updatedAt || null,
+            });
+            return;
+          }
+          console.info('[Board Room] Firestore document does not exist', { boardId });
+          const raw = localStorage.getItem(localKey);
+          if (raw) {
+            const data = JSON.parse(raw);
+            Object.assign(boardState.metadata, data.metadata || {});
+            boardState.objects.clear();
+            (data.objects || []).forEach((o) => boardState.objects.set(o.id, o));
+            render();
+            reportBoardStatus(`Loaded locally · board ${boardId} · ${boardState.objects.size} objects`, {
+              boardId,
+              source: 'localStorage',
+              objectCount: boardState.objects.size,
+              updatedAt: data.updatedAt || null,
+            });
+            return;
+          }
+          reportBoardStatus(
+            `Board not found · ${boardId} · Firestore has no document and this browser has no local copy`,
+            { boardId, source: 'empty', firestoreDocumentExists: false, localCopyExists: false },
+          );
+        } catch (e) {
+          console.error('[Board Room] Firestore load failed', { boardId, ...errorDetails(e) });
+          try {
+            const raw = localStorage.getItem(localKey);
+            if (raw) {
+              const data = JSON.parse(raw);
+              Object.assign(boardState.metadata, data.metadata || {});
+              boardState.objects.clear();
+              (data.objects || []).forEach((o) => boardState.objects.set(o.id, o));
+              render();
+              reportBoardStatus(
+                `Firestore unavailable · loaded local copy · board ${boardId} · ${boardState.objects.size} objects`,
+                {
+                  boardId,
+                  source: 'localStorage-after-firestore-error',
+                  objectCount: boardState.objects.size,
+                  error: errorDetails(e),
+                },
+              );
+              return;
+            }
+            reportBoardStatus(
+              `Load failed · ${e?.code || e?.name || 'Firestore'} · ${e?.message || e} · board ${boardId}`,
+              { boardId, source: 'none', localCopyExists: false, error: errorDetails(e) },
+            );
+          } catch (localError) {
+            console.error('[Board Room] Local fallback read failed', {
+              boardId,
+              firestoreError: errorDetails(e),
+              localError: errorDetails(localError),
+            });
+            reportBoardStatus(`Load failed · see console · board ${boardId}`, {
+              boardId,
+              firestoreError: errorDetails(e),
+              localError: errorDetails(localError),
+            });
+          }
+        }
+      }
+      $('save-board').onclick = saveBoard;
+      $('share-board').onclick = async () => {
+        const u = new URL(location.href);
+        u.searchParams.set('board', boardId);
+        try {
+          await navigator.clipboard.writeText(u.href);
+          reportBoardStatus(`Share link copied · board ${boardId}`, {
+            boardId,
+            shareUrl: u.href,
+            storage: 'Firestore required for cross-browser sharing',
+          });
+        } catch (e) {
+          console.error('[Board Room] Clipboard copy failed', { shareUrl: u.href, ...errorDetails(e) });
+          reportBoardStatus(`Could not copy link · board ${boardId} · see console`, {
+            boardId,
+            shareUrl: u.href,
+            error: errorDetails(e),
+          });
+        }
+      };
 
-// Explicit Web Audio mixer. Attach each remote decoded MediaStream independently; never mix before gain/pan.
-const VoiceMode={voice:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1,sampleRate:48000},highFidelity:{echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:2,sampleRate:48000}};
-class SpatialAudioMixer { constructor(){this.context=null;this.master=null;this.remoteAudio=new Map();this.outputMuted=false} async start(mode='voice'){const stream=await navigator.mediaDevices.getUserMedia({audio:VoiceMode[mode]||VoiceMode.voice});this.context=new AudioContext();this.master=this.context.createGain();this.master.connect(this.context.destination);const t=stream.getAudioTracks()[0],s=t.getSettings?.()||{};$('audio-diagnostic').textContent=`Mic ${s.sampleRate||'default'}Hz, ${s.channelCount||1} channel; ${t.readyState}`;return stream} addParticipant(id,stream){this.removeParticipant(id);const source=this.context.createMediaStreamSource(stream),gain=this.context.createGain(),panner=this.context.createStereoPanner();source.connect(gain).connect(panner).connect(this.master);this.remoteAudio.set(id,{stream,sourceNode:source,gainNode:gain,pannerNode:panner})} setParticipantVolume(id,volume){this.remoteAudio.get(id)?.gainNode.gain.setTargetAtTime(Math.max(0,Math.min(1,volume)),this.context.currentTime,.02)} setParticipantPan(id,pan){this.remoteAudio.get(id)?.pannerNode.pan.setTargetAtTime(Math.max(-1,Math.min(1,pan)),this.context.currentTime,.02)} removeParticipant(id){const r=this.remoteAudio.get(id);if(r){r.sourceNode.disconnect();r.gainNode.disconnect();r.pannerNode.disconnect();this.remoteAudio.delete(id)}} }
-const mixer=new SpatialAudioMixer();window.boardRoomAudio=mixer; let localTrack=null,localStream=null;$('microphone').onclick=async()=>{try{localStream??=await mixer.start();localTrack=localStream.getAudioTracks()[0];$('microphone').textContent='Microphone enabled'}catch(e){$('audio-diagnostic').textContent=`Microphone unavailable: ${e.message}`}};$('mic-mute').onclick=()=>{if(localTrack)localTrack.enabled=!localTrack.enabled;$('mic-mute').textContent=localTrack?.enabled?'Mute microphone':'Unmute microphone'};$('output-mute').onclick=()=>{if(!mixer.master)return;mixer.outputMuted=!mixer.outputMuted;mixer.master.gain.value=mixer.outputMuted?0:+$('output-volume').value;$('output-mute').textContent=mixer.outputMuted?'Unmute output':'Mute output'};$('output-volume').oninput=e=>{if(mixer.master&&!mixer.outputMuted)mixer.master.gain.value=+e.target.value};$('base-volume').oninput=e=>{window.boardRoomLocalState={...(window.boardRoomLocalState||{}),baseVolume:+e.target.value};sendPresence()};
-// Room transport calls this after position data arrives. Gain is computed locally, never transmitted per listener.
-window.updateSpatialAudio=(listener,speaker)=>{const d=Math.hypot(listener.x-speaker.x,listener.y-speaker.y),near=80,far=520,t=Math.max(0,Math.min(1,(d-near)/(far-near))),attenuation=d<=near?1:d>=far?0:1-(t*t*(3-2*t));mixer.setParticipantVolume(speaker.id,(speaker.baseVolume??1)*attenuation);mixer.setParticipantPan(speaker.id,Math.max(-1,Math.min(1,(speaker.x-listener.x)/far)))};
+      // Explicit Web Audio mixer. Attach each remote decoded MediaStream independently; never mix before gain/pan.
+      const VoiceMode = {
+        voice: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1,
+          sampleRate: 48000,
+        },
+        highFidelity: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          channelCount: 2,
+          sampleRate: 48000,
+        },
+      };
+      class SpatialAudioMixer {
+        constructor() {
+          this.context = null;
+          this.master = null;
+          this.remoteAudio = new Map();
+          this.outputMuted = false;
+        }
+        async start(mode = 'voice') {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: VoiceMode[mode] || VoiceMode.voice });
+          this.context = new AudioContext();
+          this.master = this.context.createGain();
+          this.master.connect(this.context.destination);
+          const t = stream.getAudioTracks()[0],
+            s = t.getSettings?.() || {};
+          $('audio-diagnostic').textContent =
+            `Mic ${s.sampleRate || 'default'}Hz, ${s.channelCount || 1} channel; ${t.readyState}`;
+          return stream;
+        }
+        addParticipant(id, stream) {
+          this.removeParticipant(id);
+          const source = this.context.createMediaStreamSource(stream),
+            gain = this.context.createGain(),
+            panner = this.context.createStereoPanner();
+          source.connect(gain).connect(panner).connect(this.master);
+          this.remoteAudio.set(id, { stream, sourceNode: source, gainNode: gain, pannerNode: panner });
+        }
+        setParticipantVolume(id, volume) {
+          this.remoteAudio
+            .get(id)
+            ?.gainNode.gain.setTargetAtTime(Math.max(0, Math.min(1, volume)), this.context.currentTime, 0.02);
+        }
+        setParticipantPan(id, pan) {
+          this.remoteAudio
+            .get(id)
+            ?.pannerNode.pan.setTargetAtTime(Math.max(-1, Math.min(1, pan)), this.context.currentTime, 0.02);
+        }
+        removeParticipant(id) {
+          const r = this.remoteAudio.get(id);
+          if (r) {
+            r.sourceNode.disconnect();
+            r.gainNode.disconnect();
+            r.pannerNode.disconnect();
+            this.remoteAudio.delete(id);
+          }
+        }
+      }
+      const mixer = new SpatialAudioMixer();
+      window.boardRoomAudio = mixer;
+      let localTrack = null,
+        localStream = null;
+      $('microphone').onclick = async () => {
+        try {
+          localStream ??= await mixer.start();
+          localTrack = localStream.getAudioTracks()[0];
+          $('microphone').textContent = 'Microphone enabled';
+        } catch (e) {
+          $('audio-diagnostic').textContent = `Microphone unavailable: ${e.message}`;
+        }
+      };
+      $('mic-mute').onclick = () => {
+        if (localTrack) localTrack.enabled = !localTrack.enabled;
+        $('mic-mute').textContent = localTrack?.enabled ? 'Mute microphone' : 'Unmute microphone';
+      };
+      $('output-mute').onclick = () => {
+        if (!mixer.master) return;
+        mixer.outputMuted = !mixer.outputMuted;
+        mixer.master.gain.value = mixer.outputMuted ? 0 : +$('output-volume').value;
+        $('output-mute').textContent = mixer.outputMuted ? 'Unmute output' : 'Mute output';
+      };
+      $('output-volume').oninput = (e) => {
+        if (mixer.master && !mixer.outputMuted) mixer.master.gain.value = +e.target.value;
+      };
+      $('base-volume').oninput = (e) => {
+        window.boardRoomLocalState = { ...(window.boardRoomLocalState || {}), baseVolume: +e.target.value };
+        sendPresence();
+      };
+      // Room transport calls this after position data arrives. Gain is computed locally, never transmitted per listener.
+      window.updateSpatialAudio = (listener, speaker) => {
+        const d = Math.hypot(listener.x - speaker.x, listener.y - speaker.y),
+          near = 80,
+          far = 520,
+          t = Math.max(0, Math.min(1, (d - near) / (far - near))),
+          attenuation = d <= near ? 1 : d >= far ? 0 : 1 - t * t * (3 - 2 * t);
+        mixer.setParticipantVolume(speaker.id, (speaker.baseVolume ?? 1) * attenuation);
+        mixer.setParticipantPan(speaker.id, Math.max(-1, Math.min(1, (speaker.x - listener.x) / far)));
+      };
 
-// Firestore is signaling only: SDP and ICE are short-lived messages. Audio and board operations travel directly over WebRTC.
-let roomId=null,peers=new Map(),presenceUnsub=null,signalUnsub=null,presenceTimer=null;
-const iceServers=[{urls:'stun:stun.l.google.com:19302'}]; // Add a TURN server before testing outside friendly networks.
-function status(s){$('room-status').textContent=s;$('diagnostic').textContent=s}
-function currentPresence(){return{id:clientId,name:$('participant-name').value.trim()||'Guest',x:roomState.participants.get(clientId)?.x??500,y:roomState.participants.get(clientId)?.y??500,baseVolume:+$('base-volume').value,updatedAt:Date.now()}}
-function roomRef(){return doc(firestore,'boardRooms',roomId)} function participantRef(id=clientId){return doc(firestore,'boardRooms',roomId,'participants',id)}
-async function signal(to,kind,payload){await addDoc(collection(roomRef(),'signals'),{to,from:clientId,kind,payload,createdAt:Date.now()})}
-function roomMessage(remoteId,data){try{const m=JSON.parse(data);if(m.kind==='board-op')sync.receive(m.operation);if(m.kind==='presence'){roomState.participants.set(remoteId,m.participant);renderRoom();updateSpatial()}}catch(e){console.warn('Invalid room data message',e)}}
-function wireDataChannel(id,dc){dc.onopen=()=>status(`Connected to ${peers.size} peer${peers.size===1?'':'s'}`);dc.onmessage=e=>roomMessage(id,e.data);dc.onclose=()=>status(`Data channel to ${id.slice(0,6)} closed`)}
-function createPeer(id,initiator=false){if(peers.has(id))return peers.get(id);const pc=new RTCPeerConnection({iceServers});const entry={pc,dc:null,candidates:[]};peers.set(id,entry);if(localStream)localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));pc.onicecandidate=e=>{if(e.candidate)signal(id,'candidate',e.candidate.toJSON()).catch(console.error)};pc.ontrack=e=>{mixer.addParticipant(id,e.streams[0]);updateSpatial()};pc.onconnectionstatechange=()=>{if(['failed','closed','disconnected'].includes(pc.connectionState)){mixer.removeParticipant(id);if(pc.connectionState==='failed')pc.restartIce?.()}status(`${id.slice(0,6)}: ${pc.connectionState}`)};pc.ondatachannel=e=>{entry.dc=e.channel;wireDataChannel(id,e.channel)};if(initiator){entry.dc=pc.createDataChannel('board-room-v1',{ordered:true});wireDataChannel(id,entry.dc)}return entry}
-async function offer(id){const entry=createPeer(id,true),desc=await entry.pc.createOffer();await entry.pc.setLocalDescription(desc);await signal(id,'offer',entry.pc.localDescription.toJSON())}
-async function handleSignal(message){const {from,kind,payload}=message;if(from===clientId)return;let entry=peers.get(from);if(kind==='offer'){entry=createPeer(from,false);await entry.pc.setRemoteDescription(payload);for(const c of entry.candidates.splice(0))await entry.pc.addIceCandidate(c);const answer=await entry.pc.createAnswer();await entry.pc.setLocalDescription(answer);await signal(from,'answer',entry.pc.localDescription.toJSON());return}if(kind==='candidate'&&!entry)entry=createPeer(from,false);if(!entry)return;if(kind==='answer'){await entry.pc.setRemoteDescription(payload);for(const c of entry.candidates.splice(0))await entry.pc.addIceCandidate(c);return}if(kind==='candidate'){if(entry.pc.remoteDescription)await entry.pc.addIceCandidate(payload);else entry.candidates.push(payload)}}
-function updateSpatial(){const listener=roomState.participants.get(clientId);if(!listener)return;for(const speaker of roomState.participants.values())if(speaker.id!==clientId)window.updateSpatialAudio(listener,speaker)}
-function renderRoom(){const stage=$('room-stage');stage.replaceChildren();for(const p of roomState.participants.values()){const node=document.createElement('div');node.className=`person ${p.id===clientId?'self':''}`;node.dataset.id=p.id;node.style.left=`${p.x/10}%`;node.style.top=`${p.y/10}%`;node.textContent=p.name;stage.append(node)}}
-function broadcast(message){for(const {dc} of peers.values())if(dc?.readyState==='open')dc.send(JSON.stringify(message))}window.boardRoomBroadcast=broadcast;
-function sendPresence(){if(!roomId)return;const p=currentPresence();roomState.participants.set(clientId,p);broadcast({kind:'presence',participant:p});renderRoom();updateSpatial();clearTimeout(presenceTimer);presenceTimer=setTimeout(()=>setDoc(participantRef(),p),80)}
-$('room-stage').addEventListener('pointerdown',e=>{const id=e.target.dataset.id;if(id!==clientId)return;const stage=e.currentTarget,move=ev=>{const r=stage.getBoundingClientRect();const p=roomState.participants.get(clientId);p.x=Math.max(0,Math.min(1000,(ev.clientX-r.left)/r.width*1000));p.y=Math.max(0,Math.min(1000,(ev.clientY-r.top)/r.height*1000));sendPresence()};stage.setPointerCapture(e.pointerId);move(e);stage.onpointermove=move;stage.onpointerup=()=>{stage.onpointermove=null;stage.onpointerup=null}});
-async function joinRoom(){if(roomId)return;try{localStream??=await mixer.start();localTrack=localStream.getAudioTracks()[0];roomId=$('room-id').value.trim().replace(/[^a-zA-Z0-9_-]/g,'').slice(0,64);if(!roomId)throw new Error('Enter a room name');await setDoc(roomRef(),{protocol:'board-room-v1',updatedAt:Date.now()},{merge:true});sendPresence();presenceUnsub=onSnapshot(collection(roomRef(),'participants'),snap=>{snap.forEach(d=>roomState.participants.set(d.id,d.data()));renderRoom();updateSpatial();for(const p of roomState.participants.values())if(p.id!==clientId&&clientId<p.id&&!peers.has(p.id))offer(p.id).catch(console.error)});signalUnsub=onSnapshot(query(collection(roomRef(),'signals'),where('to','==',clientId)),snap=>snap.docChanges().forEach(async change=>{if(change.type==='added'){try{await handleSignal(change.doc.data())}catch(e){console.error(e);status(`Signal error: ${e.message}`)}await deleteDoc(change.doc.ref)}}));$('join-room').disabled=true;$('leave-room').disabled=false;$('microphone').textContent='Microphone enabled';status(`Joined ${roomId}; waiting for peers`)}catch(e){roomId=null;status(`Could not join: ${e.message}`)}}
-async function leaveRoom(){presenceUnsub?.();signalUnsub?.();presenceUnsub=signalUnsub=null;for(const [id,{pc}] of peers){pc.close();mixer.removeParticipant(id)}peers.clear();if(roomId)await deleteDoc(participantRef()).catch(()=>{});roomState.participants.clear();renderRoom();roomId=null;$('join-room').disabled=false;$('leave-room').disabled=true;status('Left room')}
-$('join-room').onclick=joinRoom;$('leave-room').onclick=leaveRoom;window.addEventListener('pagehide',()=>{if(roomId)deleteDoc(participantRef()).catch(()=>{})});
-function switchWorkspace(tab){const board=tab==='board';$('board-tab').classList.toggle('active',board);$('room-tab').classList.toggle('active',!board);$('tab-board').classList.toggle('active',board);$('tab-room').classList.toggle('active',!board);if(board)render()}
-$('tab-board').onclick=()=>switchWorkspace('board');$('tab-room').onclick=()=>switchWorkspace('room');
-render();
-</script>
-</body></html>
+      // Firestore is signaling only: SDP and ICE are short-lived messages. Audio and board operations travel directly over WebRTC.
+      let roomId = null,
+        peers = new Map(),
+        presenceUnsub = null,
+        signalUnsub = null,
+        presenceTimer = null;
+      const iceServers = [{ urls: 'stun:stun.l.google.com:19302' }]; // Add a TURN server before testing outside friendly networks.
+      function status(s) {
+        $('room-status').textContent = s;
+        $('diagnostic').textContent = s;
+      }
+      function currentPresence() {
+        return {
+          id: clientId,
+          name: $('participant-name').value.trim() || 'Guest',
+          x: roomState.participants.get(clientId)?.x ?? 500,
+          y: roomState.participants.get(clientId)?.y ?? 500,
+          baseVolume: +$('base-volume').value,
+          updatedAt: Date.now(),
+        };
+      }
+      function roomRef() {
+        return doc(firestore, 'boardRooms', roomId);
+      }
+      function participantRef(id = clientId) {
+        return doc(firestore, 'boardRooms', roomId, 'participants', id);
+      }
+      async function signal(to, kind, payload) {
+        await addDoc(collection(roomRef(), 'signals'), { to, from: clientId, kind, payload, createdAt: Date.now() });
+      }
+      function roomMessage(remoteId, data) {
+        try {
+          const m = JSON.parse(data);
+          if (m.kind === 'board-op') sync.receive(m.operation);
+          if (m.kind === 'presence') {
+            roomState.participants.set(remoteId, m.participant);
+            renderRoom();
+            updateSpatial();
+          }
+        } catch (e) {
+          console.warn('Invalid room data message', e);
+        }
+      }
+      function wireDataChannel(id, dc) {
+        dc.onopen = () => status(`Connected to ${peers.size} peer${peers.size === 1 ? '' : 's'}`);
+        dc.onmessage = (e) => roomMessage(id, e.data);
+        dc.onclose = () => status(`Data channel to ${id.slice(0, 6)} closed`);
+      }
+      function createPeer(id, initiator = false) {
+        if (peers.has(id)) return peers.get(id);
+        const pc = new RTCPeerConnection({ iceServers });
+        const entry = { pc, dc: null, candidates: [] };
+        peers.set(id, entry);
+        if (localStream) localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
+        pc.onicecandidate = (e) => {
+          if (e.candidate) signal(id, 'candidate', e.candidate.toJSON()).catch(console.error);
+        };
+        pc.ontrack = (e) => {
+          mixer.addParticipant(id, e.streams[0]);
+          updateSpatial();
+        };
+        pc.onconnectionstatechange = () => {
+          if (['failed', 'closed', 'disconnected'].includes(pc.connectionState)) {
+            mixer.removeParticipant(id);
+            if (pc.connectionState === 'failed') pc.restartIce?.();
+          }
+          status(`${id.slice(0, 6)}: ${pc.connectionState}`);
+        };
+        pc.ondatachannel = (e) => {
+          entry.dc = e.channel;
+          wireDataChannel(id, e.channel);
+        };
+        if (initiator) {
+          entry.dc = pc.createDataChannel('board-room-v1', { ordered: true });
+          wireDataChannel(id, entry.dc);
+        }
+        return entry;
+      }
+      async function offer(id) {
+        const entry = createPeer(id, true),
+          desc = await entry.pc.createOffer();
+        await entry.pc.setLocalDescription(desc);
+        await signal(id, 'offer', entry.pc.localDescription.toJSON());
+      }
+      async function handleSignal(message) {
+        const { from, kind, payload } = message;
+        if (from === clientId) return;
+        let entry = peers.get(from);
+        if (kind === 'offer') {
+          entry = createPeer(from, false);
+          await entry.pc.setRemoteDescription(payload);
+          for (const c of entry.candidates.splice(0)) await entry.pc.addIceCandidate(c);
+          const answer = await entry.pc.createAnswer();
+          await entry.pc.setLocalDescription(answer);
+          await signal(from, 'answer', entry.pc.localDescription.toJSON());
+          return;
+        }
+        if (kind === 'candidate' && !entry) entry = createPeer(from, false);
+        if (!entry) return;
+        if (kind === 'answer') {
+          await entry.pc.setRemoteDescription(payload);
+          for (const c of entry.candidates.splice(0)) await entry.pc.addIceCandidate(c);
+          return;
+        }
+        if (kind === 'candidate') {
+          if (entry.pc.remoteDescription) await entry.pc.addIceCandidate(payload);
+          else entry.candidates.push(payload);
+        }
+      }
+      function updateSpatial() {
+        const listener = roomState.participants.get(clientId);
+        if (!listener) return;
+        for (const speaker of roomState.participants.values())
+          if (speaker.id !== clientId) window.updateSpatialAudio(listener, speaker);
+      }
+      function renderRoom() {
+        const stage = $('room-stage');
+        stage.replaceChildren();
+        for (const p of roomState.participants.values()) {
+          const node = document.createElement('div');
+          node.className = `person ${p.id === clientId ? 'self' : ''}`;
+          node.dataset.id = p.id;
+          node.style.left = `${p.x / 10}%`;
+          node.style.top = `${p.y / 10}%`;
+          node.textContent = p.name;
+          stage.append(node);
+        }
+      }
+      function broadcast(message) {
+        for (const { dc } of peers.values()) if (dc?.readyState === 'open') dc.send(JSON.stringify(message));
+      }
+      window.boardRoomBroadcast = broadcast;
+      function sendPresence() {
+        if (!roomId) return;
+        const p = currentPresence();
+        roomState.participants.set(clientId, p);
+        broadcast({ kind: 'presence', participant: p });
+        renderRoom();
+        updateSpatial();
+        clearTimeout(presenceTimer);
+        presenceTimer = setTimeout(() => setDoc(participantRef(), p), 80);
+      }
+      $('room-stage').addEventListener('pointerdown', (e) => {
+        const id = e.target.dataset.id;
+        if (id !== clientId) return;
+        const stage = e.currentTarget,
+          move = (ev) => {
+            const r = stage.getBoundingClientRect();
+            const p = roomState.participants.get(clientId);
+            p.x = Math.max(0, Math.min(1000, ((ev.clientX - r.left) / r.width) * 1000));
+            p.y = Math.max(0, Math.min(1000, ((ev.clientY - r.top) / r.height) * 1000));
+            sendPresence();
+          };
+        stage.setPointerCapture(e.pointerId);
+        move(e);
+        stage.onpointermove = move;
+        stage.onpointerup = () => {
+          stage.onpointermove = null;
+          stage.onpointerup = null;
+        };
+      });
+      async function joinRoom() {
+        if (roomId) return;
+        try {
+          localStream ??= await mixer.start();
+          localTrack = localStream.getAudioTracks()[0];
+          roomId = $('room-id')
+            .value.trim()
+            .replace(/[^a-zA-Z0-9_-]/g, '')
+            .slice(0, 64);
+          if (!roomId) throw new Error('Enter a room name');
+          await setDoc(roomRef(), { protocol: 'board-room-v1', updatedAt: Date.now() }, { merge: true });
+          sendPresence();
+          presenceUnsub = onSnapshot(collection(roomRef(), 'participants'), (snap) => {
+            snap.forEach((d) => roomState.participants.set(d.id, d.data()));
+            renderRoom();
+            updateSpatial();
+            for (const p of roomState.participants.values())
+              if (p.id !== clientId && clientId < p.id && !peers.has(p.id)) offer(p.id).catch(console.error);
+          });
+          signalUnsub = onSnapshot(query(collection(roomRef(), 'signals'), where('to', '==', clientId)), (snap) =>
+            snap.docChanges().forEach(async (change) => {
+              if (change.type === 'added') {
+                try {
+                  await handleSignal(change.doc.data());
+                } catch (e) {
+                  console.error(e);
+                  status(`Signal error: ${e.message}`);
+                }
+                await deleteDoc(change.doc.ref);
+              }
+            }),
+          );
+          $('join-room').disabled = true;
+          $('leave-room').disabled = false;
+          $('microphone').textContent = 'Microphone enabled';
+          status(`Joined ${roomId}; waiting for peers`);
+        } catch (e) {
+          roomId = null;
+          status(`Could not join: ${e.message}`);
+        }
+      }
+      async function leaveRoom() {
+        presenceUnsub?.();
+        signalUnsub?.();
+        presenceUnsub = signalUnsub = null;
+        for (const [id, { pc }] of peers) {
+          pc.close();
+          mixer.removeParticipant(id);
+        }
+        peers.clear();
+        if (roomId) await deleteDoc(participantRef()).catch(() => {});
+        roomState.participants.clear();
+        renderRoom();
+        roomId = null;
+        $('join-room').disabled = false;
+        $('leave-room').disabled = true;
+        status('Left room');
+      }
+      $('join-room').onclick = joinRoom;
+      $('leave-room').onclick = leaveRoom;
+      window.addEventListener('pagehide', () => {
+        if (roomId) deleteDoc(participantRef()).catch(() => {});
+      });
+      function switchWorkspace(tab) {
+        const board = tab === 'board';
+        $('board-tab').classList.toggle('active', board);
+        $('room-tab').classList.toggle('active', !board);
+        $('tab-board').classList.toggle('active', board);
+        $('tab-room').classList.toggle('active', !board);
+        if (board) render();
+      }
+      $('tab-board').onclick = () => switchWorkspace('board');
+      $('tab-room').onclick = () => switchWorkspace('room');
+      render();
+      loadBoard();
+    </script>
+  </body>
+</html>
