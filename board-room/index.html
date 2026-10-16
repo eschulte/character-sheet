@@ -417,6 +417,7 @@
           };
           applyOperation(op);
           sync.send(op);
+          persistLiveBoard(op);
         },
         receive(operation) {
           if (operation?.protocol === 'board-room-v1' && operation.clientId !== clientId) applyOperation(operation);
@@ -1087,6 +1088,8 @@
       };
       const boardIdFromUrl = new URLSearchParams(location.search).get('board'),
         boardId = boardIdFromUrl || uid().slice(0, 12);
+      let boardUnsubscribe = null;
+      let liveWriteChain = Promise.resolve();
       console.info('[Board Room] Initialized', {
         boardId,
         boardIdFromUrl,
@@ -1095,7 +1098,62 @@
         firestoreProject: firebaseConfig.projectId,
       });
       function boardPayload() {
-        return { metadata: boardState.metadata, objects: [...boardState.objects.values()], updatedAt: Date.now() };
+        return {
+          metadata: boardState.metadata,
+          objects: [...boardState.objects.values()],
+          updatedAt: Date.now(),
+          updatedBy: clientId,
+        };
+      }
+      function attachLiveBoardListener() {
+        boardUnsubscribe?.();
+        boardUnsubscribe = onSnapshot(
+          doc(firestore, 'boardBoards', boardId),
+          (snap) => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            if (data.updatedBy === clientId) return;
+            boardState.metadata = data.metadata || boardState.metadata;
+            boardState.objects.clear();
+            (data.objects || []).forEach((o) => boardState.objects.set(o.id, o));
+            render();
+            console.info('[Board Room] Live board update received', {
+              boardId,
+              objectCount: boardState.objects.size,
+              updatedBy: data.updatedBy || null,
+              updatedAt: data.updatedAt || null,
+            });
+          },
+          (e) => console.error('[Board Room] Live board listener failed', { boardId, ...errorDetails(e) }),
+        );
+      }
+      function persistLiveBoard(operation) {
+        // Serialize writes so rapid edits cannot finish out of order and replace newer board state.
+        liveWriteChain = liveWriteChain
+          .catch(() => {})
+          .then(() =>
+            setDoc(
+              doc(firestore, 'boardBoards', boardId),
+              { ...boardPayload(), lastOperationId: operation.opId },
+              { merge: true },
+            ),
+          )
+          .then(() =>
+            console.info('[Board Room] Live edit saved', {
+              boardId,
+              operationId: operation.opId,
+              type: operation.type,
+              objectCount: boardState.objects.size,
+            }),
+          )
+          .catch((e) =>
+            console.error('[Board Room] Live edit save failed', {
+              boardId,
+              operationId: operation.opId,
+              type: operation.type,
+              ...errorDetails(e),
+            }),
+          );
       }
       function reportBoardStatus(message, details) {
         $('diagnostic').textContent = message;
@@ -1170,6 +1228,7 @@
               objectCount: boardState.objects.size,
               updatedAt: data.updatedAt || null,
             });
+            attachLiveBoardListener();
             return;
           }
           console.info('[Board Room] Firestore document does not exist', { boardId });
@@ -1192,6 +1251,7 @@
             `Board not found · ${boardId} · Firestore has no document and this browser has no local copy`,
             { boardId, source: 'empty', firestoreDocumentExists: false, localCopyExists: false },
           );
+          attachLiveBoardListener();
         } catch (e) {
           console.error('[Board Room] Firestore load failed', { boardId, ...errorDetails(e) });
           try {
