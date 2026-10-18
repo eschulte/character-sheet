@@ -342,8 +342,8 @@
               <button id="save-preset" type="button">Save preset</button><button id="add-preset" type="button">Add preset</button>
               <label>Background
                 <select id="background">
+                  <option value="hex-grid" selected>Hex grid</option>
                   <option value="square-grid">Square grid</option>
-                  <option value="hex-grid">Hex grid</option>
                 </select>
               </label>
               <label>Grid <input id="grid" type="number" min="10" max="200" value="50" /></label>
@@ -425,7 +425,7 @@
         $ = (id) => document.getElementById(id),
         uid = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`;
       const boardState = {
-        metadata: { background: { mode: 'square-grid', gridSize: 50 } },
+        metadata: { background: { mode: 'hex-grid', gridSize: 50 } },
         objects: new Map(),
       };
       const roomState = { participants: new Map() }; // Reserved only for physical-room x/y, baseVolume and audio.
@@ -1141,6 +1141,10 @@
           updatedBy: clientId,
         };
       }
+      function syncBackgroundControls() {
+        $('background').value = boardState.metadata.background.mode || 'hex-grid';
+        $('grid').value = boardState.metadata.background.gridSize || 50;
+      }
       function attachLiveBoardListener() {
         boardUnsubscribe?.();
         boardUnsubscribe = onSnapshot(
@@ -1255,6 +1259,7 @@
           if (snap.exists()) {
             const data = snap.data();
             Object.assign(boardState.metadata, data.metadata || {});
+            syncBackgroundControls();
             boardState.objects.clear();
             (data.objects || []).forEach((o) => boardState.objects.set(o.id, o));
             render();
@@ -1272,6 +1277,7 @@
           if (raw) {
             const data = JSON.parse(raw);
             Object.assign(boardState.metadata, data.metadata || {});
+            syncBackgroundControls();
             boardState.objects.clear();
             (data.objects || []).forEach((o) => boardState.objects.set(o.id, o));
             render();
@@ -1297,6 +1303,7 @@
             if (raw) {
               const data = JSON.parse(raw);
               Object.assign(boardState.metadata, data.metadata || {});
+              syncBackgroundControls();
               boardState.objects.clear();
               (data.objects || []).forEach((o) => boardState.objects.set(o.id, o));
               render();
