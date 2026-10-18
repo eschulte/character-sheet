@@ -54,6 +54,8 @@
       }
       .toolbar {
         border-radius: 8px 8px 0 0;
+        position: relative;
+        z-index: 2;
       }
       button {
         border: 1px solid #536477;
@@ -69,6 +71,41 @@
       }
       button.active {
         outline: 2px solid #f6c453;
+      }
+      .toolbar-more {
+        position: relative;
+      }
+      .toolbar-more summary {
+        list-style: none;
+        border: 1px solid #536477;
+        background: #334155;
+        color: #fff;
+        padding: 6px 9px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .toolbar-more summary::-webkit-details-marker {
+        display: none;
+      }
+      .toolbar-more[open] summary,
+      .toolbar-more summary:hover {
+        background: #526b86;
+      }
+      .toolbar-extra {
+        position: absolute;
+        top: calc(100% + 6px);
+        right: 0;
+        z-index: 5;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        min-width: min(620px, calc(100vw - 48px));
+        padding: 10px;
+        background: #202b38;
+        border: 1px solid #536477;
+        border-radius: 6px;
+        box-shadow: 0 8px 20px #0008;
       }
       label {
         display: flex;
@@ -257,49 +294,45 @@
       </nav>
       <section id="board-tab" class="workspace-tab active" aria-label="Drawing board">
         <section class="toolbar" aria-label="Board tools">
-          <button data-tool="select" class="active">Select</button><button data-tool="shape">Shape ▾</button
+          <button data-tool="select" class="active">Select</button><button data-tool="shape">Shape</button
           ><button data-tool="text">Text</button><button data-tool="emoji">Emoji</button
-          ><button data-tool="line">Line</button><button data-tool="draw">Draw</button
-          ><button id="delete">Delete</button><button id="save-board">Save board</button
-          ><button id="share-board">Copy share link</button>
+          ><button id="save-board">Save board</button><button id="share-board">Copy share link</button>
           <label><input id="webrtc-share" type="checkbox" /> WebRTC live edits</label>
-          <label
-            >Shape ▾
-            <select id="shape">
-              <option value="rectangle">Rectangle</option>
-              <option value="rounded-rectangle">Rounded rectangle</option>
-              <option value="ellipse">Ellipse / circle</option>
-              <option value="octagon">Octagon</option>
-            </select></label
-          >
-          <label>Fill <input id="fill" type="color" value="#dbeafe" /></label
-          ><label
-            >Opacity
-            <input id="opacity" type="range" min="0" max="1" step="0.05" value="1" title="Fill opacity" /></label
-          ><label>Stroke <input id="stroke" type="color" value="#1e3a5f" /></label>
-          <label
-            >Content
-            <input id="content" placeholder="Label or emoji" maxlength="80" aria-label="Shape label or emoji" /></label
-          ><label>Font <input id="font-size" type="number" min="8" max="96" value="18" title="Text size" /></label>
-          <label>Line <input id="line-color" type="color" value="#dc2626" /></label
-          ><label>Width <input id="line-width" type="number" min="1" max="20" value="3" /></label>
-          <label
-            >Preset
-            <select id="preset">
-              <option value="">Choose saved shape…</option>
-            </select></label
-          ><label><input id="preset-name" placeholder="Preset name" maxlength="40" /></label
-          ><button id="save-preset" type="button">Save preset</button
-          ><button id="add-preset" type="button">Add preset</button>
-          <label
-            >Background
-            <select id="background">
-              <option value="square-grid">Square grid</option>
-              <option value="hex-grid">Hex grid</option>
-              <option value="picture">Picture</option>
-            </select></label
-          ><label>Grid <input id="grid" type="number" min="10" max="200" value="50" /></label>
-          <button id="pick-picture">Choose picture</button><input id="picture" type="file" accept="image/*" hidden />
+          <details class="toolbar-more">
+            <summary>More tools</summary>
+            <div class="toolbar-extra">
+              <button data-tool="line">Line</button><button data-tool="draw">Draw</button><button id="delete">Delete</button>
+              <label>Shape type
+                <select id="shape">
+                  <option value="rectangle">Rectangle</option>
+                  <option value="rounded-rectangle">Rounded rectangle</option>
+                  <option value="ellipse">Ellipse / circle</option>
+                  <option value="octagon">Octagon</option>
+                </select>
+              </label>
+              <label>Fill <input id="fill" type="color" value="#dbeafe" /></label>
+              <label>Opacity <input id="opacity" type="range" min="0" max="1" step="0.05" value="1" title="Fill opacity" /></label>
+              <label>Stroke <input id="stroke" type="color" value="#1e3a5f" /></label>
+              <label>Content <input id="content" placeholder="Label or emoji" maxlength="80" aria-label="Shape label or emoji" /></label>
+              <label>Font <input id="font-size" type="number" min="8" max="96" value="18" title="Text size" /></label>
+              <label>Line <input id="line-color" type="color" value="#dc2626" /></label>
+              <label>Width <input id="line-width" type="number" min="1" max="20" value="3" /></label>
+              <label>Preset
+                <select id="preset"><option value="">Choose saved shape…</option></select>
+              </label>
+              <label><input id="preset-name" placeholder="Preset name" maxlength="40" /></label>
+              <button id="save-preset" type="button">Save preset</button><button id="add-preset" type="button">Add preset</button>
+              <label>Background
+                <select id="background">
+                  <option value="square-grid">Square grid</option>
+                  <option value="hex-grid">Hex grid</option>
+                  <option value="picture">Picture</option>
+                </select>
+              </label>
+              <label>Grid <input id="grid" type="number" min="10" max="200" value="50" /></label>
+              <button id="pick-picture">Choose picture</button><input id="picture" type="file" accept="image/*" hidden />
+            </div>
+          </details>
         </section>
         <details class="board-help" open>
           <summary>Save and share this board</summary>
@@ -1094,6 +1127,11 @@
       };
       const boardIdFromUrl = new URLSearchParams(location.search).get('board'),
         boardId = boardIdFromUrl || uid().slice(0, 12);
+      if (!boardIdFromUrl) {
+        const initialBoardUrl = new URL(location.href);
+        initialBoardUrl.searchParams.set('board', boardId);
+        history.replaceState(null, '', initialBoardUrl);
+      }
       $('webrtc-share').checked = useWebRtcLiveEdits;
       let boardUnsubscribe = null;
       let liveWriteChain = Promise.resolve();
@@ -1254,10 +1292,12 @@
             });
             return;
           }
-          reportBoardStatus(
-            `Board not found · ${boardId} · Firestore has no document and this browser has no local copy`,
-            { boardId, source: 'empty', firestoreDocumentExists: false, localCopyExists: false },
-          );
+          reportBoardStatus(`New board · ${boardId} · add content, then save or copy a share link`, {
+            boardId,
+            source: 'empty',
+            firestoreDocumentExists: false,
+            localCopyExists: false,
+          });
           attachLiveBoardListener();
         } catch (e) {
           console.error('[Board Room] Firestore load failed', { boardId, ...errorDetails(e) });
