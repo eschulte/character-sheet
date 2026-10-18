@@ -262,6 +262,7 @@
           ><button data-tool="line">Line</button><button data-tool="draw">Draw</button
           ><button id="delete">Delete</button><button id="save-board">Save board</button
           ><button id="share-board">Copy share link</button>
+          <label><input id="webrtc-share" type="checkbox" /> WebRTC live edits</label>
           <label
             >Shape ▾
             <select id="shape">
@@ -305,6 +306,10 @@
           <p>
             Use <b>Save board</b> to store the current map. Then use <b>Copy share link</b> and send the link to
             collaborators; opening it loads the same board. Changes are live while everyone has the board open.
+          </p>
+          <p>
+            Enable <b>WebRTC live edits</b> before copying the link to send board changes directly between browsers. It
+            connects automatically and does not start the microphone.
           </p>
           <p>
             Click blank space to place a shared ripple marker. Double-click a shape or text to edit it, or select it and
@@ -382,6 +387,7 @@
         action = null,
         localPictureUrl = null,
         clipboardShape = null;
+      let useWebRtcLiveEdits = new URLSearchParams(location.search).get('sync') === 'webrtc';
       const pings = new Map();
       let pingFrame = 0;
       function animatePings() {
@@ -417,7 +423,7 @@
           };
           applyOperation(op);
           sync.send(op);
-          persistLiveBoard(op);
+          if (!useWebRtcLiveEdits) persistLiveBoard(op);
         },
         receive(operation) {
           if (operation?.protocol === 'board-room-v1' && operation.clientId !== clientId) applyOperation(operation);
@@ -1088,6 +1094,7 @@
       };
       const boardIdFromUrl = new URLSearchParams(location.search).get('board'),
         boardId = boardIdFromUrl || uid().slice(0, 12);
+      $('webrtc-share').checked = useWebRtcLiveEdits;
       let boardUnsubscribe = null;
       let liveWriteChain = Promise.resolve();
       console.info('[Board Room] Initialized', {
@@ -1295,12 +1302,16 @@
       $('share-board').onclick = async () => {
         const u = new URL(location.href);
         u.searchParams.set('board', boardId);
+        if ($('webrtc-share').checked) u.searchParams.set('sync', 'webrtc');
+        else u.searchParams.delete('sync');
         try {
           await navigator.clipboard.writeText(u.href);
           reportBoardStatus(`Share link copied · board ${boardId}`, {
             boardId,
             shareUrl: u.href,
-            storage: 'Firestore required for cross-browser sharing',
+            storage: $('webrtc-share').checked
+              ? 'Firestore board storage and signaling; WebRTC data channel for live edits'
+              : 'Firestore required for cross-browser sharing',
           });
         } catch (e) {
           console.error('[Board Room] Clipboard copy failed', { shareUrl: u.href, ...errorDetails(e) });
@@ -1577,13 +1588,14 @@
           stage.onpointerup = null;
         };
       });
-      async function joinRoom() {
+      async function joinRoom(withAudio = true) {
         if (roomId) return;
         try {
-          localStream ??= await mixer.start();
-          localTrack = localStream.getAudioTracks()[0];
-          roomId = $('room-id')
-            .value.trim()
+          if (withAudio) {
+            localStream ??= await mixer.start();
+            localTrack = localStream.getAudioTracks()[0];
+          }
+          roomId = (useWebRtcLiveEdits ? `board-${boardId}` : $('room-id').value.trim())
             .replace(/[^a-zA-Z0-9_-]/g, '')
             .slice(0, 64);
           if (!roomId) throw new Error('Enter a room name');
@@ -1611,8 +1623,8 @@
           );
           $('join-room').disabled = true;
           $('leave-room').disabled = false;
-          $('microphone').textContent = 'Microphone enabled';
-          status(`Joined ${roomId}; waiting for peers`);
+          if (withAudio) $('microphone').textContent = 'Microphone enabled';
+          status(`${withAudio ? 'Joined' : 'Connected for board edits'} ${roomId}; waiting for peers`);
         } catch (e) {
           roomId = null;
           status(`Could not join: ${e.message}`);
@@ -1635,8 +1647,13 @@
         $('leave-room').disabled = true;
         status('Left room');
       }
-      $('join-room').onclick = joinRoom;
+      $('join-room').onclick = () => joinRoom(true);
       $('leave-room').onclick = leaveRoom;
+      $('webrtc-share').onchange = async (e) => {
+        useWebRtcLiveEdits = e.target.checked;
+        if (useWebRtcLiveEdits) await joinRoom(false);
+        else if (roomId) await leaveRoom();
+      };
       window.addEventListener('pagehide', () => {
         if (roomId) deleteDoc(participantRef()).catch(() => {});
       });
@@ -1651,7 +1668,9 @@
       $('tab-board').onclick = () => switchWorkspace('board');
       $('tab-room').onclick = () => switchWorkspace('room');
       render();
-      loadBoard();
+      loadBoard().then(() => {
+        if (useWebRtcLiveEdits) joinRoom(false);
+      });
     </script>
   </body>
 </html>
