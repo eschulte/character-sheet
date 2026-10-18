@@ -33,6 +33,16 @@
         gap: 12px;
         align-items: center;
       }
+      .header-status {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        min-width: 0;
+      }
+      .header-status label {
+        white-space: nowrap;
+      }
       h1 {
         font-size: 1.1rem;
         margin: 0;
@@ -270,6 +280,13 @@
         font-size: 0.84rem;
       }
       @media (max-width: 700px) {
+        header {
+          align-items: flex-start;
+        }
+        .header-status {
+          flex-wrap: wrap;
+          gap: 4px 10px;
+        }
         .app {
           padding: 8px;
         }
@@ -286,7 +303,10 @@
   <body>
     <header>
       <h1>Board Room</h1>
-      <span id="diagnostic">Board ready</span>
+      <div class="header-status">
+        <span id="diagnostic">Board ready</span>
+        <label><input id="webrtc-share" type="checkbox" /> WebRTC live edits</label>
+      </div>
     </header>
     <main class="app">
       <nav class="workspace-tabs" aria-label="Workspace tabs">
@@ -295,13 +315,12 @@
       <section id="board-tab" class="workspace-tab active" aria-label="Drawing board">
         <section class="toolbar" aria-label="Board tools">
           <button data-tool="select" class="active">Select</button><button data-tool="shape">Shape</button
-          ><button data-tool="text">Text</button><button data-tool="emoji">Emoji</button
+          ><button data-tool="text">Text</button><button data-tool="draw">Draw</button
           ><button id="save-board">Save board</button><button id="share-board">Copy share link</button>
-          <label><input id="webrtc-share" type="checkbox" /> WebRTC live edits</label>
           <details class="toolbar-more">
             <summary>More tools</summary>
             <div class="toolbar-extra">
-              <button data-tool="line">Line</button><button data-tool="draw">Draw</button><button id="delete">Delete</button>
+              <button data-tool="line">Line</button><button id="delete">Delete</button>
               <label>Shape type
                 <select id="shape">
                   <option value="rectangle">Rectangle</option>
@@ -313,7 +332,6 @@
               <label>Fill <input id="fill" type="color" value="#dbeafe" /></label>
               <label>Opacity <input id="opacity" type="range" min="0" max="1" step="0.05" value="1" title="Fill opacity" /></label>
               <label>Stroke <input id="stroke" type="color" value="#1e3a5f" /></label>
-              <label>Content <input id="content" placeholder="Label or emoji" maxlength="80" aria-label="Shape label or emoji" /></label>
               <label>Font <input id="font-size" type="number" min="8" max="96" value="18" title="Text size" /></label>
               <label>Line <input id="line-color" type="color" value="#dc2626" /></label>
               <label>Width <input id="line-width" type="number" min="1" max="20" value="3" /></label>
@@ -326,11 +344,9 @@
                 <select id="background">
                   <option value="square-grid">Square grid</option>
                   <option value="hex-grid">Hex grid</option>
-                  <option value="picture">Picture</option>
                 </select>
               </label>
               <label>Grid <input id="grid" type="number" min="10" max="200" value="50" /></label>
-              <button id="pick-picture">Choose picture</button><input id="picture" type="file" accept="image/*" hidden />
             </div>
           </details>
         </section>
@@ -341,19 +357,18 @@
             collaborators; opening it loads the same board. Changes are live while everyone has the board open.
           </p>
           <p>
-            Enable <b>WebRTC live edits</b> before copying the link to send board changes directly between browsers. It
-            connects automatically and does not start the microphone.
+            <b>WebRTC live edits</b> is on by default. It sends board changes directly between browsers and connects
+            without starting the microphone. Turn it off to use Firestore for live edits.
           </p>
           <p>
-            Click blank space to place a shared ripple marker. Double-click a shape or text to edit it, or select it and
-            edit Content / Font above. Copy and paste duplicate the selected object with a small offset.
+            Click blank space to place a shared ripple marker. Click a shape or text to edit it on the board. Copy and
+            paste duplicate the selected object with a small offset.
           </p>
         </details>
         <div id="viewport"><svg id="canvas" role="application" aria-label="Tactical map and diagram board"></svg></div>
         <p class="hint">
-          Select objects with a click, then drag to move or use the controls to edit them. Double-click text or shapes
-          to edit. Text and emoji float freely; Draw makes paint-like room borders. Drag blank space to pan; wheel
-          zooms.
+          Click a shape or text to edit it; drag to move objects. Text floats freely; Draw makes paint-like room borders.
+          Drag blank space to pan; wheel zooms.
         </p>
       </section>
       <section id="room-tab" class="workspace-tab" aria-label="Physical audio room">
@@ -410,7 +425,7 @@
         $ = (id) => document.getElementById(id),
         uid = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`;
       const boardState = {
-        metadata: { background: { mode: 'square-grid', gridSize: 50, picture: { assetId: null, url: null } } },
+        metadata: { background: { mode: 'square-grid', gridSize: 50 } },
         objects: new Map(),
       };
       const roomState = { participants: new Map() }; // Reserved only for physical-room x/y, baseVolume and audio.
@@ -418,9 +433,8 @@
         tool = 'select',
         view = { x: 0, y: 0, scale: 1 },
         action = null,
-        localPictureUrl = null,
         clipboardShape = null;
-      let useWebRtcLiveEdits = new URLSearchParams(location.search).get('sync') === 'webrtc';
+      let useWebRtcLiveEdits = new URLSearchParams(location.search).get('sync') !== 'firestore';
       const pings = new Map();
       let pingFrame = 0;
       function animatePings() {
@@ -497,17 +511,6 @@
       function background(defs) {
         const b = boardState.metadata.background,
           size = Math.max(10, +b.gridSize || 50);
-        if (b.mode === 'picture' && b.picture.url) {
-          const p = el('pattern', { id: 'bg', width: 1, height: 1, patternUnits: 'objectBoundingBox' }),
-            im = el('image', {
-              href: b.picture.url,
-              width: '100%',
-              height: '100%',
-              preserveAspectRatio: 'xMidYMid slice',
-            });
-          p.append(im);
-          return (defs.append(p), el('rect', { x: -10000, y: -10000, width: 20000, height: 20000, fill: 'url(#bg)' }));
-        }
         const p = el('pattern', { id: 'bg', width: size, height: size, patternUnits: 'userSpaceOnUse' });
         if (b.mode === 'hex-grid' || b.mode === 'octagonal-grid') {
           const r = size / 2,
@@ -755,7 +758,7 @@
           opacity: +$('opacity').value,
           stroke: $('stroke').value,
           strokeWidth: 2,
-          text: $('content').value.trim(),
+          text: '',
           emoji: '',
           textSize: 18,
           textAlignment: 'middle',
@@ -766,7 +769,7 @@
           updatedBy: clientId,
         };
       }
-      function createShape(start, end, content = $('content').value) {
+      function createShape(start, end) {
         const id = uid(),
           x = Math.min(start.x, end.x),
           y = Math.min(start.y, end.y),
@@ -778,24 +781,24 @@
             width: Math.max(34, Math.abs(end.x - start.x)),
             height: Math.max(34, Math.abs(end.y - start.y)),
             ...settings(),
-            text: content.trim(),
+            text: '',
           };
         sync.emit('create', id, o);
         selected = id;
         return o;
       }
-      function createText(p, emoji = false) {
+      function createText(p) {
         const id = uid(),
           o = {
             id,
             type: 'free-text',
             x: p.x,
             y: p.y,
-            width: Math.max(40, ($('content').value.length || 1) * 12),
+            width: 120,
             height: 34,
             ...settings(),
-            text: emoji ? '' : $('content').value.trim() || '😊',
-            emoji: emoji ? $('content').value.trim() || '😊' : '',
+            text: '',
+            emoji: '',
             fill: 'none',
             stroke: 'none',
           };
@@ -858,7 +861,6 @@
         if (id) {
           selected = id;
           const o = boardState.objects.get(id);
-          $('content').value = o.text || o.emoji || '';
           $('font-size').value = o.textSize || 18;
           action = handle
             ? { kind: handle === 'resize' ? 'resize' : 'endpoint', id, handle, start: p, original: { ...o } }
@@ -866,8 +868,8 @@
           render();
         } else if (tool === 'shape') {
           action = { kind: 'create', start: p };
-        } else if (tool === 'text' || tool === 'emoji') {
-          const o = createText(p, tool === 'emoji');
+        } else if (tool === 'text') {
+          const o = createText(p);
           openEditor(o, e.clientX, e.clientY);
         } else if (tool === 'draw') {
           action = { kind: 'draw', points: [p] };
@@ -925,7 +927,10 @@
         else if (a.kind === 'draw') createDrawing(a.points);
         else if (a.kind === 'pan' && tool === 'select' && Math.hypot(e.clientX - a.start.x, e.clientY - a.start.y) < 5)
           sync.emit('ping', null, { x: p.x, y: p.y });
-        else if (a.kind !== 'pan' && a.kind !== 'select' && a.id) {
+        else if (a.kind === 'move' && Math.hypot(p.x - a.start.x, p.y - a.start.y) < 5) {
+          const o = boardState.objects.get(a.id);
+          if (o && (o.type === 'shape-text' || o.type === 'free-text')) openEditor(o, e.clientX, e.clientY);
+        } else if (a.kind !== 'pan' && a.kind !== 'select' && a.id) {
           const o = boardState.objects.get(a.id);
           sync.emit(
             'update',
@@ -978,7 +983,7 @@
         box.className = 'editor';
         box.style.left = `${Math.min(x - $('viewport').getBoundingClientRect().left, $('viewport').clientWidth - 240)}px`;
         box.style.top = `${Math.min(y - $('viewport').getBoundingClientRect().top, $('viewport').clientHeight - 135)}px`;
-        box.innerHTML = `<label>Content<input name="content" value="${escapeHtml(o.text || o.emoji)}" autofocus></label><div class="row"><button>Save</button><button type="button">Cancel</button></div>`;
+        box.innerHTML = `<label>Text<input name="content" value="${escapeHtml(o.text || o.emoji)}" placeholder="Type here…" maxlength="200" autofocus></label><div class="row"><button>Save</button><button type="button">Cancel</button></div>`;
         $('viewport').append(box);
         box.elements.content.focus();
         box.addEventListener('submit', (e) => {
@@ -1045,7 +1050,6 @@
       $('shape').onchange = (e) => updateSelectedStyle({ shape: e.target.value });
       $('line-color').oninput = (e) => updateSelectedStyle({ stroke: e.target.value });
       $('line-width').oninput = (e) => updateSelectedStyle({ strokeWidth: +e.target.value || 1 });
-      $('content').oninput = (e) => updateSelectedStyle({ text: e.target.value, emoji: '' });
       $('font-size').oninput = (e) =>
         updateSelectedStyle({ textSize: Math.max(8, Math.min(96, +e.target.value || 18)) });
       const presetKey = 'board-room-presets-v1';
@@ -1064,7 +1068,7 @@
           opacity: +$('opacity').value,
           stroke: $('stroke').value,
           strokeWidth: +$('line-width').value || 2,
-          text: $('content').value.trim(),
+          text: (o?.text || '').trim(),
           textSize: +$('font-size').value || 18,
           width: o?.width || 120,
           height: o?.height || 80,
@@ -1112,19 +1116,6 @@
       };
       $('background').onchange = (e) => sync.emit('metadata', null, { mode: e.target.value });
       $('grid').onchange = (e) => sync.emit('metadata', null, { gridSize: +e.target.value || 50 });
-      $('pick-picture').onclick = () => $('picture').click();
-      $('picture').onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (localPictureUrl) URL.revokeObjectURL(localPictureUrl);
-        localPictureUrl = URL.createObjectURL(file);
-        /* Asset reference only; replace this local adapter with Firebase Storage later. */ sync.emit(
-          'metadata',
-          null,
-          { mode: 'picture', picture: { assetId: `local:${file.name}:${file.size}`, url: localPictureUrl } },
-        );
-        $('background').value = 'picture';
-      };
       const boardIdFromUrl = new URLSearchParams(location.search).get('board'),
         boardId = boardIdFromUrl || uid().slice(0, 12);
       if (!boardIdFromUrl) {
@@ -1342,8 +1333,7 @@
       $('share-board').onclick = async () => {
         const u = new URL(location.href);
         u.searchParams.set('board', boardId);
-        if ($('webrtc-share').checked) u.searchParams.set('sync', 'webrtc');
-        else u.searchParams.delete('sync');
+        u.searchParams.set('sync', $('webrtc-share').checked ? 'webrtc' : 'firestore');
         try {
           await navigator.clipboard.writeText(u.href);
           reportBoardStatus(`Share link copied · board ${boardId}`, {
