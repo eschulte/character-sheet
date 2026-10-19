@@ -368,8 +368,9 @@
         </details>
         <div id="viewport"><svg id="canvas" role="application" aria-label="Tactical map and diagram board"></svg></div>
         <p class="hint">
-          Click a shape or text to edit it; drag to move objects. Text floats freely; Draw makes paint-like room borders.
-          Drag blank space to pan; wheel zooms.
+            Click a shape or text to edit it; drag to move objects. Drag empty space to select a group, or Ctrl/Cmd-click
+            to toggle objects in the selection. Text floats freely; Draw makes paint-like room borders. Drag blank space
+            with Shift to pan; wheel zooms.
         </p>
       </section>
       <section id="room-tab" class="workspace-tab" aria-label="Physical audio room">
@@ -431,10 +432,11 @@
       };
       const roomState = { participants: new Map() }; // Reserved only for physical-room x/y, baseVolume and audio.
       let selected = null,
+        selectedIds = new Set(),
         tool = 'select',
         view = { x: 0, y: 0, scale: 1 },
         action = null,
-        clipboardShape = null;
+        clipboardShapes = [];
       let useWebRtcLiveEdits = new URLSearchParams(location.search).get('sync') !== 'firestore';
       const pings = new Map();
       let pingFrame = 0;
@@ -488,7 +490,11 @@
             updatedAt: op.timestamp,
             updatedBy: op.clientId,
           });
-        else if (op.type === 'delete') boardState.objects.delete(op.objectId);
+        else if (op.type === 'delete') {
+          boardState.objects.delete(op.objectId);
+          selectedIds.delete(op.objectId);
+          if (selected === op.objectId) selected = [...selectedIds].at(-1) || null;
+        }
         else if (op.type === 'ping') {
           pings.set(op.opId, { ...op.patch, at: Date.now() });
           if (!pingFrame) animatePings();
@@ -601,6 +607,23 @@
             stroke: $('line-color').value,
             strokeWidth: +$('line-width').value || 3,
           });
+        if (action?.kind === 'marquee' && action.current) {
+          const x = Math.min(action.start.x, action.current.x),
+            y = Math.min(action.start.y, action.current.y);
+          layer.append(
+            el('rect', {
+              x,
+              y,
+              width: Math.abs(action.current.x - action.start.x),
+              height: Math.abs(action.current.y - action.start.y),
+              fill: '#3b82f6',
+              'fill-opacity': 0.14,
+              stroke: '#2563eb',
+              'stroke-dasharray': '5 3',
+              'pointer-events': 'none',
+            }),
+          );
+        }
       }
       function drawObject(layer, o) {
         const g = el('g', {
@@ -619,7 +642,20 @@
               'marker-end': o.arrowEnd ? 'url(#arrow)' : '',
             }),
           );
-          if (selected === o.id) {
+          if (selectedIds.has(o.id))
+            g.append(
+              el('line', {
+                x1: o.x1,
+                y1: o.y1,
+                x2: o.x2,
+                y2: o.y2,
+                stroke: '#2563eb',
+                'stroke-width': (o.strokeWidth || 2) + 5,
+                opacity: 0.45,
+                'pointer-events': 'none',
+              }),
+            );
+          if (selectedIds.has(o.id) && selectedIds.size === 1) {
             [
               [o.x1, o.y1, 'start'],
               [o.x2, o.y2, 'end'],
@@ -651,7 +687,7 @@
               'stroke-linejoin': 'round',
             }),
           );
-          if (selected === o.id)
+          if (selectedIds.has(o.id))
             g.append(
               el('path', {
                 d: o.path,
@@ -727,7 +763,7 @@
           });
           g.append(t);
         }
-        if (selected === o.id)
+        if (selectedIds.has(o.id))
           g.append(
             el('rect', {
               x: o.x - 4,
@@ -740,7 +776,7 @@
               'stroke-dasharray': '5 3',
               'pointer-events': 'none',
             }),
-            el('rect', {
+            ...(selectedIds.size === 1 ? [el('rect', {
               x: o.x + o.width - 5,
               y: o.y + o.height - 5,
               width: 10,
@@ -748,7 +784,7 @@
               fill: '#fff',
               stroke: '#2563eb',
               'data-handle': 'resize',
-            }),
+            })] : []),
           );
         layer.append(g);
       }
@@ -785,7 +821,7 @@
             text: '',
           };
         sync.emit('create', id, o);
-        selected = id;
+        selectOnly(id);
         return o;
       }
       function createText(p) {
@@ -804,7 +840,7 @@
             stroke: 'none',
           };
         sync.emit('create', id, o);
-        selected = id;
+        selectOnly(id);
         return o;
       }
       function createDrawing(points) {
@@ -822,7 +858,7 @@
             updatedBy: clientId,
           };
         sync.emit('create', id, o);
-        selected = id;
+        selectOnly(id);
         return o;
       }
       function createLine(a, b) {
@@ -844,11 +880,56 @@
             updatedBy: clientId,
           };
         sync.emit('create', id, o);
-        selected = id;
+        selectOnly(id);
         return o;
       }
       function objectFromTarget(t) {
         return t.closest?.('[data-id]')?.dataset.id || null;
+      }
+      function selectOnly(id) {
+        selectedIds = new Set(id ? [id] : []);
+        selected = id || null;
+        render();
+      }
+      function objectBounds(o) {
+        if (o.type === 'line') {
+          return {
+            left: Math.min(o.x1, o.x2) - 4,
+            top: Math.min(o.y1, o.y2) - 4,
+            right: Math.max(o.x1, o.x2) + 4,
+            bottom: Math.max(o.y1, o.y2) + 4,
+          };
+        }
+        if (o.type === 'draw') {
+          const values = (o.path.match(/-?\d+(?:\.\d+)?/g) || []).map(Number),
+            xs = values.filter((_, i) => i % 2 === 0),
+            ys = values.filter((_, i) => i % 2 === 1);
+          if (!xs.length || !ys.length) return null;
+          return {
+            left: Math.min(...xs) - 6,
+            top: Math.min(...ys) - 6,
+            right: Math.max(...xs) + 6,
+            bottom: Math.max(...ys) + 6,
+          };
+        }
+        return { left: o.x, top: o.y, right: o.x + o.width, bottom: o.y + o.height };
+      }
+      function translateObject(o, dx, dy) {
+        if (o.type === 'line') {
+          o.x1 += dx;
+          o.x2 += dx;
+          o.y1 += dy;
+          o.y2 += dy;
+        } else if (o.type === 'draw') {
+          let coordinate = 0;
+          o.path = o.path.replace(/-?\d+(?:\.\d+)?/g, (value) => {
+            const delta = coordinate++ % 2 ? dy : dx;
+            return String(Number(value) + delta);
+          });
+        } else {
+          o.x += dx;
+          o.y += dy;
+        }
       }
       svg.addEventListener('pointerdown', (e) => {
         const p = point(e);
@@ -860,24 +941,44 @@
         const handle = e.target.dataset?.handle;
         svg.setPointerCapture(e.pointerId);
         if (id) {
-          selected = id;
+          const additive = e.ctrlKey || e.metaKey;
+          if (additive) {
+            e.preventDefault();
+            if (selectedIds.has(id)) selectedIds.delete(id);
+            else selectedIds.add(id);
+            selected = selectedIds.has(id) ? id : [...selectedIds].at(-1) || null;
+            action = { kind: 'select', id, start: p };
+            render();
+            return;
+          }
+          if (!selectedIds.has(id)) selectOnly(id);
+          else selected = id;
           const o = boardState.objects.get(id);
           $('font-size').value = o.textSize || 18;
-          action = handle
+          const group = [...selectedIds].map((objectId) => [objectId, { ...boardState.objects.get(objectId) }]);
+          action = handle && selectedIds.size === 1
             ? { kind: handle === 'resize' ? 'resize' : 'endpoint', id, handle, start: p, original: { ...o } }
-            : { kind: o.type === 'draw' ? 'select' : 'move', id, start: p, original: { ...o } };
+            : { kind: 'move', id, start: p, group };
           render();
         } else if (tool === 'shape') {
+          selectOnly(null);
           action = { kind: 'create', start: p };
         } else if (tool === 'text') {
+          selectOnly(null);
           const o = createText(p);
           openEditor(o, e.clientX, e.clientY);
         } else if (tool === 'draw') {
+          selectOnly(null);
           action = { kind: 'draw', points: [p] };
-        } else if (tool === 'line') action = { kind: 'line', start: p };
+        } else if (tool === 'line') {
+          selectOnly(null);
+          action = { kind: 'line', start: p };
+        }
         else {
-          selected = null;
-          action = { kind: 'pan', start: { x: e.clientX, y: e.clientY }, original: { ...view } };
+          if (!e.ctrlKey && !e.metaKey) selectOnly(null);
+          action = e.shiftKey
+            ? { kind: 'pan', start: { x: e.clientX, y: e.clientY }, original: { ...view } }
+            : { kind: 'marquee', start: p, current: p, additive: e.ctrlKey || e.metaKey, initialSelection: new Set(selectedIds) };
           render();
         }
       });
@@ -895,15 +996,31 @@
           render();
           return;
         }
+        if (action.kind === 'marquee') {
+          action.current = p;
+          render();
+          return;
+        }
         if (action.kind === 'line' || action.kind === 'select') return;
         if (action.kind === 'draw') {
           action.points.push(p);
           render();
           return;
         }
-        const o = action.original,
-          dx = p.x - action.start.x,
+        const dx = p.x - action.start.x,
           dy = p.y - action.start.y;
+        if (action.kind === 'move' && action.group) {
+          action.group.forEach(([id, original]) => {
+            const object = boardState.objects.get(id);
+            if (object) {
+              Object.assign(object, original);
+              translateObject(object, dx, dy);
+            }
+          });
+          render();
+          return;
+        }
+        const o = action.original;
         let patch;
         if (action.kind === 'move')
           patch =
@@ -926,12 +1043,38 @@
           openEditor(o, e.clientX, e.clientY);
         } else if (a.kind === 'line') createLine(a.start, p);
         else if (a.kind === 'draw') createDrawing(a.points);
-        else if (a.kind === 'pan' && tool === 'select' && Math.hypot(e.clientX - a.start.x, e.clientY - a.start.y) < 5)
+        else if (a.kind === 'marquee') {
+          if (Math.hypot(p.x - a.start.x, p.y - a.start.y) >= 5) {
+            const left = Math.min(a.start.x, p.x),
+              right = Math.max(a.start.x, p.x),
+              top = Math.min(a.start.y, p.y),
+              bottom = Math.max(a.start.y, p.y),
+              found = [...boardState.objects.values()]
+                .filter((o) => {
+                  const bounds = objectBounds(o);
+                  return bounds && bounds.right >= left && bounds.left <= right && bounds.bottom >= top && bounds.top <= bottom;
+                })
+                .map((o) => o.id);
+            selectedIds = a.additive ? new Set([...a.initialSelection, ...found]) : new Set(found);
+            selected = [...selectedIds].at(-1) || null;
+          } else sync.emit('ping', null, { x: p.x, y: p.y });
+        } else if (a.kind === 'pan' && tool === 'select' && Math.hypot(e.clientX - a.start.x, e.clientY - a.start.y) < 5)
           sync.emit('ping', null, { x: p.x, y: p.y });
-        else if (a.kind === 'move' && Math.hypot(p.x - a.start.x, p.y - a.start.y) < 5) {
+        else if (a.kind === 'move' && Math.hypot(p.x - a.start.x, p.y - a.start.y) < 5 && selectedIds.size === 1) {
           const o = boardState.objects.get(a.id);
           if (o && (o.type === 'shape-text' || o.type === 'free-text')) openEditor(o, e.clientX, e.clientY);
-        } else if (a.kind !== 'pan' && a.kind !== 'select' && a.id) {
+        } else if (a.kind === 'move' && a.group && Math.hypot(p.x - a.start.x, p.y - a.start.y) >= 5) {
+          a.group.forEach(([id]) => {
+            const o = boardState.objects.get(id);
+            if (!o) return;
+            const patch = o.type === 'line'
+              ? { x1: o.x1, y1: o.y1, x2: o.x2, y2: o.y2 }
+              : o.type === 'draw'
+                ? { path: o.path }
+                : { x: o.x, y: o.y };
+            sync.emit('update', id, patch);
+          });
+        } else if (a.kind !== 'pan' && a.kind !== 'select' && a.kind !== 'marquee' && a.id) {
           const o = boardState.objects.get(a.id);
           sync.emit(
             'update',
@@ -1005,44 +1148,47 @@
           }),
       );
       $('delete').onclick = () => {
-        if (selected) {
-          sync.emit('delete', selected, {});
+        if (selectedIds.size) {
+          [...selectedIds].forEach((id) => sync.emit('delete', id, {}));
+          selectedIds.clear();
           selected = null;
+          render();
         }
       };
       document.addEventListener('keydown', (e) => {
         const editing = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
-        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'c' && !editing && selected) {
-          const o = boardState.objects.get(selected);
-          if (o) {
-            clipboardShape = JSON.parse(JSON.stringify(o));
-            e.preventDefault();
-          }
-        } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'v' && !editing && clipboardShape) {
-          const o = JSON.parse(JSON.stringify(clipboardShape));
-          o.id = uid();
-          if (o.x != null) o.x += 20;
-          if (o.y != null) o.y += 20;
-          if (o.x1 != null) {
-            o.x1 += 20;
-            o.x2 += 20;
-            o.y1 += 20;
-            o.y2 += 20;
-          }
-          o.zIndex = Date.now();
-          sync.emit('create', o.id, o);
-          selected = o.id;
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'c' && !editing && selectedIds.size) {
+          clipboardShapes = [...selectedIds]
+            .map((id) => boardState.objects.get(id))
+            .filter(Boolean)
+            .map((o) => JSON.parse(JSON.stringify(o)));
           e.preventDefault();
-        } else if ((e.key === 'Delete' || e.key === 'Backspace') && selected && !editing) {
+        } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'v' && !editing && clipboardShapes.length) {
+          const pasted = clipboardShapes.map((shape) => {
+            const o = JSON.parse(JSON.stringify(shape));
+            o.id = uid();
+            translateObject(o, 20, 20);
+            o.zIndex = Date.now();
+            sync.emit('create', o.id, o);
+            return o.id;
+          });
+          selectedIds = new Set(pasted);
+          selected = pasted.at(-1) || null;
+          render();
+          e.preventDefault();
+        } else if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIds.size && !editing) {
           $('delete').click();
           e.preventDefault();
         }
       });
       function updateSelectedStyle(patch) {
-        const o = selected && boardState.objects.get(selected);
-        if (!o) return;
-        Object.assign(o, patch);
-        sync.emit('update', o.id, patch);
+        if (!selectedIds.size) return;
+        [...selectedIds].forEach((id) => {
+          const o = boardState.objects.get(id);
+          if (!o) return;
+          Object.assign(o, patch);
+          sync.emit('update', o.id, patch);
+        });
         render();
       }
       $('fill').oninput = (e) => updateSelectedStyle({ fill: e.target.value });
@@ -1111,7 +1257,7 @@
             updatedBy: clientId,
           };
         sync.emit('create', o.id, o);
-        selected = o.id;
+        selectOnly(o.id);
       };
       $('background').onchange = (e) => sync.emit('metadata', null, { mode: e.target.value });
       $('grid').onchange = (e) => sync.emit('metadata', null, { gridSize: +e.target.value || 50 });
