@@ -1048,8 +1048,6 @@
       $('opacity').oninput = (e) => updateSelectedStyle({ opacity: +e.target.value });
       $('stroke').oninput = (e) => updateSelectedStyle({ stroke: e.target.value });
       $('shape').onchange = (e) => updateSelectedStyle({ shape: e.target.value });
-      $('line-color').oninput = (e) => updateSelectedStyle({ stroke: e.target.value });
-      $('line-width').oninput = (e) => updateSelectedStyle({ strokeWidth: +e.target.value || 1 });
       $('font-size').oninput = (e) =>
         updateSelectedStyle({ textSize: Math.max(8, Math.min(96, +e.target.value || 18)) });
       const presetKey = 'board-room-presets-v1';
