@@ -496,6 +496,11 @@
         clipboardShapes = [];
       let useWebRtcLiveEdits = new URLSearchParams(location.search).get('sync') !== 'firestore';
       const pings = new Map();
+      function pingColorFor(clientId) {
+        let hash = 2166136261;
+        for (const char of clientId) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+        return `hsl(${(hash >>> 0) % 360}, 82%, 62%)`;
+      }
       let pingFrame = 0;
       function animatePings() {
         if (!pings.size) {
@@ -553,7 +558,7 @@
           if (selected === op.objectId) selected = [...selectedIds].at(-1) || null;
         }
         else if (op.type === 'ping') {
-          pings.set(op.opId, { ...op.patch, at: Date.now() });
+          pings.set(op.opId, { ...op.patch, color: pingColorFor(op.clientId), at: Date.now() });
           if (!pingFrame) animatePings();
           setTimeout(() => {
             pings.delete(op.opId);
@@ -635,11 +640,11 @@
               cy: p.y,
               r: radius,
               fill: 'none',
-              stroke: '#f6c453',
+              stroke: p.color,
               'stroke-width': 3,
               opacity: alpha,
             }),
-            el('circle', { cx: p.x, cy: p.y, r: 4, fill: '#f6c453', opacity: alpha }),
+            el('circle', { cx: p.x, cy: p.y, r: 4, fill: p.color, opacity: alpha }),
           );
         });
         if (action?.kind === 'create' && action.current) {
