@@ -33,12 +33,16 @@
         gap: 12px;
         align-items: center;
       }
+      header h1 {
+        flex: 0 0 auto;
+      }
       .header-status {
         display: flex;
         align-items: center;
         justify-content: flex-end;
         gap: 12px;
         min-width: 0;
+        margin-left: auto;
       }
       .header-status label {
         white-space: nowrap;
@@ -93,6 +97,7 @@
         padding: 6px 9px;
         border-radius: 4px;
         cursor: pointer;
+        user-select: none;
       }
       .toolbar-more summary::-webkit-details-marker {
         display: none;
@@ -103,14 +108,16 @@
       }
       .toolbar-extra {
         position: absolute;
-        top: calc(100% + 6px);
+        top: calc(100% - 1px);
         right: 0;
         z-index: 5;
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
         align-items: center;
-        min-width: min(620px, calc(100vw - 48px));
+        width: min(680px, calc(100vw - 48px));
+        min-width: min(480px, calc(100vw - 48px));
+        max-width: min(760px, calc(100vw - 48px));
         padding: 10px;
         background: #202b38;
         border: 1px solid #536477;
@@ -138,7 +145,7 @@
         width: 38px;
       }
       #viewport {
-        height: calc(100vh - 195px);
+        height: calc(100vh - 160px);
         min-height: 440px;
         position: relative;
         overflow: hidden;
@@ -252,10 +259,10 @@
       .workspace-tabs {
         display: flex;
         gap: 8px;
-        margin: 0 0 10px;
+        margin: 0;
       }
       .workspace-tabs button {
-        min-width: 110px;
+        min-width: 78px;
       }
       .workspace-tabs button.active {
         background: #526b86;
@@ -267,31 +274,35 @@
       .workspace-tab.active {
         display: block;
       }
-      .board-help {
-        padding: 8px 10px;
-        margin: 10px 0;
-        color: #cbd5e1;
-        background: #17212e;
-        border: 1px solid #344155;
-        border-radius: 5px;
-      }
-      .board-help p {
-        margin: 6px 0;
-        font-size: 0.84rem;
+      @media (min-width: 1000px) {
+        .toolbar-extra {
+          width: max-content;
+          grid-template-columns: repeat(4, max-content);
+          display: grid;
+        }
       }
       @media (max-width: 700px) {
         header {
-          align-items: flex-start;
+          display: grid;
+          grid-template-columns: auto 1fr;
+          align-items: center;
+          gap: 8px 12px;
+          padding: 10px;
+        }
+        .workspace-tabs {
+          justify-content: flex-end;
         }
         .header-status {
           flex-wrap: wrap;
           gap: 4px 10px;
+          grid-column: 1 / -1;
+          justify-content: space-between;
         }
         .app {
           padding: 8px;
         }
         #viewport {
-          height: calc(100vh - 250px);
+          height: calc(100vh - 225px);
         }
         .diagnostic {
           width: 100%;
@@ -303,20 +314,25 @@
   <body>
     <header>
       <h1>Board Room</h1>
+      <nav class="workspace-tabs" aria-label="Workspace tabs">
+        <button id="tab-board" class="active">Board</button><button id="tab-room">Room</button>
+      </nav>
       <div class="header-status">
         <span id="diagnostic">Board ready</span>
         <label><input id="webrtc-share" type="checkbox" /> WebRTC live edits</label>
       </div>
     </header>
     <main class="app">
-      <nav class="workspace-tabs" aria-label="Workspace tabs">
-        <button id="tab-board" class="active">Board</button><button id="tab-room">Room</button>
-      </nav>
       <section id="board-tab" class="workspace-tab active" aria-label="Drawing board">
         <section class="toolbar" aria-label="Board tools">
           <button data-tool="select" class="active">Select</button><button data-tool="shape">Shape</button
           ><button data-tool="text">Text</button><button data-tool="draw">Draw</button
-          ><button id="save-board">Save board</button><button id="share-board">Copy share link</button>
+          ><button id="save-board">Save board</button><button
+            id="share-board"
+            title="Save stores the map; this link opens the same board. WebRTC edits are on by default and do not use the microphone. Open Room for audio. Click blank space for a ripple; click shapes or text to edit; copy/paste duplicates selections."
+            aria-label="Copy share link and show board help"
+            >Copy share link</button
+          >
           <details class="toolbar-more">
             <summary>More tools</summary>
             <div class="toolbar-extra">
@@ -350,22 +366,6 @@
             </div>
           </details>
         </section>
-        <details class="board-help" open>
-          <summary>Save and share this board</summary>
-          <p>
-            Use <b>Save board</b> to store the current map. Then use <b>Copy share link</b> and send the link to
-            collaborators; opening it loads the same board. Changes are live while everyone has the board open.
-          </p>
-          <p>
-            <b>WebRTC live edits</b> is on by default. It sends board changes directly between browsers and connects
-            without starting the microphone. Turn it off to use Firestore for live edits.
-          </p>
-          <p>To turn on audio over WebRTC, open the <b>Room</b> tab at the top of the page.</p>
-          <p>
-            Click blank space to place a shared ripple marker. Click a shape or text to edit it on the board. Copy and
-            paste duplicate the selected object with a small offset.
-          </p>
-        </details>
         <div id="viewport"><svg id="canvas" role="application" aria-label="Tactical map and diagram board"></svg></div>
         <p class="hint">
             Click a shape or text to edit it; drag to move objects. Drag empty space to select a group, or Ctrl/Cmd-click
