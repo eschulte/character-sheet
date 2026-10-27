@@ -275,10 +275,58 @@
         display: block;
       }
       @media (min-width: 1000px) {
+        .toolbar-more {
+          flex: 1 1 100%;
+        }
+        .toolbar-more summary {
+          display: none;
+        }
         .toolbar-extra {
-          width: max-content;
-          grid-template-columns: repeat(4, max-content);
-          display: grid;
+          position: static;
+          width: 100%;
+          min-width: 0;
+          max-width: none;
+          padding: 0;
+          background: transparent;
+          border: 0;
+          box-shadow: none;
+          display: flex;
+        }
+      }
+      @media (min-width: 1800px) {
+        .app {
+          max-width: none;
+        }
+        #board-tab {
+          position: relative;
+        }
+        .toolbar-more {
+          flex: 0 0 auto;
+          position: static;
+        }
+        .toolbar-extra {
+          position: absolute;
+          top: calc(100% + 1px);
+          left: 1452px;
+          right: auto;
+          z-index: 3;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          flex-wrap: nowrap;
+          width: 300px;
+          min-width: 0;
+          max-width: 300px;
+          max-height: calc(100vh - 190px);
+          overflow-y: auto;
+          padding: 10px;
+          background: #202b38;
+          border: 1px solid #536477;
+          border-radius: 6px;
+          box-shadow: 0 8px 20px #0008;
+        }
+        #viewport {
+          width: min(1440px, 100%);
         }
       }
       @media (max-width: 700px) {
@@ -399,6 +447,15 @@
         </section>
       </section>
     </main>
+    <script>
+      const desktopTools = window.matchMedia('(min-width: 1000px)');
+      const moreTools = document.querySelector('.toolbar-more');
+      const syncMoreTools = () => {
+        moreTools.open = desktopTools.matches;
+      };
+      desktopTools.addEventListener('change', syncMoreTools);
+      syncMoreTools();
+    </script>
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
       import {
