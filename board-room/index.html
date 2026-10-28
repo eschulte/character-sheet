@@ -159,11 +159,25 @@
         height: 100%;
         user-select: none;
       }
-      .hint {
-        color: #a9b7c5;
-        margin: 9px 0;
-        font-size: 0.85rem;
+      .pan-controls {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 4;
+        display: grid;
+        grid-template: repeat(3, 36px) / repeat(3, 36px);
+        gap: 4px;
       }
+      .pan-controls button {
+        padding: 0;
+        font-size: 18px;
+        line-height: 1;
+        touch-action: manipulation;
+      }
+      .pan-up { grid-area: 1 / 2; }
+      .pan-left { grid-area: 2 / 1; }
+      .pan-right { grid-area: 2 / 3; }
+      .pan-down { grid-area: 3 / 2; }
       .editor {
         position: absolute;
         z-index: 2;
@@ -395,9 +409,8 @@
               </label>
               <label>Fill <input id="fill" type="color" value="#dbeafe" /></label>
               <label>Opacity <input id="opacity" type="range" min="0" max="1" step="0.05" value="1" title="Fill opacity" /></label>
-              <label>Stroke <input id="stroke" type="color" value="#1e3a5f" /></label>
               <label>Font <input id="font-size" type="number" min="8" max="96" value="18" title="Text size" /></label>
-              <label>Line <input id="line-color" type="color" value="#dc2626" /></label>
+              <label>Draw / border <input id="line-color" type="color" value="#dc2626" /></label>
               <label>Width <input id="line-width" type="number" min="1" max="20" value="3" /></label>
               <label>Preset
                 <select id="preset"><option value="">Choose saved shape…</option></select>
@@ -414,12 +427,15 @@
             </div>
           </details>
         </section>
-        <div id="viewport"><svg id="canvas" role="application" aria-label="Tactical map and diagram board"></svg></div>
-        <p class="hint">
-            Click a shape or text to edit it; drag to move objects. Drag empty space to select a group, or Ctrl/Cmd-click
-            to toggle objects in the selection. Text floats freely; Draw makes paint-like room borders. Drag blank space
-            with Shift to pan; wheel zooms.
-        </p>
+        <div id="viewport">
+          <svg id="canvas" role="application" aria-label="Tactical map and diagram board"></svg>
+          <div class="pan-controls" role="group" aria-label="Pan the board">
+            <button class="pan-up" type="button" data-pan-y="-80" aria-label="Pan up" title="Pan up">▲</button>
+            <button class="pan-left" type="button" data-pan-x="-80" aria-label="Pan left" title="Pan left">◀</button>
+            <button class="pan-right" type="button" data-pan-x="80" aria-label="Pan right" title="Pan right">▶</button>
+            <button class="pan-down" type="button" data-pan-y="80" aria-label="Pan down" title="Pan down">▼</button>
+          </div>
+        </div>
       </section>
       <section id="room-tab" class="workspace-tab" aria-label="Physical audio room">
         <div class="construction" role="status">
@@ -571,6 +587,13 @@
         return n;
       }
       const svg = $('canvas');
+      document.querySelector('.pan-controls').addEventListener('click', (e) => {
+        const button = e.target.closest('button[data-pan-x], button[data-pan-y]');
+        if (!button) return;
+        view.x += Number(button.dataset.panX || 0);
+        view.y += Number(button.dataset.panY || 0);
+        render();
+      });
       function point(e) {
         const r = svg.getBoundingClientRect();
         return { x: (e.clientX - r.left - view.x) / view.scale, y: (e.clientY - r.top - view.y) / view.scale };
@@ -853,7 +876,7 @@
           shape: $('shape').value,
           fill: $('fill').value,
           opacity: +$('opacity').value,
-          stroke: $('stroke').value,
+          stroke: $('line-color').value,
           strokeWidth: 2,
           text: '',
           emoji: '',
@@ -1253,7 +1276,7 @@
       }
       $('fill').oninput = (e) => updateSelectedStyle({ fill: e.target.value });
       $('opacity').oninput = (e) => updateSelectedStyle({ opacity: +e.target.value });
-      $('stroke').oninput = (e) => updateSelectedStyle({ stroke: e.target.value });
+      $('line-color').oninput = (e) => updateSelectedStyle({ stroke: e.target.value });
       $('shape').onchange = (e) => updateSelectedStyle({ shape: e.target.value });
       $('font-size').oninput = (e) =>
         updateSelectedStyle({ textSize: Math.max(8, Math.min(96, +e.target.value || 18)) });
@@ -1271,7 +1294,7 @@
           shape: $('shape').value,
           fill: $('fill').value,
           opacity: +$('opacity').value,
-          stroke: $('stroke').value,
+          stroke: $('line-color').value,
           strokeWidth: +$('line-width').value || 2,
           text: (o?.text || '').trim(),
           textSize: +$('font-size').value || 18,
