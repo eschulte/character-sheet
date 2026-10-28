@@ -840,9 +840,8 @@
         if (content) {
           const t = el('text', {
             x: o.x + o.width / 2,
-            y: o.y + o.height / 2,
+            y: o.y + o.height / 2 + (o.textSize || 18) * 0.35,
             'text-anchor': o.textAlignment || 'middle',
-            'dominant-baseline': 'middle',
             'font-size': o.textSize || 18,
             fill: '#111827',
             'pointer-events': 'none',
