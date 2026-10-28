@@ -995,9 +995,9 @@
         const ordered = [...boardState.objects.values()].sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
         const originalOrder = ordered.map((o) => o.id);
         if (direction === 'to-back') {
-          ordered.splice(0, ordered.length, ...ordered.filter((o) => !selectedSet.has(o.id)), ...ordered.filter((o) => selectedSet.has(o.id)));
-        } else if (direction === 'to-front') {
           ordered.splice(0, ordered.length, ...ordered.filter((o) => selectedSet.has(o.id)), ...ordered.filter((o) => !selectedSet.has(o.id)));
+        } else if (direction === 'to-front') {
+          ordered.splice(0, ordered.length, ...ordered.filter((o) => !selectedSet.has(o.id)), ...ordered.filter((o) => selectedSet.has(o.id)));
         } else if (direction === 'backward') {
           for (let i = 1; i < ordered.length; i++)
             if (selectedSet.has(ordered[i].id) && !selectedSet.has(ordered[i - 1].id))
