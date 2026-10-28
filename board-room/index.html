@@ -430,10 +430,10 @@
         <div id="viewport">
           <svg id="canvas" role="application" aria-label="Tactical map and diagram board"></svg>
           <div class="pan-controls" role="group" aria-label="Pan the board">
-            <button class="pan-up" type="button" data-pan-y="-80" aria-label="Pan up" title="Pan up">▲</button>
-            <button class="pan-left" type="button" data-pan-x="-80" aria-label="Pan left" title="Pan left">◀</button>
-            <button class="pan-right" type="button" data-pan-x="80" aria-label="Pan right" title="Pan right">▶</button>
-            <button class="pan-down" type="button" data-pan-y="80" aria-label="Pan down" title="Pan down">▼</button>
+            <button class="pan-up" type="button" data-pan-y="80" aria-label="Pan up" title="Pan up">▲</button>
+            <button class="pan-left" type="button" data-pan-x="80" aria-label="Pan left" title="Pan left">◀</button>
+            <button class="pan-right" type="button" data-pan-x="-80" aria-label="Pan right" title="Pan right">▶</button>
+            <button class="pan-down" type="button" data-pan-y="-80" aria-label="Pan down" title="Pan down">▼</button>
           </div>
         </div>
       </section>
@@ -1059,9 +1059,10 @@
         }
         else {
           if (!e.ctrlKey && !e.metaKey) selectOnly(null);
-          action = e.shiftKey
-            ? { kind: 'pan', start: { x: e.clientX, y: e.clientY }, original: { ...view } }
-            : { kind: 'marquee', start: p, current: p, additive: e.ctrlKey || e.metaKey, initialSelection: new Set(selectedIds) };
+          const marquee = !e.shiftKey && (e.altKey || e.ctrlKey || e.metaKey);
+          action = marquee
+            ? { kind: 'marquee', start: p, current: p, additive: e.ctrlKey || e.metaKey, initialSelection: new Set(selectedIds) }
+            : { kind: 'pan', start: { x: e.clientX, y: e.clientY }, original: { ...view } };
           render();
         }
       });
