@@ -435,7 +435,7 @@
           </div>
           <div id="room-stage" class="room-stage" aria-label="Drag participants to change spatial audio"></div>
           <div id="room-status" class="room-status">
-            Not connected. Joining starts microphone capture and WebRTC signaling.
+            Not connected. Joining connects to the room; microphone access is requested when audio starts.
           </div>
         </section>
         <section class="audio-controls" aria-label="Local audio controls">
@@ -456,6 +456,7 @@
       desktopTools.addEventListener('change', syncMoreTools);
       syncMoreTools();
     </script>
+    <script src="https://unpkg.com/@metered-ca/realtime@1.2.1/dist/index.umd.js"></script>
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
       import {
@@ -463,12 +464,9 @@
         collection,
         doc,
         setDoc,
-        addDoc,
         deleteDoc,
         getDoc,
         onSnapshot,
-        query,
-        where,
       } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
       const firebaseConfig = {
         apiKey: 'AIzaSyAMfAkyUevv3BDKSO3yBjRra3jZ_uV5OlA',
@@ -1554,7 +1552,7 @@
             boardId,
             shareUrl: u.href,
             storage: $('webrtc-share').checked
-              ? 'Firestore board storage and signaling; WebRTC data channel for live edits'
+              ? 'Firestore board storage and Metered signaling; WebRTC data channel for live edits'
               : 'Firestore required for cross-browser sharing',
           });
         } catch (e) {
@@ -1638,6 +1636,7 @@
         try {
           localStream ??= await mixer.start();
           localTrack = localStream.getAudioTracks()[0];
+          if (meteredPeer) meteredPeer.addStream(localStream, { role: 'voice' });
           $('microphone').textContent = 'Microphone enabled';
         } catch (e) {
           $('audio-diagnostic').textContent = `Microphone unavailable: ${e.message}`;
@@ -1671,13 +1670,13 @@
         mixer.setParticipantPan(speaker.id, Math.max(-1, Math.min(1, (speaker.x - listener.x) / far)));
       };
 
-      // Firestore is signaling only: SDP and ICE are short-lived messages. Audio and board operations travel directly over WebRTC.
+      // Firestore stores room presence; Metered handles signaling, TURN and peer connections.
       let roomId = null,
         peers = new Map(),
         presenceUnsub = null,
-        signalUnsub = null,
-        presenceTimer = null;
-      const iceServers = [{ urls: 'stun:stun.l.google.com:19302' }]; // Add a TURN server before testing outside friendly networks.
+        presenceTimer = null,
+        meteredPeer = null;
+      const METERED_PUBLISHABLE_KEY = 'pk_live_ea436d40e36de32ec3f81ebe1224fcf3b410c8e3';
       function status(s) {
         $('room-status').textContent = s;
         $('diagnostic').textContent = s;
@@ -1686,6 +1685,7 @@
         return {
           id: clientId,
           name: $('participant-name').value.trim() || 'Guest',
+          transportId: meteredPeer?.peerId || null,
           x: roomState.participants.get(clientId)?.x ?? 500,
           y: roomState.participants.get(clientId)?.y ?? 500,
           baseVolume: +$('base-volume').value,
@@ -1698,93 +1698,79 @@
       function participantRef(id = clientId) {
         return doc(firestore, 'boardRooms', roomId, 'participants', id);
       }
-      async function signal(to, kind, payload) {
-        await addDoc(collection(roomRef(), 'signals'), { to, from: clientId, kind, payload, createdAt: Date.now() });
-      }
-      function roomMessage(remoteId, data) {
+      function roomMessage(data) {
         try {
-          const m = JSON.parse(data);
+          const m = typeof data === 'string' ? JSON.parse(data) : data;
+          if (!m || typeof m !== 'object') return;
           if (m.kind === 'board-op') sync.receive(m.operation);
           if (m.kind === 'presence') {
-            roomState.participants.set(remoteId, m.participant);
+            const participant = m.participant;
+            if (!participant?.id) return;
+            roomState.participants.set(participant.id, participant);
             renderRoom();
+            attachRemoteAudio(participant.transportId);
             updateSpatial();
           }
         } catch (e) {
           console.warn('Invalid room data message', e);
         }
       }
+      function attachRemoteAudio(id) {
+        if (!id || !mixer.context) return;
+        const entry = peers.get(id);
+        if (!entry?.remoteStream || entry.attachedStream === entry.remoteStream) return;
+        mixer.addParticipant(id, entry.remoteStream);
+        entry.attachedStream = entry.remoteStream;
+        updateSpatial();
+      }
       function wireDataChannel(id, dc) {
-        dc.onopen = () => status(`Connected to ${peers.size} peer${peers.size === 1 ? '' : 's'}`);
-        dc.onmessage = (e) => roomMessage(id, e.data);
-        dc.onclose = () => status(`Data channel to ${id.slice(0, 6)} closed`);
-      }
-      function createPeer(id, initiator = false) {
-        if (peers.has(id)) return peers.get(id);
-        const pc = new RTCPeerConnection({ iceServers });
-        const entry = { pc, dc: null, candidates: [] };
-        peers.set(id, entry);
-        if (localStream) localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
-        pc.onicecandidate = (e) => {
-          if (e.candidate) signal(id, 'candidate', e.candidate.toJSON()).catch(console.error);
-        };
-        pc.ontrack = (e) => {
-          mixer.addParticipant(id, e.streams[0]);
-          updateSpatial();
-        };
-        pc.onconnectionstatechange = () => {
-          if (['failed', 'closed', 'disconnected'].includes(pc.connectionState)) {
-            mixer.removeParticipant(id);
-            if (pc.connectionState === 'failed') pc.restartIce?.();
-          }
-          status(`${id.slice(0, 6)}: ${pc.connectionState}`);
-        };
-        pc.ondatachannel = (e) => {
-          entry.dc = e.channel;
-          wireDataChannel(id, e.channel);
-        };
-        if (initiator) {
-          entry.dc = pc.createDataChannel('board-room-v1', { ordered: true });
-          wireDataChannel(id, entry.dc);
-        }
-        return entry;
-      }
-      async function offer(id) {
-        const entry = createPeer(id, true),
-          desc = await entry.pc.createOffer();
-        await entry.pc.setLocalDescription(desc);
-        await signal(id, 'offer', entry.pc.localDescription.toJSON());
-      }
-      async function handleSignal(message) {
-        const { from, kind, payload } = message;
-        if (from === clientId) return;
-        let entry = peers.get(from);
-        if (kind === 'offer') {
-          entry = createPeer(from, false);
-          await entry.pc.setRemoteDescription(payload);
-          for (const c of entry.candidates.splice(0)) await entry.pc.addIceCandidate(c);
-          const answer = await entry.pc.createAnswer();
-          await entry.pc.setLocalDescription(answer);
-          await signal(from, 'answer', entry.pc.localDescription.toJSON());
-          return;
-        }
-        if (kind === 'candidate' && !entry) entry = createPeer(from, false);
+        const entry = peers.get(id);
         if (!entry) return;
-        if (kind === 'answer') {
-          await entry.pc.setRemoteDescription(payload);
-          for (const c of entry.candidates.splice(0)) await entry.pc.addIceCandidate(c);
-          return;
+        entry.dc = dc;
+        dc.onmessage = (e) => roomMessage(e.data);
+        dc.onclose = () => {
+          if (entry.dc === dc) entry.dc = null;
+        };
+      }
+      function trackRemotePeer(remote) {
+        const id = remote.id;
+        if (!id || peers.has(id)) return;
+        const entry = { remote, dc: null, remoteStream: null, attachedStream: null };
+        peers.set(id, entry);
+        remote.on('track', ({ streams }) => {
+          entry.remoteStream = streams?.[0] || null;
+          entry.attachedStream = null;
+          attachRemoteAudio(id);
+        });
+        remote.on('data-channel', ({ channel }) => wireDataChannel(id, channel));
+        remote.on('connection-reset', () => {
+          entry.dc = null;
+          entry.attachedStream = null;
+          if (!remote.polite) wireDataChannel(id, remote.pc.createDataChannel('board-room-v1', { ordered: true }));
+        });
+        if (!remote.polite) wireDataChannel(id, remote.pc.createDataChannel('board-room-v1', { ordered: true }));
+        status(`Room connected · ${peers.size} peer${peers.size === 1 ? '' : 's'}`);
+        sendPresence();
+      }
+      function removeRemotePeer(remote) {
+        const id = remote.id,
+          entry = peers.get(id);
+        peers.delete(id);
+        mixer.removeParticipant(id);
+        if (entry?.remoteStream) {
+          const participant = [...roomState.participants.values()].find((p) => p.transportId === id);
+          if (participant) roomState.participants.delete(participant.id);
         }
-        if (kind === 'candidate') {
-          if (entry.pc.remoteDescription) await entry.pc.addIceCandidate(payload);
-          else entry.candidates.push(payload);
-        }
+        renderRoom();
+        status(`Room connected · ${peers.size} peer${peers.size === 1 ? '' : 's'}`);
       }
       function updateSpatial() {
         const listener = roomState.participants.get(clientId);
         if (!listener) return;
-        for (const speaker of roomState.participants.values())
-          if (speaker.id !== clientId) window.updateSpatialAudio(listener, speaker);
+        for (const speaker of roomState.participants.values()) {
+          if (speaker.id !== clientId && speaker.transportId)
+            window.updateSpatialAudio(listener, { ...speaker, id: speaker.transportId });
+        }
       }
       function renderRoom() {
         const stage = $('room-stage');
@@ -1800,7 +1786,10 @@
         }
       }
       function broadcast(message) {
-        for (const { dc } of peers.values()) if (dc?.readyState === 'open') dc.send(JSON.stringify(message));
+        for (const [id, { dc }] of peers) {
+          if (dc?.readyState === 'open') dc.send(JSON.stringify(message));
+          else meteredPeer?.sendTo(id, message).catch((e) => console.warn('Room message was not delivered', e));
+        }
       }
       window.boardRoomBroadcast = broadcast;
       function sendPresence() {
@@ -1811,7 +1800,7 @@
         renderRoom();
         updateSpatial();
         clearTimeout(presenceTimer);
-        presenceTimer = setTimeout(() => setDoc(participantRef(), p), 80);
+        presenceTimer = setTimeout(() => setDoc(participantRef(), p).catch(console.error), 80);
       }
       $('room-stage').addEventListener('pointerdown', (e) => {
         const id = e.target.dataset.id;
@@ -1833,59 +1822,80 @@
         };
       });
       async function joinRoom(withAudio = true) {
-        if (roomId) return;
         try {
-          if (withAudio) {
+          if (withAudio && !localStream) {
             localStream ??= await mixer.start();
             localTrack = localStream.getAudioTracks()[0];
           }
-          roomId = (useWebRtcLiveEdits ? `board-${boardId}` : $('room-id').value.trim())
-            .replace(/[^a-zA-Z0-9_-]/g, '')
-            .slice(0, 64);
-          if (!roomId) throw new Error('Enter a room name');
-          await setDoc(roomRef(), { protocol: 'board-room-v1', updatedAt: Date.now() }, { merge: true });
-          sendPresence();
-          presenceUnsub = onSnapshot(collection(roomRef(), 'participants'), (snap) => {
-            snap.forEach((d) => roomState.participants.set(d.id, d.data()));
-            renderRoom();
-            updateSpatial();
-            for (const p of roomState.participants.values())
-              if (p.id !== clientId && clientId < p.id && !peers.has(p.id)) offer(p.id).catch(console.error);
-          });
-          signalUnsub = onSnapshot(query(collection(roomRef(), 'signals'), where('to', '==', clientId)), (snap) =>
-            snap.docChanges().forEach(async (change) => {
-              if (change.type === 'added') {
-                try {
-                  await handleSignal(change.doc.data());
-                } catch (e) {
-                  console.error(e);
-                  status(`Signal error: ${e.message}`);
-                }
-                await deleteDoc(change.doc.ref);
-              }
-            }),
-          );
-          $('join-room').disabled = true;
-          $('leave-room').disabled = false;
-          if (withAudio) $('microphone').textContent = 'Microphone enabled';
-          status(`${withAudio ? 'Joined' : 'Connected for board edits'} ${roomId}; waiting for peers`);
+          if (!roomId) {
+            roomId = (useWebRtcLiveEdits ? `board-${boardId}` : $('room-id').value.trim())
+              .replace(/[^a-zA-Z0-9_-]/g, '')
+              .slice(0, 64);
+            if (!roomId) throw new Error('Enter a room name');
+            await setDoc(roomRef(), { protocol: 'board-room-v1', updatedAt: Date.now() }, { merge: true });
+            presenceUnsub = onSnapshot(collection(roomRef(), 'participants'), (snap) => {
+              const next = new Map();
+              snap.forEach((d) => next.set(d.id, d.data()));
+              for (const [id, participant] of roomState.participants)
+                if (!next.has(id) && id !== clientId) mixer.removeParticipant(participant.transportId);
+              roomState.participants.clear();
+              next.forEach((participant, id) => roomState.participants.set(id, participant));
+              for (const participant of next.values()) attachRemoteAudio(participant.transportId);
+              renderRoom();
+              updateSpatial();
+            });
+            const MeteredPeer = window.MeteredPeer?.MeteredPeer;
+            if (!MeteredPeer) throw new Error('Metered Realtime SDK failed to load');
+            meteredPeer = new MeteredPeer({ apiKey: METERED_PUBLISHABLE_KEY });
+            meteredPeer.on('peer-joined', ({ peer }) => trackRemotePeer(peer));
+            meteredPeer.on('peer-left', ({ peer }) => removeRemotePeer(peer));
+            meteredPeer.on('data', ({ data }) => roomMessage(data));
+            meteredPeer.on('state-change', ({ to }) => {
+              if (to === 'reconnecting') status('Reconnecting to room…');
+              else if (to === 'joined') status(`Room connected · ${peers.size} peer${peers.size === 1 ? '' : 's'}`);
+            });
+            meteredPeer.on('error', ({ err }) => {
+              console.error('Metered Realtime error', err);
+              status(`Metered connection error: ${err.message || err.name}`);
+            });
+            if (localStream) meteredPeer.addStream(localStream, { role: 'voice' });
+            await meteredPeer.join(roomId);
+            $('join-room').disabled = true;
+            $('leave-room').disabled = false;
+            if (withAudio) $('microphone').textContent = 'Microphone enabled';
+            status(`Joined ${roomId}; waiting for peers`);
+            sendPresence();
+          } else if (withAudio && localStream) {
+            meteredPeer.addStream(localStream, { role: 'voice' });
+            $('join-room').disabled = true;
+            $('leave-room').disabled = false;
+            $('microphone').textContent = 'Microphone enabled';
+          }
         } catch (e) {
-          roomId = null;
+          console.error('Could not join Metered room', e);
+          if (meteredPeer?.state !== 'joined') {
+            presenceUnsub?.();
+            presenceUnsub = null;
+            if (meteredPeer) await meteredPeer.close('join failed').catch(console.error);
+            meteredPeer = null;
+            roomId = null;
+          }
           status(`Could not join: ${e.message}`);
         }
       }
       async function leaveRoom() {
         presenceUnsub?.();
-        signalUnsub?.();
-        presenceUnsub = signalUnsub = null;
-        for (const [id, { pc }] of peers) {
-          pc.close();
+        presenceUnsub = null;
+        clearTimeout(presenceTimer);
+        for (const id of peers.keys()) {
           mixer.removeParticipant(id);
         }
         peers.clear();
         if (roomId) await deleteDoc(participantRef()).catch(() => {});
         roomState.participants.clear();
         renderRoom();
+        if (meteredPeer) await meteredPeer.close('left room').catch(console.error);
+        meteredPeer = null;
         roomId = null;
         $('join-room').disabled = false;
         $('leave-room').disabled = true;
