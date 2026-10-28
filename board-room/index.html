@@ -399,6 +399,10 @@
             <summary>More tools</summary>
             <div class="toolbar-extra">
               <button data-tool="line">Line</button><button id="delete">Delete</button>
+              <button type="button" data-z-order="backward" title="Move selected objects one layer back">Send backward</button>
+              <button type="button" data-z-order="forward" title="Move selected objects one layer forward">Send forward</button>
+              <button type="button" data-z-order="to-back" title="Move selected objects behind all others">Send to back</button>
+              <button type="button" data-z-order="to-front" title="Move selected objects in front of all others">Bring to front</button>
               <label>Shape type
                 <select id="shape">
                   <option value="rectangle">Rectangle</option>
@@ -565,6 +569,17 @@
             version: (boardState.objects.get(op.objectId).version || 0) + 1,
             updatedAt: op.timestamp,
             updatedBy: op.clientId,
+          });
+        else if (op.type === 'reorder')
+          Object.entries(op.patch || {}).forEach(([id, zIndex]) => {
+            const object = boardState.objects.get(id);
+            if (object)
+              Object.assign(object, {
+                zIndex,
+                version: (object.version || 0) + 1,
+                updatedAt: op.timestamp,
+                updatedBy: op.clientId,
+              });
           });
         else if (op.type === 'delete') {
           boardState.objects.delete(op.objectId);
@@ -974,6 +989,31 @@
         selected = id || null;
         render();
       }
+      function reorderSelected(direction) {
+        const selectedSet = new Set([...selectedIds].filter((id) => boardState.objects.has(id)));
+        if (!selectedSet.size) return;
+        const ordered = [...boardState.objects.values()].sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
+        const originalOrder = ordered.map((o) => o.id);
+        if (direction === 'to-back') {
+          ordered.splice(0, ordered.length, ...ordered.filter((o) => !selectedSet.has(o.id)), ...ordered.filter((o) => selectedSet.has(o.id)));
+        } else if (direction === 'to-front') {
+          ordered.splice(0, ordered.length, ...ordered.filter((o) => selectedSet.has(o.id)), ...ordered.filter((o) => !selectedSet.has(o.id)));
+        } else if (direction === 'backward') {
+          for (let i = 1; i < ordered.length; i++)
+            if (selectedSet.has(ordered[i].id) && !selectedSet.has(ordered[i - 1].id))
+              [ordered[i - 1], ordered[i]] = [ordered[i], ordered[i - 1]];
+        } else if (direction === 'forward') {
+          for (let i = ordered.length - 2; i >= 0; i--)
+            if (selectedSet.has(ordered[i].id) && !selectedSet.has(ordered[i + 1].id))
+              [ordered[i], ordered[i + 1]] = [ordered[i + 1], ordered[i]];
+        }
+        if (ordered.every((o, i) => o.id === originalOrder[i])) return;
+        const zOrder = Object.fromEntries(ordered.map((o, i) => [o.id, (i + 1) * 100]));
+        sync.emit('reorder', null, zOrder);
+      }
+      document.querySelectorAll('[data-z-order]').forEach((button) => {
+        button.addEventListener('click', () => reorderSelected(button.dataset.zOrder));
+      });
       function objectBounds(o) {
         if (o.type === 'line') {
           return {
